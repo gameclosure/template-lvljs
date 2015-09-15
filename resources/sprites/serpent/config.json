@@ -2,6 +2,8 @@
     "visual": {
         "frameRate": 15,
         "zIndex": 20,
+        "anchorX": 160,
+        "anchorY": 75,
         "width": 320,
         "height": 150,
         "url": "resources/sprites/serpent/serpent",

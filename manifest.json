@@ -1,1 +1,23 @@
-{"title": "test", "ios": {"bundleID": "co.weeby.producer.mxc.test"}, "dependencies": {"devkit-scene": "git@github.com:gameclosure/devkit-scene.git#f4314783905957c5cccaf42c98346a152e96c6eb", "devkit-core": "git@github.com:gameclosure/devkit-core.git#ee462077c22ee82c6edf1d37c16348b813f0e4be"}, "studio": {"domain": "studio.example.com", "stagingDomain": "staging.example.com", "name": "Your Studio Name"}, "appID": "79267d0b17a847058633316731992255", "android": {}, "shortName": "test", "supportedOrientations": ["portrait", "landscape"]}
+{
+  "android": {},
+  "appID": "79267d0b17a847058633316731992255",
+  "dependencies": {
+    "devkit-core": "https://github.com/gameclosure/devkit-core#v3.0.2",
+    "devkit-entities": "git@github.com:gameclosure/devkit-entities#master",
+    "devkit-parallax": "https://github.com/gameclosure/devkit-parallax#master"
+  },
+  "ios": {
+    "bundleID": "co.weeby.producer.mxc.test"
+  },
+  "shortName": "test",
+  "studio": {
+    "domain": "studio.example.com",
+    "name": "Your Studio Name",
+    "stagingDomain": "staging.example.com"
+  },
+  "supportedOrientations": [
+    "portrait",
+    "landscape"
+  ],
+  "title": "test"
+}

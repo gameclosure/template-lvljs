@@ -16,7 +16,8 @@ exports = Class(GC.Application, function () {
     setInterval(bind(this, function () {
       dragon.vx = -dragon.vx;
       dragon.view.flipX = !dragon.view.flipX;
-      dragon.view.opacity = Math.random();
+      dragon.view.opacity = 0.2 + 0.8 * Math.random();
+      dragon.view.scale = dragon.view.opacity;
       lvl.sound.playSound(sfx, { volume: Math.pow(dragon.view.opacity, 2) });
     }), 1600);
   };
