@@ -1,0 +1,16 @@
+{
+    "visual": {
+        "frameRate": 15,
+        "zIndex": 20,
+        "width": 320,
+        "height": 150,
+        "url": "resources/sprites/serpent/serpent",
+        "defaultAnimation": "swim",
+        "autoStart": true,
+        "loop": true
+    },
+    "geometry": {
+        "offsetX": 4,
+        "offsetY": 24
+    }
+}

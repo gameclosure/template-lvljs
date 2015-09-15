@@ -1,0 +1,112 @@
+// libraries
+
+level.resource
+level.sound
+
+
+
+
+level.resource.loadImage
+  // .loadSprite
+  // .loadParallax
+  // .loadMusic
+  // .loadSound
+
+
+level.sound.playMusic
+level.sound.playSound
+level.sound.
+
+
+namespaces/modules
+  sound
+  resource
+  device
+    // screen stuff
+    // IDs
+    // localStorage?
+  input
+  shape
+    new level.shape.Rect()
+    new level.shape.Circle()
+    new level.shape.Point()
+
+  random
+    setSeed
+    getSeed
+    pointInShape(new level.shape.Rect())
+
+level methods (for manipulating the middle view, the "level", or active scene)
+  addActor(resource, opts)
+  endGame
+
+properties (active singletons that can affect the game directly)
+  bg = background
+    clear
+    add
+  fg = foreground
+    addText
+    addImageText // maybe just call it a ScoreView?
+
+
+    var asdfText = fg.addText("asdf", {
+    });
+
+    fg.addImageText("..."
+  camera
+
+f(a,b,...)
+
+def f(a, b, c=4, *args, **kw)
+
+f(1,2,4,6,7,d=11,f=44):
+
+  a = 1
+  b = 2
+  c = 4
+  args = [6,7]
+  kw = {
+    d: 11,
+    f: 44
+  }
+
+addActor(resource) => center of screen, some default animation?
+addActor(resource, {x: ... y: ... }) => change default behavior, add it somewhere else
+
+addInvisibleActor({x: ..., y: ... })
+  addActor(null);
+
+  addActor(level.resource.emptyResource);
+
+  addActor({})
+    { resource: null }
+
+
+
+
+
+
+scene.onDown(function() {
+  // do something
+});
+
+level.input.on("touchstart", function(evt) {
+  // do something
+});
+
+  //
+level.getActorsAtPosition(x,y) {
+
+}
+
+ImageResource
+
+
+level.bg.add(level.resource.loadImage(...))
+
+
+
+
+level.addActor
+
+
