@@ -1,25 +1,35 @@
-import .Background
-import .Actor
+import .Actor;
+import .Scenery;
+import .UI;
+import .Camera;
 
-// Level.js
-var Level = exports = Class(function() {
-  this.init = function(opts) {
-    this._backend = opts.backend;
-    this.background = new Background({
-      backend: this._backend
-    })
+exports = Class("Level", function () {
+  var _backend;
+
+  this.init = function (backend) {
+    _backend = backend;
+
+    this.bg = new Scenery(_backend, 'background');
+    this.fg = new Scenery(_backend, 'foreground');
+    this.ui = new UI(_backend);
+    this.camera = new Camera(_backend);
   };
 
-  this.initializeWithView = function(view) {
+  // TODO: remove / fix this
+  this.initializeWithView = function (view) {
     this._view = view;
   };
 
   this.addActor = function (resource, geometryOverrides) {
-    var actor = new Actor({
-      backend: this._backend,
-      resource: resource,
-      geometryOverrides: geometryOverrides
-    });
-    return actor;
+    var type = resource.getType();
+    if (type === 'sprite' || type === 'image') {
+      return new Actor(_backend, resource, geometryOverrides);
+    } else {
+      throw new Error("Invalid Resource Type for Actor:", type);
+    }
+  };
+
+  this.addParallax = function (resource) {
+    throw new Error("TODO");
   };
 });

@@ -86,11 +86,11 @@ addInvisibleActor({x: ..., y: ... })
 
 
 
-scene.onDown(function() {
+scene.onDown(function () {
   // do something
 });
 
-level.input.on("touchstart", function(evt) {
+level.input.on("touchstart", function (evt) {
   // do something
 });
 

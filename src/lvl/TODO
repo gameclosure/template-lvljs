@@ -1,3 +1,1 @@
-XXX: Why does the AudioManager not allow you to play the same sound multiple times concurrently?
-    FIX by commenting out AudioManager.js lines 267-271
 

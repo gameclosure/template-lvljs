@@ -5,28 +5,30 @@ import entities.EntityPool;
 Entity.prototype.viewClass = null;
 var pool;
 
-var Actor = exports = Class(function() {
-  this.init = function(opts) {
-    this._backend = opts.backend;
+exports = Class("Actor", function () {
+  var _backend;
+
+  this.init = function (backend, resource, geometryOverrides) {
+    _backend = backend;
+
+    // TODO: clean this up
     if (!pool) {
-      pool = new entities.EntityPool({ctor: Entity});
-      this._backend.onTick(bind(pool, "update"));
+      pool = new entities.EntityPool({ ctor: Entity });
+      _backend.onTick(bind(pool, "update"));
     }
-    var geoOpts = merge(opts.geometryOverrides, opts.resource.getOpts().geometry);
-    this.entity = pool.obtain({
-      hitOpts: geoOpts
-    });
 
-    this.view = new ActorView({resource: opts.resource});
-    this._backend.createViewFromActorView(this.view);
-    this._backend.stickViewToEntity(this.view, this.entity);
-  }
+    var geoOpts = merge(geometryOverrides, resource.getOpts().geometry);
+    this.entity = pool.obtain({ hitOpts: geoOpts });
+    this.view = new ActorView(resource);
+    _backend.createViewFromActorView(this.view);
+    _backend.stickViewToEntity(this.view, this.entity);
+  };
 
-  this.destroy = function() {
-      //clean it up
+  // remove the actor from gameplay
+  this.destroy = function () {
     backend.unregisterView(this.view);
     pool.release(this.entity);
-  }
+  };
 
   // XXX: These are all just literally pasted from Entity for now.
   function readOnlyProp(ctx, name, getter) {
@@ -110,59 +112,60 @@ var Actor = exports = Class(function() {
 
 
 
-var ActorView = Class(function () {
-  var ALLOWED_KEYS =[];
-  this.init = function(opts) {
-    this._properties = {}
-    this.resource = opts.resource
-  }
+var ActorView = Class("ActorView", function () {
+  var ALLOWED_KEYS = [];
+
+  this.init = function (resource) {
+    this._properties = {};
+    this.resource = resource;
+  };
+
   // TODO: use some kind of pubsub / eventemiiter
-  this.onUpdated = function() {}
-  
-  this.update = function(opts) {
+  this.onUpdated = function () {};
+
+  this.update = function (opts) {
     var updatedKeys = [];
     for (key in opts) {
       if (ALLOWED_KEYS.indexOf(key) == -1) {
-        continue
+        continue;
       }
       this._properties[key] = opts[key];
       updatedKeys.push(key);
     }
-
     this.onUpdated.apply(this, updatedKeys);
-  }
+  };
 
-  this.getAllProperties = function() {
+  this.getAllProperties = function () {
     return this._properties;
-  }
+  };
+
+  // TODO: clean this up?
   Object.defineProperty(this, '_viewBacking', {
     enumerable: false,
     configurable: false,
-    get: function() { return this.__viewBacking; },
-    set: function(value) { 
-      if (this._viewBacking) { 
+    get: function () { return this.__viewBacking; },
+    set: function (value) {
+      if (this._viewBacking) {
         throw new Error("Can't overwrite _viewBacking");
       }
       this.__viewBacking = value;
     }
   });
 
-  makeProxy.call(this,'flipX')
-  makeProxy.call(this,'flipY')
-  makeProxy.call(this,'opacity')
-  makeProxy.call(this,'scale')
-  makeProxy.call(this,'compositeOperation')
-  makeProxy.call(this,'r')
+  makeProxy.call(this, 'flipX');
+  makeProxy.call(this, 'flipY');
+  makeProxy.call(this, 'opacity');
+  makeProxy.call(this, 'scale');
+  makeProxy.call(this, 'compositeOperation');
+  makeProxy.call(this, 'r');
 
-  function makeProxy(name) {
+  function makeProxy (name) {
     ALLOWED_KEYS.push[name];
     Object.defineProperty(this, name, {
       enumerable: true,
       configurable: true,
-      get: function() { return this._properties[name]; },
-      set: function(value) { this._properties[name] = value; this.onUpdated(name) }
+      get: function () { return this._properties[name]; },
+      set: function (value) { this._properties[name] = value; this.onUpdated(name) }
     })
-  }
-  
-
+  };
 });

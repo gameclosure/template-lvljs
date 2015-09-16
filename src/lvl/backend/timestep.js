@@ -1,82 +1,197 @@
 import AudioManager;
-import ui.View;
-import ui.SpriteView;
-var app = GC.app;
+import ui.View as View;
+import ui.ImageView as ImageView;
+import ui.SpriteView as SpriteView;
+import parallax.Parallax as Parallax;
 
-// setup code
-var rootView = GC.app.view;
+/**
+ * Timestep Backend View Classes
+ */
 
-var backgroundView = new ui.View({
-  superview: GC.app.view,
-  zIndex: 1,
-  width: rootView.style.width,
-  height: rootView.style.height
+var SceneryView = Class(View, function () {
+  var superProto = View.prototype;
+
+  this.init = function (type, opts) {
+    superProto.init.call(this, opts);
+    this.type = type;
+    this.reset();
+  };
+
+  this.reset = function () {
+    this._x = 0;
+    this._y = 0;
+    this._scrollX = 0;
+    this._scrollY = 0;
+    this._parallaxes = [];
+  };
+
+  this.addLayer = function (view, resource, opts) {
+    var type = resource.getType();
+    if (type === 'parallax') {
+      var config = resource.getVisualOpts();
+      var section = (opts && opts.section) || this.type || 'background';
+      var layers = config[section];
+      if (layers) {
+        view.reset(layers);
+        this._parallaxes.push(view);
+      } else {
+        throw new Error("Invalid Parallax Layers:", section, config);
+      }
+    } else {
+      this.addSubview(view);
+    }
+  };
+
+  this.clearLayers = function () {
+    this._parallaxes.forEach(function (parallax) {
+      parallax.releaseLayers();
+    }, this);
+    this.removeAllSubviews();
+    this.reset();
+  };
+
+  this.scrollTo = function (x, y) {
+    this._x = x;
+    this._y = y;
+  };
+
+  this.scrollBy = function (dx, dy) {
+    this._x += dx;
+    this._y += dy;
+  };
+
+  this.autoScrollBy = function (dx, dy) {
+    this._scrollX = dx;
+    this._scrollY = dy;
+  };
+
+  this.tick = function (dt) {
+    this._x += this._scrollX * dt / 1000;
+    this._y += this._scrollY * dt / 1000;
+    this._parallaxes.forEach(function (parallax) {
+      parallax.update(this._x, this._y);
+    }, this);
+  };
 });
 
-var LevelView = Class(ui.View, function (supr) {
+var LevelView = Class(View, function () {
+  var superProto = View.prototype;
+
   this.render = function () {
-    // update our views which are stuck to entities
     updateAllEntityViews();
-  }
+  };
+});
+
+
+
+/**
+ * Timestep Backend View Hierarchy Singletons
+ */
+
+var rootView = GC.app.view;
+
+var backgroundView = new SceneryView('background', {
+  superview: rootView,
+  width: rootView.style.width,
+  height: rootView.style.height
 });
 
 var levelView = new LevelView({
   superview: rootView,
-  zIndex: 2,
   width: rootView.style.width,
   height: rootView.style.height
-})
+});
 
-var foregroundView = new ui.View({
-  superview: GC.app.view,
-  zIndex: 3,
+var foregroundView = new SceneryView('foreground', {
+  superview: rootView,
   width: rootView.style.width,
   height: rootView.style.height
-})
+});
 
-exports.addBackgroundLayer = function (rsrc, opts) {
-  //TODO: opts? expose zindexs? something?
-  var view = exports.createViewFromResource(rsrc);
-  backgroundView.addSubview(view);
-}
+
+
+/**
+ * Timestep Backend API
+ */
+
+exports.addToForeground = function (resource, opts) {
+  var view = exports.createViewFromResource(resource);
+  foregroundView.addLayer(view, resource, opts);
+};
+
+exports.addToBackground = function (resource, opts) {
+  var view = exports.createViewFromResource(resource);
+  backgroundView.addLayer(view, resource, opts);
+};
+
+exports.clearForeground = function () {
+  foregroundView.clearLayers();
+};
 
 exports.clearBackground = function () {
-  backgroundView.removeAllSubviews();
-}
+  backgroundView.clearLayers();
+};
 
 exports.createViewFromActorView = function (actorView) {
   var view = exports.createViewFromResource(actorView.resource);
   actorView._viewBacking = view;
   actorView.update(view.style);
   actorView.onUpdated = function () {
-    // one key updated
     for (var i = 0; i < arguments.length; ++i) {
       var key = arguments[i];
-      view.style[key] = actorView[key]
+      view.style[key] = actorView[key];
     }
   };
-//  exports.stickViewToEntity(view, 
-}
+};
 
 exports.createViewFromResource = function (resource) {
-    switch(resource.getType()) {
-      case 'sprite':
-        return new ui.SpriteView(resource.getVisualOpts());
-        break;
-      case 'image':
-        break;
-      case 'parallax':
-        break;
-    // resource is type 'sprite', 'image', or 'parallax'
-    }
-  throw new Error("invalid resource type for a View: " + resource.getType());
-}
+  var type = resource.getType();
+  var opts = resource.getVisualOpts();
+
+  switch (type) {
+    case 'sprite':
+      return new SpriteView(opts);
+      break;
+
+    case 'image':
+      return new ImageView(opts);
+      break;
+
+    case 'parallax':
+      return new Parallax({ parent: backgroundView });
+      break;
+
+    default:
+      throw new Error("Invalid Resource Type for a View: " + type);
+  }
+};
+
+// TODO: these probably aren't right
+exports.scrollCameraTo = function (x, y) {
+  foregroundView.scrollTo(x, y);
+  backgroundView.scrollTo(x, y);
+};
+
+exports.scrollCameraBy = function (dx, dy) {
+  foregroundView.scrollBy(dx, dy);
+  backgroundView.scrollBy(dx, dy);
+};
+
+exports.autoScrollCameraBy = function (dx, dy) {
+  foregroundView.autoScrollBy(dx, dy);
+  backgroundView.autoScrollBy(dx, dy);
+};
+
+
+
+
+
 
 // TODO: Jimmoptimize this!
 // XXX: Here there be memory and cpu dragons
 //      Please come clean this up, brave soul.
-var viewMap = {}
-var entityMap = {}
+var viewMap = {};
+var entityMap = {};
 
 exports.stickViewToEntity = function (actorView, entity, opts) {
   var view = actorView._viewBacking;
@@ -103,7 +218,7 @@ function updateAllEntityViews() {
 //TODO: ???
 exports.onTick = function (cb) {
   GC.app.engine.on('Tick', cb);
-}
+};
 
 
 

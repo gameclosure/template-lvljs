@@ -1,5 +1,5 @@
 var backend;
-exports.setBackend = function(be) {
+exports.setBackend = function (be) {
   backend = be;
 }
 

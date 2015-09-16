@@ -1,72 +1,89 @@
+
+// TODO: don't expose this to game-devs ...
 var backend;
-exports.setBackend = function(be) {
+exports.setBackend = function (be) {
   backend = be;
-}
-
-exports.loadSpriteFromJSON = function(url) {
-  var rsrc = new Resource(url, 'sprite');
-  rsrc.loadOptsFromJSONFullPath();
-  return rsrc;
 };
 
-exports.loadMusic = function(fullPath, opts) {
+/**
+ * Resource API
+ */
+
+exports.loadMusic = function (fullPath, opts) {
   return new Resource(fullPath, 'music', opts);
-}
+};
 
-
-exports.loadSound = function(fullPath, opts) {
+exports.loadSound = function (fullPath, opts) {
   return new Resource(fullPath, 'sound', opts);
-}
-exports.loadAudioSetFromJSON = function(fullPath) {
+};
+
+exports.loadAudioSetFromJSON = function (fullPath) {
   throw new Error("TODO");
 };
 
-exports.loadImage = function(fullPath, opts) {
-  throw new Error("TODO");
-}
-exports.loadImageFromJSON = function(url) {
+exports.loadImage = function (fullPath, opts) {
   throw new Error("TODO");
 };
 
-exports.loadParallax = function(fullPath, opts) {
-  throw new Error("TODO");
-}
+exports.loadImageFromJSON = function (fullPath) {
+  var resource = new Resource(fullPath, 'image');
+  resource.loadOptsFromJSONFullPath();
+  return resource;
+};
 
-exports.loadParallaxFromJSON = function(url) {
+exports.loadSprite = function (fullPath, opts) {
   throw new Error("TODO");
 };
 
-//var EmptyResource = Class...
+exports.loadSpriteFromJSON = function (fullPath) {
+  var resource = new Resource(fullPath, 'sprite');
+  resource.loadOptsFromJSONFullPath();
+  return resource;
+};
 
-var Resource = Class(function() {
-  
-  this.init = function(fullPath, type, opts) {
-    var opts = opts || {};
-    this._fullPath = fullPath;
-    this._opts = opts;
-    this._type = type || 'unknown';
-  }
-  
-  this.getOpts = function() { 
+exports.loadParallaxFromJSON = function (fullPath) {
+  var resource = new Resource(fullPath, 'parallax');
+  resource.loadOptsFromJSONFullPath();
+  return resource;
+};
+
+exports.loadEmptyResource = function () {
+  return new Resource();
+};
+
+/**
+ * Resource Class
+ */
+
+var Resource = Class("Resource", function () {
+  this.init = function (fullPath, type, opts) {
+    this._fullPath = fullPath || '';
+    this._type = type || '';
+    this._opts = opts || {};
+  };
+
+  this.getOpts = function () {
     return this._opts;
-  }
-  
-  this.getVisualOpts = function() {
-    return this._opts.visual;
-  }
-  
-  this.loadOptsFromJSONFullPath = function() {
+  };
+
+  this.getVisualOpts = function () {
+    if (this._type === 'parallax') {
+      return this._opts;
+    } else {
+      return this._opts.visual;
+    }
+  };
+
+  this.loadOptsFromJSONFullPath = function () {
     var newOpts = backend.readJSON(this._fullPath);
     merge(this._opts, newOpts);
-  }
-  
-  this.getFullPath = function() {
-    return this._fullPath;  
-  }
+  };
+
+  this.getFullPath = function () {
+    return this._fullPath;
+  };
 
   this.getType = function () {
     return this._type;
-  }
-  
+  };
 });
-

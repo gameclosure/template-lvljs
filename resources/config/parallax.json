@@ -1,0 +1,373 @@
+{
+  "background": [
+    {
+      "id": "background",
+      "zIndex": 10,
+      "xMultiplier": 0,
+      "xCanSpawn": false,
+      "xCanRelease": false,
+      "yMultiplier": 0.15,
+      "yCanSpawn": true,
+      "yCanRelease": true,
+      "pieceOptions": [
+        {
+          "id": "sky",
+          "image": "resources/images/cliffs/sky.png"
+        },
+        {
+          "id": "skyFlipped",
+          "flipX": true,
+          "image": "resources/images/cliffs/sky.png"
+        }
+      ]
+    },
+    {
+      "id": "distant",
+      "zIndex": 15,
+      "xMultiplier": 0,
+      "xCanSpawn": false,
+      "xCanRelease": false,
+      "yMultiplier": 0.15,
+      "yCanSpawn": true,
+      "yCanRelease": true,
+      "yGapRange": [500, 1250],
+      "pieceOptions": [
+        {
+          "id": "mountain",
+          "xAlign": "center",
+          "opacity": 0.75,
+          "styleRanges": {
+            "x": [0, 576],
+            "scale": [0.75, 1]
+          },
+          "image": "resources/images/cliffs/distantmountain.png"
+        },
+        {
+          "id": "mountainFlipped",
+          "xAlign": "center",
+          "opacity": 0.75,
+          "styleRanges": {
+            "x": [0, 576],
+            "scale": [0.75, 1]
+          },
+          "flipX": true,
+          "image": "resources/images/cliffs/distantmountain.png"
+        },
+        {
+          "id": "castle",
+          "xAlign": "center",
+          "opacity": 0.75,
+          "styleRanges": {
+            "x": [0, 576],
+            "scale": [0.75, 1]
+          },
+          "image": "resources/images/cliffs/distantcastle.png"
+        },
+        {
+          "id": "castleFlipped",
+          "xAlign": "center",
+          "opacity": 0.75,
+          "styleRanges": {
+            "x": [0, 576],
+            "scale": [0.75, 1]
+          },
+          "flipX": true,
+          "image": "resources/images/cliffs/distantcastle.png"
+        }
+      ]
+    },
+    {
+      "id": "clouds",
+      "zIndex": 20,
+      "xMultiplier": 0,
+      "xCanSpawn": false,
+      "xCanRelease": false,
+      "yMultiplier": 0.25,
+      "yCanSpawn": true,
+      "yCanRelease": true,
+      "yGapRange": [25, 250],
+      "pieceOptions": [
+        {
+          "id": "cloud",
+          "xAlign": "center",
+          "opacity": 0.75,
+          "styleRanges": {
+            "x": [0, 576],
+            "scale": [1, 1.3]
+          },
+          "image": "resources/images/cliffs/cloud1.png"
+        },
+        {
+          "id": "cloudFlipped",
+          "xAlign": "center",
+          "opacity": 0.75,
+          "styleRanges": {
+            "x": [0, 576],
+            "scale": [1, 1.3]
+          },
+          "flipX": true,
+          "image": "resources/images/cliffs/cloud1.png"
+        },
+        {
+          "id": "lights1",
+          "xAlign": "center",
+          "compositeOperation": "lighter",
+          "opacity": 0.75,
+          "styleRanges": {
+            "x": [0, 576],
+            "scale": [1, 1.3]
+          },
+          "image": "resources/images/cliffs/bglights1.png"
+        },
+        {
+          "id": "lights1Flipped",
+          "xAlign": "center",
+          "compositeOperation": "lighter",
+          "opacity": 0.75,
+          "styleRanges": {
+            "x": [0, 576],
+            "scale": [1, 1.3]
+          },
+          "flipX": true,
+          "image": "resources/images/cliffs/bglights1.png"
+        },
+        {
+          "id": "lights2",
+          "xAlign": "center",
+          "compositeOperation": "lighter",
+          "opacity": 0.75,
+          "styleRanges": {
+            "x": [0, 576],
+            "scale": [1, 1.3]
+          },
+          "image": "resources/images/cliffs/bglights2.png"
+        },
+        {
+          "id": "lights2Flipped",
+          "xAlign": "center",
+          "compositeOperation": "lighter",
+          "opacity": 0.75,
+          "styleRanges": {
+            "x": [0, 576],
+            "scale": [1, 1.3]
+          },
+          "flipX": true,
+          "image": "resources/images/cliffs/bglights2.png"
+        }
+      ]
+    },
+    {
+      "id": "bridges",
+      "zIndex": 40,
+      "xMultiplier": 0,
+      "xCanSpawn": false,
+      "xCanRelease": false,
+      "yMultiplier": 0.4,
+      "yCanSpawn": true,
+      "yCanRelease": true,
+      "yGapRange": [3072, 6148],
+      "pieceOptions": [
+        {
+          "id": "bridgeLeft1",
+          "styleRanges": {
+            "x": [-20, 0]
+          },
+          "image": "resources/images/cliffs/landbridge.png"
+        },
+        {
+          "id": "bridgeRight1",
+          "xAlign": "right",
+          "flipX": true,
+          "styleRanges": {
+            "x": [576, 596]
+          },
+          "image": "resources/images/cliffs/landbridge.png"
+        }
+      ]
+    },
+    {
+      "id": "towersLeft",
+      "zIndex": 50,
+      "xMultiplier": 0,
+      "xCanSpawn": false,
+      "xCanRelease": false,
+      "yMultiplier": 0.5,
+      "yCanSpawn": true,
+      "yCanRelease": true,
+      "yGapRange": [1536, 4096],
+      "pieceOptions": [
+        {
+          "id": "towerLeft1",
+          "styleRanges": {
+            "x": [-100, 0]
+          },
+          "image": "resources/images/cliffs/tower.png"
+        }
+      ]
+    },
+    {
+      "id": "towersRight",
+      "zIndex": 50,
+      "xMultiplier": 0,
+      "xCanSpawn": false,
+      "xCanRelease": false,
+      "yMultiplier": 0.5,
+      "yCanSpawn": true,
+      "yCanRelease": true,
+      "yGapRange": [1536, 4096],
+      "pieceOptions": [
+        {
+          "id": "towerRight1",
+          "xAlign": "right",
+          "flipX": true,
+          "styleRanges": {
+            "x": [576, 676]
+          },
+          "image": "resources/images/cliffs/tower.png"
+        }
+      ]
+    },
+    {
+      "id": "lightLeft",
+      "zIndex": 55,
+      "xMultiplier": 0,
+      "xCanSpawn": false,
+      "xCanRelease": false,
+      "yMultiplier": 0.6,
+      "yCanSpawn": true,
+      "yCanRelease": true,
+      "yGapRange": [1000, 3000],
+      "pieceOptions": [
+        {
+          "id": "lightLeft1",
+          "x": 185,
+          "r": -1.05,
+          "compositeOperation": "lighter",
+          "styleRanges": {
+            "opacity": [0.1, 0.5],
+            "scale": [1.1, 1.2]
+          },
+          "image": "resources/images/cliffs/lighting.png"
+        }
+      ]
+    },
+    {
+      "id": "lightRight",
+      "zIndex": 55,
+      "xMultiplier": 0,
+      "xCanSpawn": false,
+      "xCanRelease": false,
+      "yMultiplier": 0.65,
+      "yCanSpawn": true,
+      "yCanRelease": true,
+      "yGapRange": [1000, 3000],
+      "pieceOptions": [
+        {
+          "id": "lightRight1",
+          "xAlign": "right",
+          "flipX": true,
+          "x": 391,
+          "r": 1.05,
+          "compositeOperation": "lighter",
+          "styleRanges": {
+            "opacity": [0.1, 0.5],
+            "scale": [1.2, 1.3]
+          },
+          "image": "resources/images/cliffs/lighting.png"
+        }
+      ]
+    },
+    {
+      "id": "cliffsLeft",
+      "zIndex": 60,
+      "xMultiplier": 0,
+      "xCanSpawn": false,
+      "xCanRelease": false,
+      "yMultiplier": 0.7,
+      "yCanSpawn": true,
+      "yCanRelease": true,
+      "yGapRange": [0, 400],
+      "ordered": true,
+      "pieceOptions": [
+        {
+          "id": "cliffsLeft1",
+          "styleRanges": {
+            "x": [-75, 0]
+          },
+          "image": "resources/images/cliffs/cliff1.png"
+        },
+        {
+          "id": "cliffsLeft2",
+          "styleRanges": {
+            "x": [-75, 0]
+          },
+          "image": "resources/images/cliffs/cliff2.png"
+        },
+        {
+          "id": "cliffsLeft3",
+          "styleRanges": {
+            "x": [-75, 0]
+          },
+          "image": "resources/images/cliffs/cliff3.png"
+        },
+        {
+          "id": "cliffsLeft4",
+          "styleRanges": {
+            "x": [-75, 0]
+          },
+          "image": "resources/images/cliffs/cliff4.png"
+        }
+      ]
+    },
+    {
+      "id": "cliffsRight",
+      "zIndex": 60,
+      "xMultiplier": 0,
+      "xCanSpawn": false,
+      "xCanRelease": false,
+      "yMultiplier": 0.7,
+      "yCanSpawn": true,
+      "yCanRelease": true,
+      "yGapRange": [0, 400],
+      "ordered": true,
+      "pieceOptions": [
+        {
+          "id": "cliffsRight3",
+          "xAlign": "right",
+          "flipX": true,
+          "styleRanges": {
+            "x": [576, 651]
+          },
+          "image": "resources/images/cliffs/cliff3.png"
+        },
+        {
+          "id": "cliffsRight4",
+          "xAlign": "right",
+          "flipX": true,
+          "styleRanges": {
+            "x": [576, 651]
+          },
+          "image": "resources/images/cliffs/cliff4.png"
+        },
+        {
+          "id": "cliffsRight1",
+          "xAlign": "right",
+          "flipX": true,
+          "styleRanges": {
+            "x": [576, 651]
+          },
+          "image": "resources/images/cliffs/cliff1.png"
+        },
+        {
+          "id": "cliffsRight2",
+          "xAlign": "right",
+          "flipX": true,
+          "styleRanges": {
+            "x": [576, 651]
+          },
+          "image": "resources/images/cliffs/cliff2.png"
+        }
+      ]
+    }
+  ]
+}

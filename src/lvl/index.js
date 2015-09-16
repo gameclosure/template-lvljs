@@ -3,7 +3,8 @@ jsio('import .Level');
 var backend = jsio('import .backend.timestep');
 
 // initialize a global Level API object
-var level = exports = new Level({backend: backend});
+var level = exports = new Level(backend);
+
 // Attach library modules to level API
 // These need no initialization
 // They have no knowledge of the 'level' object (no external state dependencies)
