@@ -1,7 +1,3 @@
-var backend;
-exports.setBackend = function (be) {
-  backend = be;
-}
 
 exports.playMusic = function (resource, opts) {
   var soundManager = backend.getAudioManager();

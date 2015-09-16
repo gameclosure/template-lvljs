@@ -9,21 +9,14 @@ var level = exports = new Level(backend);
 // These need no initialization
 // They have no knowledge of the 'level' object (no external state dependencies)
 
-
+// XXX: TODO: FIXME: COMPILER BUG
+level.resource = jsio('import .resource', { context: { backend: backend } });
 level.resource = jsio('import .resource');
-level.resource.setBackend(backend);
 
+// XXX: TODO: FIXME: COMPILER BUG
+level.sound = jsio('import .sound', { context: { backend: backend } });
 level.sound = jsio('import .sound');
-level.sound.setBackend(backend);
 
 //level.shape = jsio('import .shape');
-///. ..
 
-// Start the game
 //level.startGame(...);
-
-
-
-
-// properties
-

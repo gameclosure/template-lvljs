@@ -33,13 +33,13 @@ exports = Class(GC.Application, function () {
       dragon.view.flipX = !dragon.view.flipX;
       dragon.view.opacity = 0.2 + 0.8 * Math.random();
       dragon.view.scale = dragon.view.opacity;
-      // lvl.sound.playSound(sfx, { volume: Math.pow(dragon.view.opacity, 2) });
+      lvl.sound.playSound(sfx, { volume: Math.pow(dragon.view.opacity, 2) });
     }), 1600);
   };
 
   this.launchUI = function () {
     var music = lvl.resource.loadMusic('resources/sounds/game.mp3');
-    // lvl.sound.playMusic(music);
+    lvl.sound.playMusic(music);
   };
 
 });

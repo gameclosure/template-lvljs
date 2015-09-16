@@ -1,10 +1,4 @@
 
-// TODO: don't expose this to game-devs ...
-var backend;
-exports.setBackend = function (be) {
-  backend = be;
-};
-
 /**
  * Resource API
  */
