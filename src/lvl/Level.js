@@ -1,18 +1,19 @@
-import .Actor;
-import .Scenery;
-import .UI;
-import .Camera;
+// XXX: TODO: FIXME: COMPILER BUG
+jsio('import .Actor', { context: { backend: backend } });
+jsio('import .Actor');
+jsio('import .Scenery', { context: { backend: backend } });
+jsio('import .Scenery');
+jsio('import .UI'), { context: { backend: backend } };
+jsio('import .UI');
+jsio('import .Camera', { context: { backend: backend } });
+jsio('import .Camera');
 
 exports = Class("Level", function () {
-  var _backend;
-
-  this.init = function (backend) {
-    _backend = backend;
-
-    this.bg = new Scenery(_backend, 'background');
-    this.fg = new Scenery(_backend, 'foreground');
-    this.ui = new UI(_backend);
-    this.camera = new Camera(_backend);
+  this.init = function () {
+    this.bg = new Scenery('background');
+    this.fg = new Scenery('foreground');
+    this.ui = new UI();
+    this.camera = new Camera();
   };
 
   // TODO: remove / fix this
@@ -23,7 +24,7 @@ exports = Class("Level", function () {
   this.addActor = function (resource, geometryOverrides) {
     var type = resource.getType();
     if (type === 'sprite' || type === 'image') {
-      return new Actor(_backend, resource, geometryOverrides);
+      return new Actor(resource, geometryOverrides);
     } else {
       throw new Error("Invalid Resource Type for Actor:", type);
     }
@@ -35,11 +36,11 @@ exports = Class("Level", function () {
 
   // TODO: move this concept / API to camera viewport
   this.setFullScreenDimensions = function (width, height) {
-    _backend.setFullScreenDimensions(width, height);
+    backend.setFullScreenDimensions(width, height);
   };
 
   // TODO: move this concept / API to camera viewport
   this.setCustomDimensions = function (width, height, scale) {
-    _backend.setCustomDimensions(width, height, scale);
+    backend.setCustomDimensions(width, height, scale);
   };
 });

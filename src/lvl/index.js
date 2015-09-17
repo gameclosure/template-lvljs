@@ -1,9 +1,11 @@
-jsio('import .Level');
-
 var backend = jsio('import .backend.timestep');
 
+// XXX: TODO: FIXME: COMPILER BUG
+jsio('import .Level', { context: { backend: backend } });
+jsio('import .Level');
+
 // initialize a global Level API object
-var level = exports = new Level(backend);
+var level = exports = new Level();
 
 // Attach library modules to level API
 // These need no initialization

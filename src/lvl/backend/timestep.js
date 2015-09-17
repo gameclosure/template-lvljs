@@ -14,6 +14,14 @@ var DEVICE_HEIGHT = device.screen.height;
  * Timestep Backend API
  */
 
+exports.getDeviceWidth = function () {
+  return DEVICE_WIDTH;
+};
+
+exports.getDeviceHeight = function () {
+  return DEVICE_HEIGHT;
+};
+
 // set view dimensions, but guarantee scale to fit full screen
 exports.setFullScreenDimensions = function (width, height) {
   exports.setCustomDimensions(

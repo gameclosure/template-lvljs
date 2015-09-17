@@ -6,22 +6,18 @@ Entity.prototype.viewClass = null;
 var pool;
 
 exports = Class("Actor", function () {
-  var _backend;
-
-  this.init = function (backend, resource, geometryOverrides) {
-    _backend = backend;
-
+  this.init = function (resource, geometryOverrides) {
     // TODO: clean this up
     if (!pool) {
       pool = new entities.EntityPool({ ctor: Entity });
-      _backend.onTick(bind(pool, "update"));
+      backend.onTick(bind(pool, "update"));
     }
 
     var geoOpts = merge(geometryOverrides, resource.getOpts().geometry);
     this.entity = pool.obtain({ hitOpts: geoOpts });
     this.view = new ActorView(resource);
-    _backend.createViewFromActorView(this.view);
-    _backend.stickViewToEntity(this.view, this.entity);
+    backend.createViewFromActorView(this.view);
+    backend.stickViewToEntity(this.view, this.entity);
   };
 
   // remove the actor from gameplay
