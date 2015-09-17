@@ -32,4 +32,14 @@ exports = Class("Level", function () {
   this.addParallax = function (resource) {
     throw new Error("TODO");
   };
+
+  // TODO: move this concept / API to camera viewport
+  this.setFullScreenDimensions = function (width, height) {
+    _backend.setFullScreenDimensions(width, height);
+  };
+
+  // TODO: move this concept / API to camera viewport
+  this.setCustomDimensions = function (width, height, scale) {
+    _backend.setCustomDimensions(width, height, scale);
+  };
 });

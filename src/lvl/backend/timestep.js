@@ -1,118 +1,45 @@
+import device;
 import AudioManager;
 import ui.View as View;
 import ui.ImageView as ImageView;
 import ui.SpriteView as SpriteView;
 import parallax.Parallax as Parallax;
 
-/**
- * Timestep Backend View Classes
- */
-
-var SceneryView = Class(View, function () {
-  var superProto = View.prototype;
-
-  this.init = function (type, opts) {
-    superProto.init.call(this, opts);
-    this.type = type;
-    this.reset();
-  };
-
-  this.reset = function () {
-    this._x = 0;
-    this._y = 0;
-    this._scrollX = 0;
-    this._scrollY = 0;
-    this._parallaxes = [];
-  };
-
-  this.addLayer = function (view, resource, opts) {
-    var type = resource.getType();
-    if (type === 'parallax') {
-      var config = resource.getVisualOpts();
-      var section = (opts && opts.section) || this.type || 'background';
-      var layers = config[section];
-      if (layers) {
-        view.reset(layers);
-        this._parallaxes.push(view);
-      } else {
-        throw new Error("Invalid Parallax Layers:", section, config);
-      }
-    } else {
-      this.addSubview(view);
-    }
-  };
-
-  this.clearLayers = function () {
-    this._parallaxes.forEach(function (parallax) {
-      parallax.releaseLayers();
-    }, this);
-    this.removeAllSubviews();
-    this.reset();
-  };
-
-  this.scrollTo = function (x, y) {
-    this._x = x;
-    this._y = y;
-  };
-
-  this.scrollBy = function (dx, dy) {
-    this._x += dx;
-    this._y += dy;
-  };
-
-  this.autoScrollBy = function (dx, dy) {
-    this._scrollX = dx;
-    this._scrollY = dy;
-  };
-
-  this.tick = function (dt) {
-    this._x += this._scrollX * dt / 1000;
-    this._y += this._scrollY * dt / 1000;
-    this._parallaxes.forEach(function (parallax) {
-      parallax.update(this._x, this._y);
-    }, this);
-  };
-});
-
-var LevelView = Class(View, function () {
-  var superProto = View.prototype;
-
-  this.render = function () {
-    updateAllEntityViews();
-  };
-});
-
-
-
-/**
- * Timestep Backend View Hierarchy Singletons
- */
-
-var rootView = GC.app.view;
-
-var backgroundView = new SceneryView('background', {
-  superview: rootView,
-  width: rootView.style.width,
-  height: rootView.style.height
-});
-
-var levelView = new LevelView({
-  superview: rootView,
-  width: rootView.style.width,
-  height: rootView.style.height
-});
-
-var foregroundView = new SceneryView('foreground', {
-  superview: rootView,
-  width: rootView.style.width,
-  height: rootView.style.height
-});
-
-
+var DEFAULT_WIDTH = 576;
+var DEFAULT_HEIGHT = 1024;
+var DEVICE_WIDTH = device.screen.width;
+var DEVICE_HEIGHT = device.screen.height;
 
 /**
  * Timestep Backend API
  */
+
+// set view dimensions, but guarantee scale to fit full screen
+exports.setFullScreenDimensions = function (width, height) {
+  exports.setCustomDimensions(
+    _isLandscape ? DEVICE_WIDTH * (height / DEVICE_HEIGHT) : width,
+    _isLandscape ? height : DEVICE_HEIGHT * (width / DEVICE_WIDTH),
+    _isLandscape ? DEVICE_HEIGHT / height : DEVICE_WIDTH / width);
+};
+
+// set view dimensions and scale, without restriction
+exports.setCustomDimensions = function (width, height, scale) {
+  _viewWidth = width || DEFAULT_WIDTH;
+  _viewHeight = height || DEFAULT_HEIGHT;
+  _viewScale = scale || 1;
+
+  var subviews = _rootView.getSubviews();
+  for (var i = 0; i < subviews.length; i++) {
+    var view = subviews[i];
+    view.style.x = (_rootView.style.width - _viewWidth) / 2;
+    view.style.y = (_rootView.style.height - _viewHeight) / 2;
+    view.style.anchorX = _viewWidth / 2;
+    view.style.anchorY = _viewHeight / 2;
+    view.style.width = _viewWidth;
+    view.style.height = _viewHeight;
+    view.style.scale = _viewScale;
+  }
+};
 
 exports.addToForeground = function (resource, opts) {
   var view = exports.createViewFromResource(resource);
@@ -222,7 +149,6 @@ exports.onTick = function (cb) {
 
 
 
-
 var audioManagerSingleton
 
 exports.getAudioManager = function () {
@@ -248,3 +174,108 @@ exports.readJSON = function (url) {
   }
 };
 
+
+
+
+
+
+/**
+ * Timestep Backend View Classes
+ */
+
+var SceneryView = Class(View, function () {
+  var superProto = View.prototype;
+
+  this.init = function (type, opts) {
+    superProto.init.call(this, opts);
+    this.type = type;
+    this.reset();
+  };
+
+  this.reset = function () {
+    this._x = 0;
+    this._y = 0;
+    this._scrollX = 0;
+    this._scrollY = 0;
+    this._parallaxes = [];
+  };
+
+  this.addLayer = function (view, resource, opts) {
+    var type = resource.getType();
+    if (type === 'parallax') {
+      var config = resource.getVisualOpts();
+      var section = (opts && opts.section) || this.type || 'background';
+      var layers = config[section];
+      if (layers) {
+        view.reset(layers);
+        this._parallaxes.push(view);
+      } else {
+        throw new Error("Invalid Parallax Layers:", section, config);
+      }
+    } else {
+      this.addSubview(view);
+    }
+  };
+
+  this.clearLayers = function () {
+    this._parallaxes.forEach(function (parallax) {
+      parallax.releaseLayers();
+    }, this);
+    this.removeAllSubviews();
+    this.reset();
+  };
+
+  this.scrollTo = function (x, y) {
+    this._x = x;
+    this._y = y;
+  };
+
+  this.scrollBy = function (dx, dy) {
+    this._x += dx;
+    this._y += dy;
+  };
+
+  this.autoScrollBy = function (dx, dy) {
+    this._scrollX = dx;
+    this._scrollY = dy;
+  };
+
+  this.tick = function (dt) {
+    this._x += this._scrollX * dt / 1000;
+    this._y += this._scrollY * dt / 1000;
+    this._parallaxes.forEach(function (parallax) {
+      parallax.update(this._x, this._y);
+    }, this);
+  };
+});
+
+var LevelView = Class(View, function () {
+  var superProto = View.prototype;
+
+  this.render = function () {
+    updateAllEntityViews();
+  };
+});
+
+var UIView = Class(View, function () {
+  var superProto = View.prototype;
+});
+
+
+
+/**
+ * Timestep Backend View Hierarchy
+ */
+
+var _rootView = GC.app.view;
+var _isLandscape = DEVICE_WIDTH > DEVICE_HEIGHT;
+var _viewWidth = _isLandscape ? DEFAULT_HEIGHT : DEFAULT_WIDTH;
+var _viewHeight = _isLandscape ? DEFAULT_WIDTH : DEFAULT_HEIGHT;
+var _viewScale;
+
+var backgroundView = new SceneryView('background', { superview: _rootView });
+var levelView = new LevelView({ superview: _rootView });
+var foregroundView = new SceneryView('foreground', { superview: _rootView });
+var uiView = new UIView ({ superview: _rootView });
+
+exports.setFullScreenDimensions(_viewWidth, _viewHeight);
