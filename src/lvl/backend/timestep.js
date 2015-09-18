@@ -3,7 +3,11 @@ import AudioManager;
 import ui.View as View;
 import ui.ImageView as ImageView;
 import ui.SpriteView as SpriteView;
+import ui.ViewPool as ViewPool;
 import parallax.Parallax as Parallax;
+
+var imageViewPool = new ViewPool({ ctor: ImageView });
+var spriteViewPool = new ViewPool({ ctor: SpriteView });
 
 var DEFAULT_WIDTH = 576;
 var DEFAULT_HEIGHT = 1024;
@@ -22,6 +26,19 @@ exports.getDeviceHeight = function () {
   return DEVICE_HEIGHT;
 };
 
+exports.moveViewportTo = function (x, y) {
+  forEachWorldView(function (view, i) {
+    view.scrollTo(x, y);
+  });
+};
+
+exports.moveViewportBy = function (dx, dy) {
+  forEachWorldView(function (view, i) {
+    view.scrollBy(dx, dy);
+  });
+};
+
+// TODO: the camera should probably control this
 // set view dimensions, but guarantee scale to fit full screen
 exports.setFullScreenDimensions = function (width, height) {
   exports.setCustomDimensions(
@@ -30,15 +47,14 @@ exports.setFullScreenDimensions = function (width, height) {
     _isLandscape ? DEVICE_HEIGHT / height : DEVICE_WIDTH / width);
 };
 
+// TODO: the camera should probably control this
 // set view dimensions and scale, without restriction
 exports.setCustomDimensions = function (width, height, scale) {
   _viewWidth = width || DEFAULT_WIDTH;
   _viewHeight = height || DEFAULT_HEIGHT;
   _viewScale = scale || 1;
 
-  var subviews = _rootView.getSubviews();
-  for (var i = 0; i < subviews.length; i++) {
-    var view = subviews[i];
+  forEachView(function (view, i) {
     view.style.x = (_rootView.style.width - _viewWidth) / 2;
     view.style.y = (_rootView.style.height - _viewHeight) / 2;
     view.style.anchorX = _viewWidth / 2;
@@ -46,54 +62,47 @@ exports.setCustomDimensions = function (width, height, scale) {
     view.style.width = _viewWidth;
     view.style.height = _viewHeight;
     view.style.scale = _viewScale;
-  }
+  }, this);
 };
 
 exports.addToForeground = function (resource, opts) {
-  var view = exports.createViewFromResource(resource);
-  foregroundView.addLayer(view, resource, opts);
+  var view = exports.createViewFromResource(resource, foregroundView);
+  foregroundView.add(view, resource, opts);
 };
 
 exports.addToBackground = function (resource, opts) {
-  var view = exports.createViewFromResource(resource);
-  backgroundView.addLayer(view, resource, opts);
+  var view = exports.createViewFromResource(resource, backgroundView);
+  backgroundView.add(view, resource, opts);
 };
 
 exports.clearForeground = function () {
-  foregroundView.clearLayers();
+  foregroundView.clear();
 };
 
 exports.clearBackground = function () {
-  backgroundView.clearLayers();
+  backgroundView.clear();
 };
 
-exports.createViewFromActorView = function (actorView) {
-  var view = exports.createViewFromResource(actorView.resource);
-  actorView._viewBacking = view;
-  actorView.update(view.style);
-  actorView.onUpdated = function () {
-    for (var i = 0; i < arguments.length; ++i) {
-      var key = arguments[i];
-      view.style[key] = actorView[key];
-    }
-  };
-};
-
-exports.createViewFromResource = function (resource) {
+exports.createViewFromResource = function (resource, parent) {
   var type = resource.getType();
   var opts = resource.getVisualOpts();
 
   switch (type) {
     case 'sprite':
-      return new SpriteView(opts);
+      var sprite = spriteViewPool.obtainView(opts);
+      sprite.resetAllAnimations(opts);
+      sprite.__pool = spriteViewPool;
+      return sprite;
       break;
 
     case 'image':
-      return new ImageView(opts);
+      var image = imageViewPool.obtainView(opts);
+      image.__pool = imageViewPool;
+      return image;
       break;
 
     case 'parallax':
-      return new Parallax({ parent: backgroundView });
+      return new Parallax({ parent: parent });
       break;
 
     default:
@@ -101,70 +110,73 @@ exports.createViewFromResource = function (resource) {
   }
 };
 
-// TODO: these probably aren't right
-exports.scrollCameraTo = function (x, y) {
-  foregroundView.scrollTo(x, y);
-  backgroundView.scrollTo(x, y);
-};
-
-exports.scrollCameraBy = function (dx, dy) {
-  foregroundView.scrollBy(dx, dy);
-  backgroundView.scrollBy(dx, dy);
-};
-
-exports.autoScrollCameraBy = function (dx, dy) {
-  foregroundView.autoScrollBy(dx, dy);
-  backgroundView.autoScrollBy(dx, dy);
-};
-
-
-
-
-
-
-// TODO: Jimmoptimize this!
-// XXX: Here there be memory and cpu dragons
-//      Please come clean this up, brave soul.
-var viewMap = {};
-var entityMap = {};
-
-exports.stickViewToEntity = function (actorView, entity, opts) {
-  var view = actorView._viewBacking;
-  if (!(entity.uid in viewMap)) {
-    viewMap[entity.uid] = []
-  }
-  viewMap[entity.uid].push(view);
-  entityMap[entity.uid] = entity;
-  levelView.addSubview(view);
-}
-
-function updateAllEntityViews() {
-  for (var uid in viewMap) {
-    var viewArray = viewMap[uid];
-    entity = entityMap[uid];
-    for (var i = 0; i < viewArray.length; ++i) {
-      view = viewArray[i];
-      view.style.x = entity.x;
-      view.style.y = entity.y;
+exports.createViewForActor = function (actor) {
+  var view = exports.createViewFromResource(actor.view.resource, levelView);
+  actor.view._viewBacking = view;
+  actor.view.update(view.style);
+  actor.view.onUpdated = function () {
+    for (var i = 0; i < arguments.length; ++i) {
+      var key = arguments[i];
+      view.style[key] = actor.view[key];
     }
-  }
-}
+  };
+  exports.attachViewToActor(view, actor);
+};
 
-//TODO: ???
+exports.attachViewToActor = function (view, actor) {
+  var entity = actor.entity;
+  var viewList = getViewListByEntityID(entity.uid);
+  viewList.push(view);
+  levelView.add(view, actor.view.resource);
+  setEntityByViewID(view.uid, entity);
+};
+
+exports.removeViewsFromActor = function (actor) {
+  var entity = actor.entity;
+  var viewList = getViewListByEntityID(entity.uid);
+  viewList.forEach(function (view) {
+    var superview = view.getSuperview();
+    superview.remove(view);
+  }, this);
+  setViewListByEntityID(entity.uid, []);
+};
+
+// TODO: move these to LayerView Class ?
+var _viewMap = {};
+var _entityMap = {};
+
+function getViewListByEntityID (id) {
+  var mapping = _viewMap[id];
+  if (!mapping) {
+    mapping = setViewListByEntityID(id, []);
+  }
+  return mapping;
+};
+
+function setViewListByEntityID (id, list) {
+  return _viewMap[id] = list;
+};
+
+function getEntityByViewID (id) {
+  return _entityMap[id];
+};
+
+function setEntityByViewID (id, entity) {
+  return _entityMap[id] = entity;
+};
+
+// TODO: track and remove subscriptions?
 exports.onTick = function (cb) {
   GC.app.engine.on('Tick', cb);
 };
 
-
-
-var audioManagerSingleton
-
+var audioManagerSingleton;
 exports.getAudioManager = function () {
   if (!audioManagerSingleton) {
-   audioManagerSingleton = new AudioManager();
+    audioManagerSingleton = new AudioManager();
   }
   return audioManagerSingleton;
-}
+};
 
 exports.readJSON = function (url) {
   try {
@@ -184,31 +196,34 @@ exports.readJSON = function (url) {
 
 
 
-
-
-
 /**
  * Timestep Backend View Classes
  */
 
-var SceneryView = Class(View, function () {
+/**
+ * LayerView
+ * - a class for views that are part of the world
+ * - subviews are moved to simulate camera movement
+ */
+var LayerView = Class(View, function () {
   var superProto = View.prototype;
 
   this.init = function (type, opts) {
     superProto.init.call(this, opts);
     this.type = type;
-    this.reset();
+    this._reset();
   };
 
-  this.reset = function () {
+  this._reset = function () {
     this._x = 0;
     this._y = 0;
-    this._scrollX = 0;
-    this._scrollY = 0;
+    this._lastX = 0;
+    this._lastY = 0;
     this._parallaxes = [];
+    this._otherViews = [];
   };
 
-  this.addLayer = function (view, resource, opts) {
+  this.add = function (view, resource, opts) {
     var type = resource.getType();
     if (type === 'parallax') {
       var config = resource.getVisualOpts();
@@ -222,15 +237,40 @@ var SceneryView = Class(View, function () {
       }
     } else {
       this.addSubview(view);
+      this._otherViews.push(view);
     }
   };
 
-  this.clearLayers = function () {
-    this._parallaxes.forEach(function (parallax) {
-      parallax.releaseLayers();
-    }, this);
-    this.removeAllSubviews();
-    this.reset();
+  this.remove = function (view) {
+    var parallaxIndex = this._parallaxes.indexOf(view);
+    var otherIndex = this._otherViews.indexOf(view);
+    if (parallaxIndex >= 0) {
+      view.releaseLayers();
+      this._parallaxes.splice(parallaxIndex, 1);
+    } else if (otherIndex >= 0) {
+      var entity = getEntityByViewID(view.uid);
+      setEntityByViewID(view.uid, null);
+      var viewList = getViewListByEntityID(entity.uid);
+      var viewListIndex = viewList.indexOf(view);
+      if (viewListIndex >= 0) {
+        viewList.splice(viewListIndex, 1);
+      }
+      view.removeFromSuperview();
+      view.__pool.releaseView(view);
+      this._otherViews.splice(otherIndex, 1);
+    }
+  };
+
+  this.clear = function () {
+    for (var i = this._parallaxes.length - 1; i >= 0; i--) {
+      this.remove(this._parallaxes[i]);
+    }
+
+    for (var i = this._otherViews.length - 1; i >= 0; i--) {
+      this.remove(this._otherViews[i]);
+    }
+
+    this._reset();
   };
 
   this.scrollTo = function (x, y) {
@@ -243,30 +283,41 @@ var SceneryView = Class(View, function () {
     this._y += dy;
   };
 
-  this.autoScrollBy = function (dx, dy) {
-    this._scrollX = dx;
-    this._scrollY = dy;
-  };
-
+  // update subview positions
   this.tick = function (dt) {
-    this._x += this._scrollX * dt / 1000;
-    this._y += this._scrollY * dt / 1000;
+    var dx = this._x - this._lastX;
+    var dy = this._y - this._lastY;
+
+    // parallax update independently since layers have different relative motion
     this._parallaxes.forEach(function (parallax) {
       parallax.update(this._x, this._y);
     }, this);
+
+    // non-parallax views move 1-to-1 with the world
+    this._otherViews.forEach(function (view) {
+      var entity = getEntityByViewID(view.uid);
+      if (entity) {
+        view.style.x = entity.x;
+        view.style.y = entity.y;
+      }
+      view.style.offsetX -= dx;
+      view.style.offsetY -= dy;
+    }, this);
+
+    this._lastX = this._x;
+    this._lastY = this._y;
   };
 });
 
-var LevelView = Class(View, function () {
-  var superProto = View.prototype;
-
-  this.render = function () {
-    updateAllEntityViews();
-  };
-});
-
+/**
+ * UIView
+ * - a class for static UI rendered on top of all game elements
+ * - subviews are unafffected by camera movement
+ */
 var UIView = Class(View, function () {
   var superProto = View.prototype;
+
+  // TODO: write UIView
 });
 
 
@@ -281,9 +332,29 @@ var _viewWidth = _isLandscape ? DEFAULT_HEIGHT : DEFAULT_WIDTH;
 var _viewHeight = _isLandscape ? DEFAULT_WIDTH : DEFAULT_HEIGHT;
 var _viewScale;
 
-var backgroundView = new SceneryView('background', { superview: _rootView });
-var levelView = new LevelView({ superview: _rootView });
-var foregroundView = new SceneryView('foreground', { superview: _rootView });
+var backgroundView = new LayerView('background', { superview: _rootView });
+var levelView = new LayerView('level', { superview: _rootView });
+var foregroundView = new LayerView('foreground', { superview: _rootView });
 var uiView = new UIView ({ superview: _rootView });
 
 exports.setFullScreenDimensions(_viewWidth, _viewHeight);
+
+// update the scenery and level views
+function forEachWorldView (fn, ctx) {
+  var subviews = _rootView.getSubviews();
+  for (var i = 0; i < subviews.length; i++) {
+    var view = subviews[i];
+    if (view !== uiView) {
+      fn.call(this, view, i);
+    }
+  }
+};
+
+// update all views including the ui
+function forEachView (fn, ctx) {
+  var subviews = _rootView.getSubviews();
+  for (var i = 0; i < subviews.length; i++) {
+    var view = subviews[i];
+    fn.call(this, view, i);
+  }
+};

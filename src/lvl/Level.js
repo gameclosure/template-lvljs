@@ -14,6 +14,7 @@ exports = Class("Level", function () {
     this.fg = new Scenery('foreground');
     this.ui = new UI();
     this.camera = new Camera();
+    GC.app.engine.subscribe('Tick', bind(this, 'tick'));
   };
 
   // TODO: remove / fix this
@@ -42,5 +43,11 @@ exports = Class("Level", function () {
   // TODO: move this concept / API to camera viewport
   this.setCustomDimensions = function (width, height, scale) {
     backend.setCustomDimensions(width, height, scale);
+  };
+
+  // TODO: devkit should limit global tick to ~100 ms max!!!
+  // BIG TICKS BREAK THINGS.
+  this.tick = function (dt) {
+    this.camera.tick(dt);
   };
 });

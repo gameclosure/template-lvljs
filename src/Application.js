@@ -7,7 +7,7 @@ exports = Class(GC.Application, function () {
 
     var parallax = lvl.resource.loadParallaxFromJSON('resources/config/parallax.json');
     lvl.bg.add(parallax);
-    lvl.camera.autoScrollBy(0, 250);
+    lvl.camera.vy = 250;
 
     // lvl.addParallax(forest);
     // lvl.bg.add(forest); // by default get section name 'background'
@@ -22,11 +22,12 @@ exports = Class(GC.Application, function () {
     var dragon = lvl.addActor(dragonSprite);
     dragon.x = 250;
     dragon.y = 250;
+    dragon.vy = 275;
 
     var sfx = lvl.resource.loadSound('resources/sounds/v_fever_a.mp3');
 
     // dragon moves back and forth
-    dragon.vx = -0.25;
+    dragon.vx = -250;
     // TODO: lvl.setInterval
     setInterval(bind(this, function () {
       dragon.vx = -dragon.vx;

@@ -1,29 +1,28 @@
 import entities.Entity as Entity;
-import entities.EntityPool;
+import entities.EntityPool as EntityPool;
 
-//monkey patch the Entity to have no view
+// force Entity to have no view, we just want to use their physics for now
 Entity.prototype.viewClass = null;
-var pool;
+
+// pool physical entities and update them each tick
+var entityPool = new EntityPool();
+backend.onTick(bind(entityPool, 'update'));
 
 exports = Class("Actor", function () {
+  // create a new actor
   this.init = function (resource, geometryOverrides) {
-    // TODO: clean this up
-    if (!pool) {
-      pool = new entities.EntityPool({ ctor: Entity });
-      backend.onTick(bind(pool, "update"));
-    }
-
     var geoOpts = merge(geometryOverrides, resource.getOpts().geometry);
-    this.entity = pool.obtain({ hitOpts: geoOpts });
+    this.entity = entityPool.obtain({ hitOpts: geoOpts });
+
+    // TODO: backend supports multiple views per actor, but this API does not
     this.view = new ActorView(resource);
-    backend.createViewFromActorView(this.view);
-    backend.stickViewToEntity(this.view, this.entity);
+    backend.createViewForActor(this);
   };
 
   // remove the actor from gameplay
   this.destroy = function () {
-    backend.unregisterView(this.view);
-    pool.release(this.entity);
+    backend.removeViewsFromActor(this);
+    entityPool.release(this.entity);
   };
 
   // XXX: These are all just literally pasted from Entity for now.
@@ -37,7 +36,7 @@ exports = Class("Actor", function () {
         throw new Error(ctxName + name + " is read-only!");
       }
     });
-  }
+  };
 
   // expose x position
   Object.defineProperty(this, 'x', {
@@ -61,21 +60,20 @@ exports = Class("Actor", function () {
   // expose read-only previous y position
   readOnlyProp(this, 'previousY', function () { return this.entity.previousY; });
 
-
   // expose x velocity
   Object.defineProperty(this, 'vx', {
     enumerable: true,
     configurable: true,
-    get: function () { return this.entity.vx; },
-    set: function (value) { this.entity.vx = value; }
+    get: function () { return this.entity.vx * 1000; },
+    set: function (value) { this.entity.vx = value / 1000; }
   });
 
   // expose y velocity
   Object.defineProperty(this, 'vy', {
     enumerable: true,
     configurable: true,
-    get: function () { return this.entity.vy; },
-    set: function (value) { this.entity.vy = value; }
+    get: function () { return this.entity.vy * 1000; },
+    set: function (value) { this.entity.vy = value / 1000; }
   });
 
   // expose x acceleration
@@ -162,6 +160,6 @@ var ActorView = Class("ActorView", function () {
       configurable: true,
       get: function () { return this._properties[name]; },
       set: function (value) { this._properties[name] = value; this.onUpdated(name) }
-    })
+    });
   };
 });
