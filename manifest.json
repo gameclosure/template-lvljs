@@ -16,7 +16,6 @@
     "stagingDomain": "staging.example.com"
   },
   "supportedOrientations": [
-    "portrait",
     "landscape"
   ],
   "title": "test"

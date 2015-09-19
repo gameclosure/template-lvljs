@@ -2,6 +2,8 @@
     "visual": {
         "frameRate": 15,
         "zIndex": 20,
+        "offsetX": -160,
+        "offsetY": -75,
         "anchorX": 160,
         "anchorY": 75,
         "width": 320,
@@ -12,7 +14,9 @@
         "loop": true
     },
     "geometry": {
-        "offsetX": 4,
-        "offsetY": 24
+        "offsetX": -25,
+        "offsetY": -25,
+        "width": 50,
+        "height": 50
     }
 }

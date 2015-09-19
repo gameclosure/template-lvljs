@@ -1,0 +1,49 @@
+{
+  "background": [
+    {
+      "xMultiplier": 1,
+      "xCanSpawn": true,
+      "xCanRelease": false,
+      "yMultiplier": 0,
+      "yCanSpawn": false,
+      "yCanRelease": false,
+      "zIndex": 1,
+      "ordered": true,
+      "spawnCount": 4,
+      "spawnBounded": true,
+      "pieceOptions": [
+        {
+          "image": "resources/images/space/bg1.png"
+        },
+        {
+          "image": "resources/images/space/bg2.png"
+        },
+        {
+          "image": "resources/images/space/bg3.png"
+        },
+        {
+          "image": "resources/images/space/bg4.png"
+        }
+      ]
+    },
+    {
+      "xMultiplier": 3,
+      "xCanSpawn": true,
+      "xCanRelease": true,
+      "xGapRange": [50, 250],
+      "yMultiplier": 3,
+      "yCanSpawn": true,
+      "yCanRelease": true,
+      "yGapRange": [50, 250],
+      "zIndex": 5,
+      "pieceOptions": [
+        {
+          "image": "resources/images/space/planet_01.png"
+        },
+        {
+          "image": "resources/images/space/planet_02.png"
+        }
+      ]
+    }
+  ]
+}

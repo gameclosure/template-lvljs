@@ -18,12 +18,12 @@ var DEVICE_HEIGHT = device.screen.height;
  * Timestep Backend API
  */
 
-exports.getDeviceWidth = function () {
-  return DEVICE_WIDTH;
+exports.getViewportWidth = function () {
+  return _viewWidth;
 };
 
-exports.getDeviceHeight = function () {
-  return DEVICE_HEIGHT;
+exports.getViewportHeight = function () {
+  return _viewHeight;
 };
 
 exports.moveViewportTo = function (x, y) {
@@ -114,12 +114,8 @@ exports.createViewForActor = function (actor) {
   var view = exports.createViewFromResource(actor.view.resource, levelView);
   actor.view._viewBacking = view;
   actor.view.update(view.style);
-  actor.view.onUpdated = function () {
-    for (var i = 0; i < arguments.length; ++i) {
-      var key = arguments[i];
-      view.style[key] = actor.view[key];
-    }
-  };
+  actor.view.onPropertyGet(function (name) { return view.style[name]; });
+  actor.view.onPropertySet(function (name, value) { view.style[name] = value; });
   exports.attachViewToActor(view, actor);
 };
 
@@ -217,8 +213,6 @@ var LayerView = Class(View, function () {
   this._reset = function () {
     this._x = 0;
     this._y = 0;
-    this._lastX = 0;
-    this._lastY = 0;
     this._parallaxes = [];
     this._otherViews = [];
   };
@@ -285,27 +279,22 @@ var LayerView = Class(View, function () {
 
   // update subview positions
   this.tick = function (dt) {
-    var dx = this._x - this._lastX;
-    var dy = this._y - this._lastY;
-
     // parallax update independently since layers have different relative motion
     this._parallaxes.forEach(function (parallax) {
-      parallax.update(this._x, this._y);
+      parallax.update(-this._x, -this._y);
     }, this);
 
     // non-parallax views move 1-to-1 with the world
     this._otherViews.forEach(function (view) {
       var entity = getEntityByViewID(view.uid);
       if (entity) {
-        view.style.x = entity.x;
-        view.style.y = entity.y;
+        view.style.x = entity.x - this._x;
+        view.style.y = entity.y - this._y;
+      } else {
+        view.style.x = -this._x;
+        view.style.y = -this._y;
       }
-      view.style.offsetX -= dx;
-      view.style.offsetY -= dy;
     }, this);
-
-    this._lastX = this._x;
-    this._lastY = this._y;
   };
 });
 

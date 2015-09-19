@@ -1,12 +1,26 @@
 import entities.Entity as Entity;
+import entities.EntityModel as EntityModel;
 import entities.EntityPool as EntityPool;
 
-// force Entity to have no view, we just want to use their physics for now
+// Entity patches
 Entity.prototype.viewClass = null;
+EntityModel.prototype._validate = function () { return true; };
 
 // pool physical entities and update them each tick
 var entityPool = new EntityPool();
 backend.onTick(bind(entityPool, 'update'));
+
+function readOnlyProp(ctx, name, getter) {
+  Object.defineProperty(ctx, name, {
+    enumerable: true,
+    configurable: true,
+    get: getter,
+    set: function () {
+      var ctxName = this.name ? this.name + " " : "";
+      throw new Error(ctxName + name + " is read-only!");
+    }
+  });
+};
 
 exports = Class("Actor", function () {
   // create a new actor
@@ -26,17 +40,6 @@ exports = Class("Actor", function () {
   };
 
   // XXX: These are all just literally pasted from Entity for now.
-  function readOnlyProp(ctx, name, getter) {
-    Object.defineProperty(ctx, name, {
-      enumerable: true,
-      configurable: true,
-      get: getter,
-      set: function () {
-        var ctxName = this.name ? this.name + " " : "";
-        throw new Error(ctxName + name + " is read-only!");
-      }
-    });
-  };
 
   // expose x position
   Object.defineProperty(this, 'x', {
@@ -92,7 +95,23 @@ exports = Class("Actor", function () {
     set: function (value) { this.entity.ay = value; }
   });
 
-  // expose the model's fixed property
+  // expose hit bounds width
+  Object.defineProperty(this, 'width', {
+    enumerable: true,
+    configurable: true,
+    get: function () { return this.entity.width; },
+    set: function (value) { this.entity.width = value; }
+  });
+
+  // expose hit bounds height
+  Object.defineProperty(this, 'height', {
+   enumerable: true,
+   configurable: true,
+   get: function () { return this.entity.height; },
+   set: function (value) { this.entity.height = value; }
+  });
+
+  // if fixed is true, collisions cannot move the actor
   Object.defineProperty(this, 'fixed', {
     enumerable: true,
     configurable: true,
@@ -100,40 +119,40 @@ exports = Class("Actor", function () {
     set: function (value) { this.entity.fixed = value; }
   });
 
-  // expose the model's physical shape
+  // expose the physical shape of the actor
   readOnlyProp(this, 'shape', function () { return this.entity.shape; });
 });
 
 
 
 var ActorView = Class("ActorView", function () {
-  var ALLOWED_KEYS = [];
+  var ALLOWED_KEYS = {};
 
   this.init = function (resource) {
     this._properties = {};
+    this._propertyGetter = null;
+    this._propertySetter = null;
     this.resource = resource;
   };
 
-  // TODO: use some kind of pubsub / eventemiiter
-  this.onUpdated = function () {};
-
-  this.update = function (opts) {
-    var updatedKeys = [];
-    for (key in opts) {
-      if (ALLOWED_KEYS.indexOf(key) == -1) {
-        continue;
-      }
-      this._properties[key] = opts[key];
-      updatedKeys.push(key);
-    }
-    this.onUpdated.apply(this, updatedKeys);
+  this.onPropertyGet = function (cb) {
+    this._propertyGetter = cb;
   };
 
-  this.getAllProperties = function () {
+  this.onPropertySet = function (cb) {
+    this._propertySetter = cb;
+  };
+
+  this.update = function (opts) {
+    for (var name in opts) {
+      _setProperty.call(this, name, opts[name]);
+    }
+  };
+
+  this.getProperties = function () {
     return this._properties;
   };
 
-  // TODO: clean this up?
   Object.defineProperty(this, '_viewBacking', {
     enumerable: false,
     configurable: false,
@@ -146,20 +165,43 @@ var ActorView = Class("ActorView", function () {
     }
   });
 
+  makeProxy.call(this, 'zIndex');
+  makeProxy.call(this, 'r');
+  makeProxy.call(this, 'anchorX');
+  makeProxy.call(this, 'anchorY');
   makeProxy.call(this, 'flipX');
   makeProxy.call(this, 'flipY');
+  makeProxy.call(this, 'width');
+  makeProxy.call(this, 'height');
   makeProxy.call(this, 'opacity');
   makeProxy.call(this, 'scale');
   makeProxy.call(this, 'compositeOperation');
-  makeProxy.call(this, 'r');
 
   function makeProxy (name) {
-    ALLOWED_KEYS.push[name];
+    ALLOWED_KEYS[name] = true;
     Object.defineProperty(this, name, {
       enumerable: true,
-      configurable: true,
-      get: function () { return this._properties[name]; },
-      set: function (value) { this._properties[name] = value; this.onUpdated(name) }
+      get: function () {
+        return _getProperty.call(this, name);
+      },
+      set: function (value) {
+        _setProperty.call(this, name, value);
+      }
     });
+  };
+
+  function _getProperty (name) {
+    var value = this._properties[name];
+    if (value === undefined) {
+      value = this._propertyGetter && this._propertyGetter(name);
+    }
+    return value;
+  };
+
+  function _setProperty (name, value) {
+    if (ALLOWED_KEYS[name]) {
+      this._properties[name] = value;
+      this._propertySetter && this._propertySetter(name, value);
+    }
   };
 });

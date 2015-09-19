@@ -3,18 +3,17 @@ jsio('import .Actor', { context: { backend: backend } });
 jsio('import .Actor');
 jsio('import .Scenery', { context: { backend: backend } });
 jsio('import .Scenery');
-jsio('import .UI'), { context: { backend: backend } };
+jsio('import .UI', { context: { backend: backend } });
 jsio('import .UI');
 jsio('import .Camera', { context: { backend: backend } });
 jsio('import .Camera');
 
-exports = Class("Level", function () {
+var Level = Class("Level", function () {
   this.init = function () {
     this.bg = new Scenery('background');
     this.fg = new Scenery('foreground');
     this.ui = new UI();
     this.camera = new Camera();
-    GC.app.engine.subscribe('Tick', bind(this, 'tick'));
   };
 
   // TODO: remove / fix this
@@ -35,6 +34,14 @@ exports = Class("Level", function () {
     throw new Error("TODO");
   };
 
+  this.setTimeout = function () {
+    throw new Error("TODO");
+  };
+
+  this.setInterval = function () {
+    throw new Error("TODO");
+  };
+
   // TODO: move this concept / API to camera viewport
   this.setFullScreenDimensions = function (width, height) {
     backend.setFullScreenDimensions(width, height);
@@ -44,10 +51,7 @@ exports = Class("Level", function () {
   this.setCustomDimensions = function (width, height, scale) {
     backend.setCustomDimensions(width, height, scale);
   };
-
-  // TODO: devkit should limit global tick to ~100 ms max!!!
-  // BIG TICKS BREAK THINGS.
-  this.tick = function (dt) {
-    this.camera.tick(dt);
-  };
 });
+
+// singleton Level API
+exports = new Level();
