@@ -9,8 +9,6 @@
       "yCanRelease": false,
       "zIndex": 1,
       "ordered": true,
-      "spawnCount": 4,
-      "spawnBounded": true,
       "pieceOptions": [
         {
           "image": "resources/images/space/bg1.png"

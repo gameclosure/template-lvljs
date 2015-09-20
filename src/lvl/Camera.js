@@ -118,26 +118,41 @@ exports = Class("Camera", function () {
     _followRect.width = maxX - minX;
     _followRect.height = maxY - minY;
 
-    // TODO: camera easing, velocity, animations?
+    // TODO: camera velocity, animations?
+    // TODO: different easing functions?
 
-    var dx = _followRect.centerX - (this.viewport.centerX - this.lagDistanceX);
+    var dx = _followRect.centerX - this.viewport.centerX;
     if (dx < 0) {
-      this.viewport.x += dx;
+      if (dx < -this.lagDistanceX) {
+        this.viewport.x += dx;
+      } else {
+        var pct = dx / -this.lagDistanceX;
+        this.viewport.x += pct * pct * dx;
+      }
+    } else if (dx > 0) {
+      if (dx > this.lagDistanceX) {
+        this.viewport.x += dx;
+      } else {
+        var pct = dx / this.lagDistanceX;
+        this.viewport.x += pct * pct * dx;
+      }
     }
 
-    dx = _followRect.centerX - (this.viewport.centerX + this.lagDistanceX);
-    if (dx > 0) {
-      this.viewport.x += dx;
-    }
-
-    var dy = _followRect.centerY - (this.viewport.centerY - this.lagDistanceY);
+    var dy = _followRect.centerY - this.viewport.centerY;
     if (dy < 0) {
-      this.viewport.y += dy;
-    }
-
-    dy = _followRect.centerY - (this.viewport.centerY + this.lagDistanceY);
-    if (dy > 0) {
-      this.viewport.y += dy;
+      if (dy < -this.lagDistanceY) {
+        this.viewport.y += dy;
+      } else {
+        var pct = dy / -this.lagDistanceY;
+        this.viewport.y += pct * pct * dy;
+      }
+    } else if (dy > 0) {
+      if (dy > this.lagDistanceY) {
+        this.viewport.y += dy;
+      } else {
+        var pct = dy / this.lagDistanceY;
+        this.viewport.y += pct * pct * dy;
+      }
     }
   };
 });

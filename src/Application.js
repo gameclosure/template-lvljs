@@ -1,3 +1,7 @@
+// TODO: lvl.animate
+import animate;
+
+var ANIM_TIME = 2500;
 
 exports = Class(GC.Application, function () {
   this.initUI = function () {
@@ -26,32 +30,48 @@ exports = Class(GC.Application, function () {
     var dragon = lvl.addActor(dragonSprite);
     dragon.x = lvl.camera.viewport.centerX;
     dragon.y = lvl.camera.viewport.centerY;
-    // TODO: lvl.setInterval
     setInterval(bind(this, function () {
       var roll = Math.random();
       if (roll < 0.25) {
-        dragon.vx = -250;
-        dragon.vy = 0;
-        dragon.view.r = 0;
+        animate(dragon).now({
+          vx: -100 - 900 * Math.random(),
+          vy: 0
+        }, ANIM_TIME, animate.easeInOut);
+        animate(dragon.view).now({
+          r: 0
+        }, ANIM_TIME, animate.easeInOut);
       } else if (roll < 0.5) {
-        dragon.vx = 250;
-        dragon.vy = 0;
-        dragon.view.r = Math.PI;
+        animate(dragon).now({
+          vx: 100 + 900 * Math.random(),
+          vy: 0
+        }, ANIM_TIME, animate.easeInOut);
+        animate(dragon.view).now({
+          r: Math.PI
+        }, ANIM_TIME, animate.easeInOut);
       } else if (roll < 0.75) {
-        dragon.vx = 0;
-        dragon.vy = -250;
-        dragon.view.r = Math.PI / 2;
+        animate(dragon).now({
+          vx: 0,
+          vy: -100 - 900 * Math.random()
+        }, ANIM_TIME, animate.easeInOut);
+        animate(dragon.view).now({
+          r: Math.PI / 2
+        }, ANIM_TIME, animate.easeInOut);
       } else {
-        dragon.vx = 0;
-        dragon.vy = 250;
-        dragon.view.r = 3 * Math.PI / 2;
+        animate(dragon).now({
+          vx: 0,
+          vy: 100 + 900 * Math.random()
+        }, ANIM_TIME, animate.easeInOut);
+        animate(dragon.view).now({
+          r: 3 * Math.PI / 2
+        }, ANIM_TIME, animate.easeInOut);
       }
-    }), 3000);
+    }), ANIM_TIME);
 
     // Camera API Tests
+    // TODO: these numbers don't feel exactly right with what you'd expect
     lvl.camera.follow(dragon, {
-      lagDistanceX: 160,
-      lagDistanceY: 90
+      lagDistanceX: 640,
+      lagDistanceY: 360
     });
   };
 
