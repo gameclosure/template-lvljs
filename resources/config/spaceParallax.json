@@ -1,13 +1,14 @@
 {
   "background": [
     {
-      "xMultiplier": 1,
+      "xMultiplier": 0.1,
       "xCanSpawn": true,
       "xCanRelease": false,
       "yMultiplier": 0,
       "yCanSpawn": false,
       "yCanRelease": false,
       "zIndex": 1,
+      "scaleMultiplier": 0,
       "ordered": true,
       "pieceOptions": [
         {
@@ -25,15 +26,16 @@
       ]
     },
     {
-      "xMultiplier": 3,
+      "xMultiplier": 0.5,
       "xCanSpawn": true,
       "xCanRelease": true,
       "xGapRange": [50, 250],
-      "yMultiplier": 3,
+      "yMultiplier": 0.5,
       "yCanSpawn": true,
       "yCanRelease": true,
       "yGapRange": [50, 250],
       "zIndex": 5,
+      "scaleMultiplier": 0.5,
       "pieceOptions": [
         {
           "image": "resources/images/space/planet_01.png"

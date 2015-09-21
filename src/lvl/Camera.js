@@ -17,6 +17,7 @@ exports = Class("Camera", Rect, function () {
   // private state
   var _lastX;
   var _lastY;
+  var _lastZoom;
   var _width;
   var _height;
   var _followTargets;
@@ -59,11 +60,17 @@ exports = Class("Camera", Rect, function () {
     this.vx = 0;
     this.vy = 0;
     this.zoom = 1;
-    this.lagDistanceX = 0;
-    this.lagDistanceY = 0;
+    // TODO: minZoom and maxZoom are diff than minX and maxX inherited from Rect
+    // solve by creating a 'bounds' object, { minX: #, .... minZoom: # } ?
+    this.minZoom = 0.2;
+    this.maxZoom = 1;
+    this.lagX = 0;
+    this.lagY = 0;
+    this.lagZoom = 0;
 
     _lastX = this.x;
     _lastY = this.y;
+    _lastZoom = this.zoom;
     _followTargets = [];
     _followRect = new Rect(this);
   };
@@ -100,18 +107,19 @@ exports = Class("Camera", Rect, function () {
   };
 
   this.follow = function (target, opts) {
+    opts = opts || {};
     if (target.__class__ !== "Actor") {
       throw new Error("Camera can only follow instances of Actor!");
     }
 
     _followTargets.push(target);
 
-    if (opts.lagDistanceX !== undefined) {
-      this.lagDistanceX = opts.lagDistanceX;
+    if (opts.lagX !== undefined) {
+      this.lagX = opts.lagX;
     }
 
-    if (opts.lagDistanceY !== undefined) {
-      this.lagDistanceY = opts.lagDistanceY;
+    if (opts.lagY !== undefined) {
+      this.lagY = opts.lagY;
     }
   };
 
@@ -141,11 +149,16 @@ exports = Class("Camera", Rect, function () {
     var dy = this.y - _lastY;
     backend.moveViewportBy(dx, dy);
 
+    var dz = this.zoom / _lastZoom;
+    backend.scaleViewportBy(dz);
+
     _lastX = this.x;
     _lastY = this.y;
+    _lastZoom = this.zoom;
   };
 
   function followTargets () {
+    // _followRect position and dimensions calculated by target spread
     var minX = MAX_NUM;
     var minY = MAX_NUM;
     var maxX = MIN_NUM;
@@ -156,28 +169,41 @@ exports = Class("Camera", Rect, function () {
       maxX = max(target.entity.maxX, maxX);
       maxY = max(target.entity.maxY, maxY);
     });
-
     _followRect.x = minX;
     _followRect.y = minY;
     _followRect.width = maxX - minX;
     _followRect.height = maxY - minY;
 
+    // camera center moves horizontally towards _followRect center
     var dx = _followRect.centerX - this.centerX;
     if (dx < 0) {
-      var pct = dx < -this.lagDistanceX ? 1 : pow(dx / -this.lagDistanceX, 2);
+      var pct = dx < -this.lagX ? 1 : pow(dx / -this.lagX, 2);
       this.x += pct * dx;
     } else if (dx > 0) {
-      var pct = dx > this.lagDistanceX ? 1 : pow(dx / this.lagDistanceX, 2);
+      var pct = dx > this.lagX ? 1 : pow(dx / this.lagX, 2);
       this.x += pct * dx;
     }
 
+    // camera center moves vertically towards _followRect center
     var dy = _followRect.centerY - this.centerY;
     if (dy < 0) {
-      var pct = dy < -this.lagDistanceY ? 1 : pow(dy / -this.lagDistanceY, 2);
+      var pct = dy < -this.lagY ? 1 : pow(dy / -this.lagY, 2);
       this.y += pct * dy;
     } else if (dy > 0) {
-      var pct = dy > this.lagDistanceY ? 1 : pow(dy / this.lagDistanceY, 2);
+      var pct = dy > this.lagY ? 1 : pow(dy / this.lagY, 2);
       this.y += pct * dy;
+    }
+
+    // camera zoom to fit all targets, constrained within minZoom and maxZoom
+    var zoom = min(this.width / _followRect.width, this.height / _followRect.height);
+    zoom = min(this.maxZoom, max(this.minZoom, zoom));
+    var dz = zoom - this.zoom;
+    if (dz < 0) {
+      var pct = dz < -this.lagZoom ? 1 : pow(dz / -this.lagZoom, 2);
+      this.zoom += pct * dz;
+    } else if (dz > 0) {
+      var pct = dz > this.lagZoom ? 1 : pow(dz / this.lagZoom, 2);
+      this.zoom += pct * dz;
     }
   };
 });

@@ -37,32 +37,32 @@ exports = Class(GC.Application, function () {
       lvl.setInterval(bind(this, function () {
         var roll = random();
         if (roll < 0.25) {
-          lvl.animate(dragon).now({ vx: -100 - 900 * random(), vy: 0 }, ANIM_TIME, lvl.animate.easeInOut);
+          lvl.animate(dragon).now({ vx: -100 - 400 * random(), vy: 0 }, ANIM_TIME, lvl.animate.easeInOut);
           lvl.animate(dragon.view).now({ r: 0 }, ANIM_TIME, lvl.animate.easeInOut);
         } else if (roll < 0.5) {
-          lvl.animate(dragon).now({ vx: 100 + 900 * random(), vy: 0 }, ANIM_TIME, lvl.animate.easeInOut);
+          lvl.animate(dragon).now({ vx: 100 + 400 * random(), vy: 0 }, ANIM_TIME, lvl.animate.easeInOut);
           lvl.animate(dragon.view).now({ r: PI }, ANIM_TIME, lvl.animate.easeInOut);
         } else if (roll < 0.75) {
-          lvl.animate(dragon).now({ vx: 0, vy: -100 - 900 * random() }, ANIM_TIME, lvl.animate.easeInOut);
+          lvl.animate(dragon).now({ vx: 0, vy: -100 - 400 * random() }, ANIM_TIME, lvl.animate.easeInOut);
           lvl.animate(dragon.view).now({ r: PI / 2 }, ANIM_TIME, lvl.animate.easeInOut);
         } else {
-          lvl.animate(dragon).now({ vx: 0, vy: 100 + 900 * random() }, ANIM_TIME, lvl.animate.easeInOut);
+          lvl.animate(dragon).now({ vx: 0, vy: 100 + 400 * random() }, ANIM_TIME, lvl.animate.easeInOut);
           lvl.animate(dragon.view).now({ r: 3 * PI / 2 }, ANIM_TIME, lvl.animate.easeInOut);
         }
       }), ANIM_TIME);
 
       // Camera API Tests
       // TODO: these numbers don't feel exactly right with what you'd expect
-      lvl.camera.follow(dragon, {
-        lagDistanceX: 640,
-        lagDistanceY: 360
-      });
+      lvl.camera.follow(dragon);
     };
 
-    var dragonCount = 1;
+    var dragonCount = 2;
     for (var i = 0; i < dragonCount; i++) {
       spawnDragon(i);
     }
+
+    lvl.camera.minZoom = 0.05;
+    lvl.camera.maxZoom = 2;
   };
 
   this.launchUI = function () {};
