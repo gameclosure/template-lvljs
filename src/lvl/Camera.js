@@ -2,6 +2,7 @@ import entities.shapes.Rect as Rect;
 
 var min = Math.min;
 var max = Math.max;
+var pow = Math.pow;
 var MIN_NUM = -Number.MAX_VALUE;
 var MAX_NUM = Number.MAX_VALUE;
 
@@ -161,41 +162,22 @@ exports = Class("Camera", Rect, function () {
     _followRect.width = maxX - minX;
     _followRect.height = maxY - minY;
 
-    // TODO: camera velocity, animations?
-    // TODO: different easing functions?
-
     var dx = _followRect.centerX - this.centerX;
     if (dx < 0) {
-      if (dx < -this.lagDistanceX) {
-        this.x += dx;
-      } else {
-        var pct = dx / -this.lagDistanceX;
-        this.x += pct * pct * dx;
-      }
+      var pct = dx < -this.lagDistanceX ? 1 : pow(dx / -this.lagDistanceX, 2);
+      this.x += pct * dx;
     } else if (dx > 0) {
-      if (dx > this.lagDistanceX) {
-        this.x += dx;
-      } else {
-        var pct = dx / this.lagDistanceX;
-        this.x += pct * pct * dx;
-      }
+      var pct = dx > this.lagDistanceX ? 1 : pow(dx / this.lagDistanceX, 2);
+      this.x += pct * dx;
     }
 
     var dy = _followRect.centerY - this.centerY;
     if (dy < 0) {
-      if (dy < -this.lagDistanceY) {
-        this.y += dy;
-      } else {
-        var pct = dy / -this.lagDistanceY;
-        this.y += pct * pct * dy;
-      }
+      var pct = dy < -this.lagDistanceY ? 1 : pow(dy / -this.lagDistanceY, 2);
+      this.y += pct * dy;
     } else if (dy > 0) {
-      if (dy > this.lagDistanceY) {
-        this.y += dy;
-      } else {
-        var pct = dy / this.lagDistanceY;
-        this.y += pct * pct * dy;
-      }
+      var pct = dy > this.lagDistanceY ? 1 : pow(dy / this.lagDistanceY, 2);
+      this.y += pct * dy;
     }
   };
 });
