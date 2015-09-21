@@ -1,3 +1,5 @@
+import animate;
+
 // XXX: TODO: FIXME: COMPILER BUG
 jsio('import .Actor', { context: { backend: backend } });
 jsio('import .Actor');
@@ -34,12 +36,25 @@ var Level = Class("Level", function () {
     throw new Error("TODO");
   };
 
-  this.setTimeout = function () {
-    throw new Error("TODO");
+  // TODO: track and clear all animations on reset?
+  this.animate = animate;
+
+  this.setTimeout = function (fn, duration) {
+    // TODO: track and clear all timeouts on reset?
+    return setTimeout(fn, duration);
   };
 
-  this.setInterval = function () {
-    throw new Error("TODO");
+  this.clearTimeout = function (id) {
+    return clearTimeout(id);
+  };
+
+  this.setInterval = function (fn, duration) {
+    // TODO: track and clear all intervals on reset?
+    return setInterval(fn, duration);
+  };
+
+  this.clearInterval = function (id) {
+    return clearInterval(id);
   };
 
   // TODO: move this concept / API to camera viewport

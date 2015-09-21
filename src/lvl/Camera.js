@@ -40,19 +40,34 @@ exports = Class("Camera", function () {
   };
 
   this.moveTo = function (x, y) {
+    // the camera can't be manually controlled and following simultaneously
+    this.stopFollowingAll();
 
+    this.viewport.x = x;
+    this.viewport.y = y;
   };
 
   this.moveBy = function (dx, dy) {
+    // the camera can't be manually controlled and following simultaneously
+    this.stopFollowingAll();
 
+    this.viewport.x += dx;
+    this.viewport.y += dy;
   };
 
   this.zoomTo = function (z) {
+    // the camera can't be manually controlled and following simultaneously
+    this.stopFollowingAll();
 
+    this.zoom = z;
   };
 
   this.zoomBy = function (dz) {
+    // the camera can't be manually controlled and following simultaneously
+    this.stopFollowingAll();
 
+    // delta zoom is multiplicative
+    this.zoom *= dz;
   };
 
   this.follow = function (target, opts) {

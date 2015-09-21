@@ -2,6 +2,9 @@
 import animate;
 
 var ANIM_TIME = 2500;
+var PI = Math.PI;
+// TODO: lvl.random API, random seeds etc.
+var random = Math.random;
 
 exports = Class(GC.Application, function () {
   this.initUI = function () {
@@ -30,40 +33,20 @@ exports = Class(GC.Application, function () {
     var dragon = lvl.addActor(dragonSprite);
     dragon.x = lvl.camera.viewport.centerX;
     dragon.y = lvl.camera.viewport.centerY;
-    setInterval(bind(this, function () {
-      var roll = Math.random();
+    lvl.setInterval(bind(this, function () {
+      var roll = random();
       if (roll < 0.25) {
-        animate(dragon).now({
-          vx: -100 - 900 * Math.random(),
-          vy: 0
-        }, ANIM_TIME, animate.easeInOut);
-        animate(dragon.view).now({
-          r: 0
-        }, ANIM_TIME, animate.easeInOut);
+        lvl.animate(dragon).now({ vx: -100 - 900 * random(), vy: 0 }, ANIM_TIME, lvl.animate.easeInOut);
+        lvl.animate(dragon.view).now({ r: 0 }, ANIM_TIME, lvl.animate.easeInOut);
       } else if (roll < 0.5) {
-        animate(dragon).now({
-          vx: 100 + 900 * Math.random(),
-          vy: 0
-        }, ANIM_TIME, animate.easeInOut);
-        animate(dragon.view).now({
-          r: Math.PI
-        }, ANIM_TIME, animate.easeInOut);
+        lvl.animate(dragon).now({ vx: 100 + 900 * random(), vy: 0 }, ANIM_TIME, lvl.animate.easeInOut);
+        lvl.animate(dragon.view).now({ r: PI }, ANIM_TIME, lvl.animate.easeInOut);
       } else if (roll < 0.75) {
-        animate(dragon).now({
-          vx: 0,
-          vy: -100 - 900 * Math.random()
-        }, ANIM_TIME, animate.easeInOut);
-        animate(dragon.view).now({
-          r: Math.PI / 2
-        }, ANIM_TIME, animate.easeInOut);
+        lvl.animate(dragon).now({ vx: 0, vy: -100 - 900 * random() }, ANIM_TIME, lvl.animate.easeInOut);
+        lvl.animate(dragon.view).now({ r: PI / 2 }, ANIM_TIME, lvl.animate.easeInOut);
       } else {
-        animate(dragon).now({
-          vx: 0,
-          vy: 100 + 900 * Math.random()
-        }, ANIM_TIME, animate.easeInOut);
-        animate(dragon.view).now({
-          r: 3 * Math.PI / 2
-        }, ANIM_TIME, animate.easeInOut);
+        lvl.animate(dragon).now({ vx: 0, vy: 100 + 900 * random() }, ANIM_TIME, lvl.animate.easeInOut);
+        lvl.animate(dragon.view).now({ r: 3 * PI / 2 }, ANIM_TIME, lvl.animate.easeInOut);
       }
     }), ANIM_TIME);
 
