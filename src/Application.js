@@ -31,8 +31,8 @@ exports = Class(GC.Application, function () {
     // Actor API Tests
     var dragonSprite = lvl.resources.loadSpriteFromJSON('resources/sprites/serpent/config.json');
     var dragon = lvl.addActor(dragonSprite);
-    dragon.x = lvl.camera.viewport.centerX;
-    dragon.y = lvl.camera.viewport.centerY;
+    dragon.x = lvl.camera.centerX;
+    dragon.y = lvl.camera.centerY;
     lvl.setInterval(bind(this, function () {
       var roll = random();
       if (roll < 0.25) {

@@ -7,15 +7,49 @@ var MAX_NUM = Number.MAX_VALUE;
 
 /**
  * Camera Class
+ * - extends Rect
+ * - defines the public lvl.camera API
  */
-exports = Class("Camera", function () {
+exports = Class("Camera", Rect, function () {
+  var superProto = Rect.prototype;
+
   // private state
   var _lastX;
   var _lastY;
-  var _following;
+  var _width;
+  var _height;
+  var _followTargets;
   var _followRect;
 
   this.init = function () {
+    superProto.init.call(this, {
+      width: backend.getViewportWidth(),
+      height: backend.getViewportHeight()
+    });
+
+    _width = this.width;
+    _height = this.height;
+
+    Object.defineProperty(this, 'width', {
+      enumerable: true,
+      get: function () { return _width; },
+      set: function (value) {
+        // TODO: should camera width modify backend views ...
+        // camera width === device width, so changing that would essentially scale the view to fit?
+        // alternatively, we don't allow this to change at all
+        throw new Error("Cannot set camera width, it's defined by your device");
+      }
+    });
+
+    Object.defineProperty(this, 'height', {
+      enumerable: true,
+      get: function () { return _height; },
+      set: function (value) {
+        // TODO: see width above
+        throw new Error("Cannot set camera height, it's defined by your device");
+      }
+    });
+
     this.reset();
     backend.onTick(bind(this, onTick));
   };
@@ -26,33 +60,27 @@ exports = Class("Camera", function () {
     this.zoom = 1;
     this.lagDistanceX = 0;
     this.lagDistanceY = 0;
-    this.viewport = new Viewport();
 
-    _lastX = this.viewport.x;
-    _lastY = this.viewport.y;
-    _following = [];
-    _followRect = new Rect({
-      x: this.viewport.x,
-      y: this.viewport.y,
-      width: this.viewport.width,
-      height: this.viewport.height
-    });
+    _lastX = this.x;
+    _lastY = this.y;
+    _followTargets = [];
+    _followRect = new Rect(this);
   };
 
   this.moveTo = function (x, y) {
     // the camera can't be manually controlled and following simultaneously
     this.stopFollowingAll();
 
-    this.viewport.x = x;
-    this.viewport.y = y;
+    this.x = x;
+    this.y = y;
   };
 
   this.moveBy = function (dx, dy) {
     // the camera can't be manually controlled and following simultaneously
     this.stopFollowingAll();
 
-    this.viewport.x += dx;
-    this.viewport.y += dy;
+    this.x += dx;
+    this.y += dy;
   };
 
   this.zoomTo = function (z) {
@@ -75,7 +103,7 @@ exports = Class("Camera", function () {
       throw new Error("Camera can only follow instances of Actor!");
     }
 
-    _following.push(target);
+    _followTargets.push(target);
 
     if (opts.lagDistanceX !== undefined) {
       this.lagDistanceX = opts.lagDistanceX;
@@ -87,41 +115,41 @@ exports = Class("Camera", function () {
   };
 
   this.stopFollowing = function (target) {
-    var i = _following.indexOf(target);
+    var i = _followTargets.indexOf(target);
     if (i >= 0) {
-      _following.splice(i, 1);
+      _followTargets.splice(i, 1);
     }
   };
 
   this.stopFollowingAll = function () {
-    _following = [];
+    _followTargets = [];
   };
 
   // TODO: devkit should limit global tick to ~100 ms max! BIG TICKS BREAK STUFF
   // process changes to camera state by applying them to the backend
   function onTick (dt) {
-    this.viewport.x += this.vx * dt / 1000;
-    this.viewport.y += this.vy * dt / 1000;
+    this.x += this.vx * dt / 1000;
+    this.y += this.vy * dt / 1000;
 
     // update viewport if necessary
-    if (_following.length) {
-      doViewportFollow.call(this, dt);
+    if (_followTargets.length) {
+      followTargets.call(this, dt);
     }
 
-    var dx = this.viewport.x - _lastX;
-    var dy = this.viewport.y - _lastY;
+    var dx = this.x - _lastX;
+    var dy = this.y - _lastY;
     backend.moveViewportBy(dx, dy);
 
-    _lastX = this.viewport.x;
-    _lastY = this.viewport.y;
+    _lastX = this.x;
+    _lastY = this.y;
   };
 
-  function doViewportFollow () {
+  function followTargets () {
     var minX = MAX_NUM;
     var minY = MAX_NUM;
     var maxX = MIN_NUM;
     var maxY = MIN_NUM;
-    _following.forEach(function (target) {
+    _followTargets.forEach(function (target) {
       minX = min(target.entity.minX, minX);
       minY = min(target.entity.minY, minY);
       maxX = max(target.entity.maxX, maxX);
@@ -136,79 +164,38 @@ exports = Class("Camera", function () {
     // TODO: camera velocity, animations?
     // TODO: different easing functions?
 
-    var dx = _followRect.centerX - this.viewport.centerX;
+    var dx = _followRect.centerX - this.centerX;
     if (dx < 0) {
       if (dx < -this.lagDistanceX) {
-        this.viewport.x += dx;
+        this.x += dx;
       } else {
         var pct = dx / -this.lagDistanceX;
-        this.viewport.x += pct * pct * dx;
+        this.x += pct * pct * dx;
       }
     } else if (dx > 0) {
       if (dx > this.lagDistanceX) {
-        this.viewport.x += dx;
+        this.x += dx;
       } else {
         var pct = dx / this.lagDistanceX;
-        this.viewport.x += pct * pct * dx;
+        this.x += pct * pct * dx;
       }
     }
 
-    var dy = _followRect.centerY - this.viewport.centerY;
+    var dy = _followRect.centerY - this.centerY;
     if (dy < 0) {
       if (dy < -this.lagDistanceY) {
-        this.viewport.y += dy;
+        this.y += dy;
       } else {
         var pct = dy / -this.lagDistanceY;
-        this.viewport.y += pct * pct * dy;
+        this.y += pct * pct * dy;
       }
     } else if (dy > 0) {
       if (dy > this.lagDistanceY) {
-        this.viewport.y += dy;
+        this.y += dy;
       } else {
         var pct = dy / this.lagDistanceY;
-        this.viewport.y += pct * pct * dy;
+        this.y += pct * pct * dy;
       }
     }
-  };
-});
-
-
-
-/**
- * Viewport Class
- * - extends Rect
- * - defines the public lvl.camera.viewport API
- */
-var Viewport = Class("Viewport", Rect, function () {
-  var superProto = Rect.prototype;
-
-  this.init = function () {
-    superProto.init.call(this, {
-      width: backend.getViewportWidth(),
-      height: backend.getViewportHeight()
-    });
-
-    var _width = this.width;
-    var _height = this.height;
-
-    Object.defineProperty(this, 'width', {
-      enumerable: true,
-      get: function () { return _width; },
-      set: function (value) {
-        // TODO: should camera width modify backend views ...
-        // camera width === device width, so changing that would essentially scale the view to fit?
-        // alternatively, we don't allow this to change at all
-        throw new Error("Cannot set camera viewport width, it's defined by your device");
-      }
-    });
-
-    Object.defineProperty(this, 'height', {
-      enumerable: true,
-      get: function () { return _height; },
-      set: function (value) {
-        // TODO: see width above
-        throw new Error("Cannot set camera viewport height, it's defined by your device");
-      }
-    });
   };
 });
