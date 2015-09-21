@@ -4,7 +4,7 @@
   "dependencies": {
     "devkit-core": "https://github.com/gameclosure/devkit-core#v3.0.2",
     "devkit-entities": "git@github.com:gameclosure/devkit-entities#v0.5.1",
-    "devkit-parallax": "https://github.com/gameclosure/devkit-parallax#v0.2.0"
+    "devkit-parallax": "https://github.com/gameclosure/devkit-parallax#layer-scaling"
   },
   "ios": {
     "bundleID": "co.weeby.producer.mxc.test"
