@@ -10,15 +10,15 @@ var lvl = exports = jsio('import .Level');
 // They have no knowledge of the 'level' object (no external state dependencies)
 
 // XXX: TODO: FIXME: COMPILER BUG
-lvl.resource = jsio('import .resource', { context: { backend: backend } });
-lvl.resource = jsio('import .resource');
+lvl.resources = jsio('import .resources', { context: { backend: backend } });
+lvl.resources = jsio('import .resources');
 
 // XXX: TODO: FIXME: COMPILER BUG
-lvl.sound = jsio('import .sound', { context: { backend: backend } });
-lvl.sound = jsio('import .sound');
+lvl.sounds = jsio('import .sounds', { context: { backend: backend } });
+lvl.sounds = jsio('import .sounds');
 
 // XXX: TODO: FIXME: COMPILER BUG
-lvl.shape = jsio('import .shape', { context: { backend: backend } });
-lvl.shape = jsio('import .shape');
+lvl.shapes = jsio('import .shapes', { context: { backend: backend } });
+lvl.shapes = jsio('import .shapes');
 
 //lvl.startGame(...);
