@@ -1,6 +1,9 @@
+import .utils;
 import entities.Entity as Entity;
 import entities.EntityModel as EntityModel;
 import entities.EntityPool as EntityPool;
+
+var readOnlyProp = utils.addReadOnlyProperty;
 
 // Entity patches
 Entity.prototype.viewClass = null;
@@ -9,18 +12,6 @@ EntityModel.prototype._validate = function () { return true; };
 // pool physical entities and update them each tick
 var entityPool = new EntityPool();
 backend.onTick(bind(entityPool, 'update'));
-
-function readOnlyProp(ctx, name, getter) {
-  Object.defineProperty(ctx, name, {
-    enumerable: true,
-    configurable: true,
-    get: getter,
-    set: function () {
-      var ctxName = this.name ? this.name + " " : "";
-      throw new Error(ctxName + name + " is read-only!");
-    }
-  });
-};
 
 exports = Class("Actor", function () {
   // create a new actor

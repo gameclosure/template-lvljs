@@ -1,3 +1,4 @@
+import .utils;
 import entities.shapes.Rect as Rect;
 
 var min = Math.min;
@@ -5,15 +6,13 @@ var max = Math.max;
 var pow = Math.pow;
 var MIN_NUM = -Number.MAX_VALUE;
 var MAX_NUM = Number.MAX_VALUE;
+var readOnlyProp = utils.addReadOnlyProperty;
 
 /**
  * Camera Class
- * - extends Rect
  * - defines the public lvl.camera API
  */
-exports = Class("Camera", Rect, function () {
-  var superProto = Rect.prototype;
-
+exports = Class("Camera", function () {
   // private state
   var _lastX;
   var _lastY;
@@ -24,44 +23,27 @@ exports = Class("Camera", Rect, function () {
   var _followRect;
 
   this.init = function () {
-    superProto.init.call(this, {
-      width: backend.getViewportWidth(),
-      height: backend.getViewportHeight()
-    });
-
-    // TODO: kill velocity
-    // TODO: don't inherit Rect
     // TODO: max speeds and max zoom speed
     // TODO: follow bounds - PADDING TRBL - where can targets go within
     // TODO: world bounds - where can the camera go
     // TODO: Object.defineProp ... __animatableProperties
 
-    _width = this.width;
-    _height = this.height;
-
-    Object.defineProperty(this, 'width', {
-      enumerable: true,
-      get: function () { return _width; },
-      set: function (value) {
-        throw new Error("Cannot set camera width, it's defined by your device");
-      }
-    });
-
-    Object.defineProperty(this, 'height', {
-      enumerable: true,
-      get: function () { return _height; },
-      set: function (value) {
-        throw new Error("Cannot set camera height, it's defined by your device");
-      }
-    });
-
     this.reset();
     backend.onTick(bind(this, onTick));
   };
 
+  readOnlyProp(this, 'width', function () { return _width; });
+  readOnlyProp(this, 'height', function () { return _height; });
+  readOnlyProp(this, 'centerX', function () { return this.x + _width / 2; });
+  readOnlyProp(this, 'centerY', function () { return this.y + _height / 2; });
+  readOnlyProp(this, 'top', function () { return this.y; });
+  readOnlyProp(this, 'right', function () { return this.x + _width; });
+  readOnlyProp(this, 'bottom', function () { return this.y + _height; });
+  readOnlyProp(this, 'left', function () { return this.x; });
+
   this.reset = function () {
-    this.vx = 0;
-    this.vy = 0;
+    this.x = 0;
+    this.y = 0;
     this.zoom = 1;
     this.minZoom = 0.2;
     this.maxZoom = 1;
@@ -69,6 +51,8 @@ exports = Class("Camera", Rect, function () {
     this.lagY = 0;
     this.lagZoom = 0;
 
+    _width = backend.getViewportWidth();
+    _height = backend.getViewportHeight();
     _lastX = this.x;
     _lastY = this.y;
     _lastZoom = this.zoom;
@@ -144,9 +128,6 @@ exports = Class("Camera", Rect, function () {
 
   // process changes to camera state by applying them to the backend
   function onTick (dt) {
-    this.x += this.vx * dt / 1000;
-    this.y += this.vy * dt / 1000;
-
     // update viewport if necessary
     if (_followTargets.length) {
       followTargets.call(this, dt);
@@ -154,9 +135,8 @@ exports = Class("Camera", Rect, function () {
 
     var dx = this.x - _lastX;
     var dy = this.y - _lastY;
-    backend.moveViewportBy(dx, dy);
-
     var dz = this.zoom / _lastZoom;
+    backend.moveViewportBy(dx, dy);
     backend.scaleViewportBy(dz);
 
     _lastX = this.x;
@@ -202,7 +182,7 @@ exports = Class("Camera", Rect, function () {
     }
 
     // camera zoom to fit all targets, constrained within minZoom and maxZoom
-    var zoom = min(this.width / _followRect.width, this.height / _followRect.height);
+    var zoom = min(_width / _followRect.width, _height / _followRect.height);
     zoom = min(this.maxZoom, max(this.minZoom, zoom));
     var dz = zoom - this.zoom;
     if (dz < 0) {
