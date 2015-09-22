@@ -14,8 +14,8 @@ var Level = Class("Level", function () {
   this.init = function () {
     this.bg = new Scenery('background');
     this.fg = new Scenery('foreground');
-    this.ui = new UI();
-    this.camera = new Camera();
+    this.ui = UI;
+    this.camera = Camera;
   };
 
   // TODO: remove / fix this

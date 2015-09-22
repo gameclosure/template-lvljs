@@ -12,7 +12,7 @@ var readOnlyProp = utils.addReadOnlyProperty;
  * Camera Class
  * - defines the public lvl.camera API
  */
-exports = Class("Camera", function () {
+var Camera = Class("Camera", function () {
   // private state
   var _lastX;
   var _lastY;
@@ -194,3 +194,6 @@ exports = Class("Camera", function () {
     }
   };
 });
+
+// singleton class
+exports = new Camera();
