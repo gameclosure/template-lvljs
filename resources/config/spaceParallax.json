@@ -26,21 +26,25 @@
       ]
     },
     {
-      "xMultiplier": 0.5,
+      "xMultiplier": 0.25,
       "xCanSpawn": true,
       "xCanRelease": true,
       "xGapRange": [50, 250],
-      "yMultiplier": 0.5,
+      "yMultiplier": 0.25,
       "yCanSpawn": true,
       "yCanRelease": true,
       "yGapRange": [50, 250],
       "zIndex": 5,
-      "scaleMultiplier": 0.5,
+      "scaleMultiplier": 0.75,
       "pieceOptions": [
         {
+          "scale": 0.8,
+          "opacity": 0.8,
           "image": "resources/images/space/planet_01.png"
         },
         {
+          "scale": 0.8,
+          "opacity": 0.8,
           "image": "resources/images/space/planet_02.png"
         }
       ]

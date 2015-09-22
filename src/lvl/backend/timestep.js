@@ -309,7 +309,8 @@ var LayerView = Class(View, function () {
   this.tick = function (dt) {
     // parallax update independently since layers have different relative motion
     this._parallaxes.forEach(function (parallax) {
-      parallax.update(-this._x, -this._y);
+      // TODO: should applying the scale to the position be handled by parallax?
+      parallax.update(-this._x * this._scale, -this._y * this._scale);
       parallax.setScale(this._scale);
     }, this);
 

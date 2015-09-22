@@ -29,6 +29,13 @@ exports = Class("Camera", Rect, function () {
       height: backend.getViewportHeight()
     });
 
+    // TODO: kill velocity
+    // TODO: don't inherit Rect
+    // TODO: max speeds and max zoom speed
+    // TODO: follow bounds - PADDING TRBL - where can targets go within
+    // TODO: world bounds - where can the camera go
+    // TODO: Object.defineProp ... __animatableProperties
+
     _width = this.width;
     _height = this.height;
 
@@ -36,9 +43,6 @@ exports = Class("Camera", Rect, function () {
       enumerable: true,
       get: function () { return _width; },
       set: function (value) {
-        // TODO: should camera width modify backend views ...
-        // camera width === device width, so changing that would essentially scale the view to fit?
-        // alternatively, we don't allow this to change at all
         throw new Error("Cannot set camera width, it's defined by your device");
       }
     });
@@ -47,7 +51,6 @@ exports = Class("Camera", Rect, function () {
       enumerable: true,
       get: function () { return _height; },
       set: function (value) {
-        // TODO: see width above
         throw new Error("Cannot set camera height, it's defined by your device");
       }
     });
@@ -60,8 +63,6 @@ exports = Class("Camera", Rect, function () {
     this.vx = 0;
     this.vy = 0;
     this.zoom = 1;
-    // TODO: minZoom and maxZoom are diff than minX and maxX inherited from Rect
-    // solve by creating a 'bounds' object, { minX: #, .... minZoom: # } ?
     this.minZoom = 0.2;
     this.maxZoom = 1;
     this.lagX = 0;
@@ -95,6 +96,7 @@ exports = Class("Camera", Rect, function () {
     // the camera can't be manually controlled and following simultaneously
     this.stopFollowingAll();
 
+    // TODO: constrain
     this.zoom = z;
   };
 
@@ -121,6 +123,10 @@ exports = Class("Camera", Rect, function () {
     if (opts.lagY !== undefined) {
       this.lagY = opts.lagY;
     }
+
+    if (opts.lagZoom !== undefined) {
+      this.lagZoom = opts.lagZoom;
+    }
   };
 
   this.stopFollowing = function (target) {
@@ -135,6 +141,7 @@ exports = Class("Camera", Rect, function () {
   };
 
   // TODO: devkit should limit global tick to ~100 ms max! BIG TICKS BREAK STUFF
+
   // process changes to camera state by applying them to the backend
   function onTick (dt) {
     this.x += this.vx * dt / 1000;
