@@ -38,6 +38,18 @@ exports.moveViewportBy = function (dx, dy) {
   });
 };
 
+exports.scaleViewportTo = function (s) {
+  forEachWorldView(function (view, i) {
+    view.scaleTo(s);
+  });
+};
+
+exports.scaleViewportBy = function (ds) {
+  forEachWorldView(function (view, i) {
+    view.scaleBy(ds);
+  });
+};
+
 // TODO: the camera should probably control this
 // set view dimensions, but guarantee scale to fit full screen
 exports.setFullScreenDimensions = function (width, height) {
@@ -208,11 +220,19 @@ var LayerView = Class(View, function () {
     superProto.init.call(this, opts);
     this.type = type;
     this._reset();
+    this._nonParallaxRoot = new View({
+      parent: this,
+      anchorX: this.style.width / 2,
+      anchorY: this.style.height / 2,
+      width: this.style.width,
+      height: this.style.height
+    });
   };
 
   this._reset = function () {
     this._x = 0;
     this._y = 0;
+    this._scale = 1;
     this._parallaxes = [];
     this._otherViews = [];
   };
@@ -230,7 +250,7 @@ var LayerView = Class(View, function () {
         throw new Error("Invalid Parallax Layers:", section, config);
       }
     } else {
-      this.addSubview(view);
+      this._nonParallaxRoot.addSubview(view);
       this._otherViews.push(view);
     }
   };
@@ -277,11 +297,21 @@ var LayerView = Class(View, function () {
     this._y += dy;
   };
 
+  this.scaleTo = function (s) {
+    this._scale = s;
+  };
+
+  this.scaleBy = function (ds) {
+    this._scale *= ds;
+  };
+
   // update subview positions
   this.tick = function (dt) {
     // parallax update independently since layers have different relative motion
     this._parallaxes.forEach(function (parallax) {
-      parallax.update(-this._x, -this._y);
+      // TODO: should applying the scale to the position be handled by parallax?
+      parallax.update(-this._x * this._scale, -this._y * this._scale);
+      parallax.setScale(this._scale);
     }, this);
 
     // non-parallax views move 1-to-1 with the world
@@ -295,6 +325,12 @@ var LayerView = Class(View, function () {
         view.style.y = -this._y;
       }
     }, this);
+
+    this._nonParallaxRoot.style.anchorX = this.style.width / 2;
+    this._nonParallaxRoot.style.anchorY = this.style.height / 2;
+    this._nonParallaxRoot.style.width = this.style.width;
+    this._nonParallaxRoot.style.height = this.style.height;
+    this._nonParallaxRoot.style.scale = this._scale;
   };
 });
 

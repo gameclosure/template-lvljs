@@ -28,6 +28,13 @@ exports = Class(GC.Application, function () {
     // lvl.fg.add(mist, {sectionName: 'scaryMist'})
     // lvl.bg.autoScrollBy(0, 250); // MAYBE ?
 
+
+    // Input
+    // lvl.input.on("touchstart", function () {});
+    // lvl.input.on("touchend", function () {});
+    // lvl.input.on("touchmove", function () {});
+    // lvl.getActorsAtScreenPosition(x,y) { -- ordered by zIndex, top-most first
+
     // Actor API Tests
     var dragonSprite = lvl.resources.loadSpriteFromJSON('resources/sprites/serpent/config.json');
     function spawnDragon (i) {
@@ -37,34 +44,72 @@ exports = Class(GC.Application, function () {
       lvl.setInterval(bind(this, function () {
         var roll = random();
         if (roll < 0.25) {
-          lvl.animate(dragon).now({ vx: -100 - 900 * random(), vy: 0 }, ANIM_TIME, lvl.animate.easeInOut);
+          lvl.animate(dragon).now({ vx: -1000, vy: 0 }, ANIM_TIME, lvl.animate.easeInOut);
           lvl.animate(dragon.view).now({ r: 0 }, ANIM_TIME, lvl.animate.easeInOut);
         } else if (roll < 0.5) {
-          lvl.animate(dragon).now({ vx: 100 + 900 * random(), vy: 0 }, ANIM_TIME, lvl.animate.easeInOut);
+          lvl.animate(dragon).now({ vx: 1000, vy: 0 }, ANIM_TIME, lvl.animate.easeInOut);
           lvl.animate(dragon.view).now({ r: PI }, ANIM_TIME, lvl.animate.easeInOut);
         } else if (roll < 0.75) {
-          lvl.animate(dragon).now({ vx: 0, vy: -100 - 900 * random() }, ANIM_TIME, lvl.animate.easeInOut);
+          lvl.animate(dragon).now({ vx: 0, vy: -1000 }, ANIM_TIME, lvl.animate.easeInOut);
           lvl.animate(dragon.view).now({ r: PI / 2 }, ANIM_TIME, lvl.animate.easeInOut);
         } else {
-          lvl.animate(dragon).now({ vx: 0, vy: 100 + 900 * random() }, ANIM_TIME, lvl.animate.easeInOut);
+          lvl.animate(dragon).now({ vx: 0, vy: 1000 }, ANIM_TIME, lvl.animate.easeInOut);
           lvl.animate(dragon.view).now({ r: 3 * PI / 2 }, ANIM_TIME, lvl.animate.easeInOut);
         }
       }), ANIM_TIME);
 
       // Camera API Tests
       // TODO: these numbers don't feel exactly right with what you'd expect
-      lvl.camera.follow(dragon, {
-        lagDistanceX: 640,
-        lagDistanceY: 360
-      });
+      lvl.camera.follow(dragon);
     };
 
-    var dragonCount = 1;
+    var dragonCount = 500;
     for (var i = 0; i < dragonCount; i++) {
       spawnDragon(i);
     }
+
+    lvl.camera.minZoom = 0.01;
+    lvl.camera.maxZoom = 2;
   };
 
   this.launchUI = function () {};
 
 });
+
+
+// TODO: COLLISION NOTES
+// endless runner, you better stay on the screen
+
+// var bounds lvl.addActor(new lvl.Shape({x1,y1,x2,y2}));
+
+// bounds.vx = 400
+// bounds.ax = 50
+// bounds.fixed = true
+
+// player.collidesWith = function(bounds, collisionResolverCb)
+
+// function(o1, o2) {
+//   o1.resolveCollision(o2);
+// })
+
+
+
+// bounds.defaultCollides = [true] / false
+
+// bounds.removeCollidesWith(...)
+// bounds.addCollidesWith(...)
+
+// player.collidesWith([bounds, platforms, dragons, fire]);
+
+// player.onCollision([dragon, fire], function(player, object) {
+//   collison.resolve();
+// })
+
+
+// camera.follow(bounds);
+
+
+// bounds.onBorderCollision(player, function() {
+//   resolve(bounds, player);
+//   // move player back in box.
+// })
