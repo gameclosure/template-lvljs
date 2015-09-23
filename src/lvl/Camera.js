@@ -7,13 +7,13 @@ var pow = Math.pow;
 var MIN_NUM = -Number.MAX_VALUE;
 var MAX_NUM = Number.MAX_VALUE;
 var readOnlyProp = utils.addReadOnlyProperty;
+var validatedProp = utils.addValidatedProperty;
 
 /**
  * Camera Class
  * - defines the public lvl.camera API
  */
 var Camera = Class("Camera", function () {
-  // private state
   var _lastX;
   var _lastY;
   var _lastZoom;
@@ -23,6 +23,9 @@ var Camera = Class("Camera", function () {
   var _followRect;
 
   this.init = function () {
+    _width = backend.getViewportWidth();
+    _height = backend.getViewportHeight();
+
     // TODO: max speeds and max zoom speed
     // TODO: follow bounds - PADDING TRBL - where can targets go within
     // TODO: world bounds - where can the camera go
@@ -32,6 +35,7 @@ var Camera = Class("Camera", function () {
     backend.onTick(bind(this, onTick));
   };
 
+  // read-only camera properties
   readOnlyProp(this, 'width', function () { return _width; });
   readOnlyProp(this, 'height', function () { return _height; });
   readOnlyProp(this, 'centerX', function () { return this.x + _width / 2; });
@@ -42,23 +46,92 @@ var Camera = Class("Camera", function () {
   readOnlyProp(this, 'left', function () { return this.x; });
 
   this.reset = function () {
+    // camera viewport
     this.x = 0;
     this.y = 0;
     this.zoom = 1;
+
+    // camera viewport bounds
+    this.minX = MIN_NUM;
+    this.maxX = MAX_NUM;
+    this.minY = MIN_NUM;
+    this.maxY = MAX_NUM;
     this.minZoom = 0.2;
     this.maxZoom = 1;
-    this.lagX = 0;
-    this.lagY = 0;
-    this.lagZoom = 0;
 
-    _width = backend.getViewportWidth();
-    _height = backend.getViewportHeight();
+    // padding to contain follow targets within the viewport
+    this.followPaddingTop = 0;
+    this.followPaddingRight = 0;
+    this.followPaddingBottom = 0;
+    this.followPaddingLeft = 0;
+
+    // private camera properties
     _lastX = this.x;
     _lastY = this.y;
     _lastZoom = this.zoom;
     _followTargets = [];
     _followRect = new Rect(this);
   };
+
+  validatedProp(this, 'minX', function (value) {
+    if (value > this.maxX) {
+      throw new Error("Camera minX cannot exceed maxX!");
+    }
+  });
+
+  validatedProp(this, 'maxX', function (value) {
+    if (value < this.minX) {
+      throw new Error("Camera minX cannot exceed maxX!");
+    }
+  });
+
+  validatedProp(this, 'minY', function (value) {
+    if (value > this.maxY) {
+      throw new Error("Camera minY cannot exceed maxY!");
+    }
+  });
+
+  validatedProp(this, 'maxY', function (value) {
+    if (value < this.minY) {
+      throw new Error("Camera minY cannot exceed maxY!");
+    }
+  });
+
+  validatedProp(this, 'minZoom', function (value) {
+    if (value > this.maxZoom) {
+      throw new Error("Camera minZoom cannot exceed maxZoom!");
+    }
+  });
+
+  validatedProp(this, 'maxZoom', function (value) {
+    if (value < this.minZoom) {
+      throw new Error("Camera minZoom cannot exceed maxZoom!");
+    }
+  });
+
+  validatedProp(this, 'followPaddingLeft', function (value) {
+    if (value + this.followPaddingRight > _width) {
+      throw new Error("Camera padding left + right cannot exceed width!");
+    }
+  });
+
+  validatedProp(this, 'followPaddingRight', function (value) {
+    if (value + this.followPaddingLeft > _width) {
+      throw new Error("Camera padding left + right cannot exceed width!");
+    }
+  });
+
+  validatedProp(this, 'followPaddingTop', function (value) {
+    if (value + this.followPaddingBottom > _height) {
+      throw new Error("Camera padding top + bottom cannot exceed height!");
+    }
+  });
+
+  validatedProp(this, 'followPaddingBottom', function (value) {
+    if (value + this.followPaddingTop > _height) {
+      throw new Error("Camera padding top + bottom cannot exceed height!");
+    }
+  });
 
   this.moveTo = function (x, y) {
     // the camera can't be manually controlled and following simultaneously
@@ -95,22 +168,10 @@ var Camera = Class("Camera", function () {
   this.follow = function (target, opts) {
     opts = opts || {};
     if (target.__class__ !== "Actor") {
-      throw new Error("Camera can only follow instances of Actor!");
+      throw new Error("Camera can only follow Actors!");
     }
 
     _followTargets.push(target);
-
-    if (opts.lagX !== undefined) {
-      this.lagX = opts.lagX;
-    }
-
-    if (opts.lagY !== undefined) {
-      this.lagY = opts.lagY;
-    }
-
-    if (opts.lagZoom !== undefined) {
-      this.lagZoom = opts.lagZoom;
-    }
   };
 
   this.stopFollowing = function (target) {
@@ -128,7 +189,11 @@ var Camera = Class("Camera", function () {
 
   // process changes to camera state by applying them to the backend
   function onTick (dt) {
-    // update viewport if necessary
+    // constrain the camera within its physical bounds
+    this.x = min(this.maxX, max(this.minX, this.x));
+    this.y = min(this.maxY, max(this.minY, this.y));
+    this.zoom = min(this.maxZoom, max(this.minZoom, this.zoom));
+
     if (_followTargets.length) {
       followTargets.call(this, dt);
     }
@@ -145,6 +210,11 @@ var Camera = Class("Camera", function () {
   };
 
   function followTargets () {
+    // TODO: remove deprecated API lagProps
+    this.lagX = 0;
+    this.lagY = 0;
+    this.lagZoom = 0;
+
     // _followRect position and dimensions calculated by target spread
     var minX = MAX_NUM;
     var minY = MAX_NUM;
@@ -182,6 +252,9 @@ var Camera = Class("Camera", function () {
     }
 
     // camera zoom to fit all targets, constrained within minZoom and maxZoom
+    // var effectiveWidth = _width * this.zoom;
+    // var effectiveHeight = _height * this.zoom;
+
     var zoom = min(_width / _followRect.width, _height / _followRect.height);
     zoom = min(this.maxZoom, max(this.minZoom, zoom));
     var dz = zoom - this.zoom;

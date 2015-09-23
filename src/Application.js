@@ -113,3 +113,5 @@ exports = Class(GC.Application, function () {
 //   resolve(bounds, player);
 //   // move player back in box.
 // })
+
+// TODO : world / camera / etc bounding rects
