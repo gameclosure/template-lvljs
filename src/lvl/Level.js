@@ -9,6 +9,8 @@ jsio('import .UI', { context: { backend: backend } });
 jsio('import .UI');
 jsio('import .Camera', { context: { backend: backend } });
 jsio('import .Camera');
+jsio('import .Input', { context: { backend: backend } });
+jsio('import .Input');
 
 var Level = Class("Level", function () {
   this.init = function () {
@@ -16,11 +18,17 @@ var Level = Class("Level", function () {
     this.fg = new Scenery('foreground');
     this.ui = UI;
     this.camera = Camera;
+    this.input = Input;
   };
 
   // TODO: remove / fix this
   this.initializeWithView = function (view) {
     this._view = view;
+  };
+
+  this.reset = function () {
+    // TODO: reset backend first, then reset lvl API
+    throw new Error("TODO");
   };
 
   this.addActor = function (resource, geometryOverrides) {
@@ -61,6 +69,11 @@ var Level = Class("Level", function () {
   this.clearInterval = function (id) {
     // TODO: implement version that ticks w backend
     return clearInterval(id);
+  };
+
+  // ordered by zIndex, top-most first
+  this.getActorsAtScreenPosition = function (x, y) {
+    throw new Error("TODO");
   };
 
   // TODO: move this concept / API to camera viewport

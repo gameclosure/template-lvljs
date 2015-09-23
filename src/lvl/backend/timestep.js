@@ -18,12 +18,16 @@ var DEVICE_HEIGHT = device.screen.height;
  * Timestep Backend API
  */
 
+exports.reset = function () {
+  throw new Error("TODO");
+};
+
 exports.getViewportWidth = function () {
-  return _viewWidth;
+  return viewWidth;
 };
 
 exports.getViewportHeight = function () {
-  return _viewHeight;
+  return viewHeight;
 };
 
 exports.moveViewportTo = function (x, y) {
@@ -50,30 +54,34 @@ exports.scaleViewportBy = function (ds) {
   });
 };
 
+exports.registerInputHandler = function (eventName, callback) {
+  uiView.registerInputHandler(eventName, callback);
+};
+
 // TODO: the camera should probably control this
 // set view dimensions, but guarantee scale to fit full screen
 exports.setFullScreenDimensions = function (width, height) {
   exports.setCustomDimensions(
-    _isLandscape ? DEVICE_WIDTH * (height / DEVICE_HEIGHT) : width,
-    _isLandscape ? height : DEVICE_HEIGHT * (width / DEVICE_WIDTH),
-    _isLandscape ? DEVICE_HEIGHT / height : DEVICE_WIDTH / width);
+    isLandscape ? DEVICE_WIDTH * (height / DEVICE_HEIGHT) : width,
+    isLandscape ? height : DEVICE_HEIGHT * (width / DEVICE_WIDTH),
+    isLandscape ? DEVICE_HEIGHT / height : DEVICE_WIDTH / width);
 };
 
 // TODO: the camera should probably control this
 // set view dimensions and scale, without restriction
 exports.setCustomDimensions = function (width, height, scale) {
-  _viewWidth = width || DEFAULT_WIDTH;
-  _viewHeight = height || DEFAULT_HEIGHT;
-  _viewScale = scale || 1;
+  viewWidth = width || DEFAULT_WIDTH;
+  viewHeight = height || DEFAULT_HEIGHT;
+  viewScale = scale || 1;
 
   forEachView(function (view, i) {
-    view.style.x = (_rootView.style.width - _viewWidth) / 2;
-    view.style.y = (_rootView.style.height - _viewHeight) / 2;
-    view.style.anchorX = _viewWidth / 2;
-    view.style.anchorY = _viewHeight / 2;
-    view.style.width = _viewWidth;
-    view.style.height = _viewHeight;
-    view.style.scale = _viewScale;
+    view.style.x = (rootView.style.width - viewWidth) / 2;
+    view.style.y = (rootView.style.height - viewHeight) / 2;
+    view.style.anchorX = viewWidth / 2;
+    view.style.anchorY = viewHeight / 2;
+    view.style.width = viewWidth;
+    view.style.height = viewHeight;
+    view.style.scale = viewScale;
   }, this);
 };
 
@@ -342,7 +350,98 @@ var LayerView = Class(View, function () {
 var UIView = Class(View, function () {
   var superProto = View.prototype;
 
-  // TODO: write UIView
+  this.init = function (opts) {
+    superProto.init.call(this, opts);
+    this._reset();
+  };
+
+  this._reset = function () {
+    // TODO: support mouse over and other events?
+    this.inputStartHandlers = [];
+    this.inputMoveHandlers = [];
+    this.inputStopHandlers = [];
+  };
+
+  this.clear = function () {
+    // TODO: this.removeAllSubviews() ... recycle into pools
+    this._reset();
+  };
+
+  this.onInputStart = function (startEvent, startPoint) {
+    for (var i = 0; i < this.inputStartHandlers.length; i++) {
+      var handler = this.inputStartHandlers[i];
+      var pt = startEvent.pt[this.uid] || startPoint;
+      handler('touchstart', {
+        x: pt.x,
+        y: pt.y,
+        touchID: startEvent.id
+      });
+    }
+    this.startDrag();
+  };
+
+  this.onDragStart = function (dragEvent) {};
+
+  // used instead of onInputMove, which fires on mouse over
+  this.onDrag = function (dragEvent, moveEvent, delta) {
+    for (var i = 0; i < this.inputMoveHandlers.length; i++) {
+      var handler = this.inputMoveHandlers[i];
+      var pt = moveEvent.pt[this.uid] || dragEvent.localPt;
+      handler('touchmove', {
+        x: pt.x,
+        y: pt.y,
+        touchID: moveEvent.id
+      });
+    }
+  };
+
+  // fires instead of onInputSelect when dragging
+  this.onDragStop = function (dragEvent, stopEvent) {
+    for (var i = 0; i < this.inputStopHandlers.length; i++) {
+      var handler = this.inputStopHandlers[i];
+      var pt = stopEvent.pt[this.uid] || dragEvent.localPt;
+      handler('touchend', {
+        x: pt.x,
+        y: pt.y,
+        touchID: stopEvent.id
+      });
+    }
+  };
+
+  // fires on mouse over and on drag, ignore for now
+  this.onInputMove = function () {};
+
+  // fires instead of onDragStop when tapping
+  this.onInputSelect = function (stopEvent, stopPoint) {
+    for (var i = 0; i < this.inputStopHandlers.length; i++) {
+      var handler = this.inputStopHandlers[i];
+      var pt = stopEvent.pt[this.uid] || stopPoint;
+      handler('touchend', {
+        x: pt.x,
+        y: pt.y,
+        touchID: stopEvent.id
+      });
+    }
+  };
+
+  this.registerInputHandler = function (eventName, callback) {
+    switch (eventName) {
+      case 'touchstart':
+        this.inputStartHandlers.push(callback);
+        break;
+
+      case 'touchend':
+        this.inputStopHandlers.push(callback);
+        break;
+
+      case 'touchmove':
+        this.inputMoveHandlers.push(callback);
+        break;
+
+      default:
+        throw new Error("Timestep backend, unhandled input event:", eventName);
+    }
+  };
 });
 
 
@@ -351,22 +450,22 @@ var UIView = Class(View, function () {
  * Timestep Backend View Hierarchy
  */
 
-var _rootView = GC.app.view;
-var _isLandscape = DEVICE_WIDTH > DEVICE_HEIGHT;
-var _viewWidth = _isLandscape ? DEFAULT_HEIGHT : DEFAULT_WIDTH;
-var _viewHeight = _isLandscape ? DEFAULT_WIDTH : DEFAULT_HEIGHT;
-var _viewScale;
+var rootView = GC.app.view;
+var isLandscape = DEVICE_WIDTH > DEVICE_HEIGHT;
+var viewWidth = isLandscape ? DEFAULT_HEIGHT : DEFAULT_WIDTH;
+var viewHeight = isLandscape ? DEFAULT_WIDTH : DEFAULT_HEIGHT;
+var viewScale;
 
-var backgroundView = new LayerView('background', { superview: _rootView });
-var levelView = new LayerView('level', { superview: _rootView });
-var foregroundView = new LayerView('foreground', { superview: _rootView });
-var uiView = new UIView ({ superview: _rootView });
+var backgroundView = new LayerView('background', { superview: rootView });
+var levelView = new LayerView('level', { superview: rootView });
+var foregroundView = new LayerView('foreground', { superview: rootView });
+var uiView = new UIView ({ superview: rootView });
 
-exports.setFullScreenDimensions(_viewWidth, _viewHeight);
+exports.setFullScreenDimensions(viewWidth, viewHeight);
 
 // update the scenery and level views
 function forEachWorldView (fn, ctx) {
-  var subviews = _rootView.getSubviews();
+  var subviews = rootView.getSubviews();
   for (var i = 0; i < subviews.length; i++) {
     var view = subviews[i];
     if (view !== uiView) {
@@ -377,7 +476,7 @@ function forEachWorldView (fn, ctx) {
 
 // update all views including the ui
 function forEachView (fn, ctx) {
-  var subviews = _rootView.getSubviews();
+  var subviews = rootView.getSubviews();
   for (var i = 0; i < subviews.length; i++) {
     var view = subviews[i];
     fn.call(this, view, i);

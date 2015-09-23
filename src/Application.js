@@ -28,12 +28,16 @@ exports = Class(GC.Application, function () {
     // lvl.fg.add(mist, {sectionName: 'scaryMist'})
     // lvl.bg.autoScrollBy(0, 250); // MAYBE ?
 
-
-    // Input
-    // lvl.input.on("touchstart", function () {});
-    // lvl.input.on("touchend", function () {});
-    // lvl.input.on("touchmove", function () {});
-    // lvl.getActorsAtScreenPosition(x,y) { -- ordered by zIndex, top-most first
+    // Input API Tests
+    lvl.input.on('touchstart', function (data) {
+      logger.log('TOUCH START:', data.x, data.y, data.touchID);
+    }, this);
+    lvl.input.on('touchend', function (data) {
+      logger.log('TOUCH END:', data.x, data.y, data.touchID);
+    }, this);
+    lvl.input.on('touchmove', function (data) {
+      logger.log('TOUCH MOVE:', data.x, data.y, data.touchID);
+    }, this);
 
     // Actor API Tests
     var dragonSprite = lvl.resources.loadSpriteFromJSON('resources/sprites/serpent/config.json');
@@ -74,9 +78,6 @@ exports = Class(GC.Application, function () {
     lvl.camera.minZoom = 0.01;
     lvl.camera.maxZoom = 1;
   };
-
-  this.launchUI = function () {};
-
 });
 
 
