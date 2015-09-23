@@ -15,8 +15,8 @@ exports = Class(GC.Application, function () {
     // Sound API Tests
     // var sfx = lvl.resources.loadSound('resources/sounds/v_fever_a.mp3');
     // var music = lvl.resources.loadMusic('resources/sounds/game.mp3');
-    // lvl.sound.playSound(sfx, { volume: 0.5 + 0.5 * Math.random() });
-    // lvl.sound.playMusic(music);
+    // lvl.sounds.playSound(sfx, { volume: 0.5 + 0.5 * Math.random() });
+    // lvl.sounds.playMusic(music);
 
     // Parallax API Tests
     var parallax = lvl.resources.loadParallaxFromJSON('resources/config/spaceParallax.json');

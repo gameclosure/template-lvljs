@@ -7,6 +7,7 @@ exports.playMusic = function (resource, opts) {
     throw new Error("playMusic requires resource of type music");
   }
 
+  // TODO: soundManager.getSound throws a warning the first time through...
   var path = resource.getFullPath();
   var music = soundManager.getSound(path);
   if (!music) {
@@ -35,6 +36,7 @@ exports.playSound = function (resource, opts) {
     throw new Error("playSound requires resource of type sound");
   }
 
+  // TODO: soundManager.getSound throws a warning the first time through...
   var path = resource.getFullPath();
   var sound = soundManager.getSound(path);
   if (!sound) {
@@ -52,8 +54,14 @@ exports.playSound = function (resource, opts) {
   soundManager.play(path);
 };
 
-exports.mute = function (mute) {};
+exports.mute = function (mute) {
+  throw new Error("TODO");
+};
 
-exports.muteSound = function (mute) {};
+exports.muteSound = function (mute) {
+  throw new Error("TODO");
+};
 
-exports.muteMusic = function (mute) {};
+exports.muteMusic = function (mute) {
+  throw new Error("TODO");
+};

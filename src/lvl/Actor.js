@@ -109,9 +109,6 @@ exports = Class("Actor", function () {
     get: function () { return this.entity.fixed; },
     set: function (value) { this.entity.fixed = value; }
   });
-
-  // expose the physical shape of the actor
-  readOnlyProp(this, 'shape', function () { return this.entity.shape; });
 });
 
 

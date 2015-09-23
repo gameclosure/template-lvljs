@@ -41,19 +41,23 @@ var Level = Class("Level", function () {
 
   this.setTimeout = function (fn, duration) {
     // TODO: track and clear all timeouts on reset?
+    // TODO: implement version that ticks w backend
     return setTimeout(fn, duration);
   };
 
   this.clearTimeout = function (id) {
+    // TODO: implement version that ticks w backend
     return clearTimeout(id);
   };
 
   this.setInterval = function (fn, duration) {
     // TODO: track and clear all intervals on reset?
+    // TODO: implement version that ticks w backend
     return setInterval(fn, duration);
   };
 
   this.clearInterval = function (id) {
+    // TODO: implement version that ticks w backend
     return clearInterval(id);
   };
 

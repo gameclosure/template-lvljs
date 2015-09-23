@@ -1,5 +1,5 @@
 import .utils;
-import entities.shapes.Rect as Rect;
+import .shapes.Rect as Rect;
 
 var min = Math.min;
 var max = Math.max;

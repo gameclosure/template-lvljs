@@ -1,6 +1,6 @@
-import entities.shapes.Rect as Rect;
-import entities.shapes.Circle as Circle;
-import entities.shapes.Line as Line;
+import .Rect;
+import .Circle;
+import .Line;
 
 exports.getRect = function (x, y, width, height) {
   return new Rect({
