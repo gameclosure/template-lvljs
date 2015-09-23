@@ -59,7 +59,6 @@ exports = Class(GC.Application, function () {
       }), ANIM_TIME);
 
       // Camera API Tests
-      // TODO: these numbers don't feel exactly right with what you'd expect
       lvl.camera.follow(dragon);
     };
 

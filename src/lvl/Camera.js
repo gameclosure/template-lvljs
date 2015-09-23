@@ -3,8 +3,6 @@ import .shapes.Rect as Rect;
 
 var min = Math.min;
 var max = Math.max;
-var pow = Math.pow;
-var abs = Math.abs;
 var MIN_NUM = -Number.MAX_VALUE;
 var MAX_NUM = Number.MAX_VALUE;
 var readOnlyProp = utils.addReadOnlyProperty;
