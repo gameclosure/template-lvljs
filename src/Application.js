@@ -44,16 +44,16 @@ exports = Class(GC.Application, function () {
       lvl.setInterval(bind(this, function () {
         var roll = random();
         if (roll < 0.25) {
-          lvl.animate(dragon).now({ vx: -1000, vy: 0 }, ANIM_TIME, lvl.animate.easeInOut);
+          lvl.animate(dragon).now({ vx: -500, vy: 0 }, ANIM_TIME, lvl.animate.easeInOut);
           lvl.animate(dragon.view).now({ r: 0 }, ANIM_TIME, lvl.animate.easeInOut);
         } else if (roll < 0.5) {
-          lvl.animate(dragon).now({ vx: 1000, vy: 0 }, ANIM_TIME, lvl.animate.easeInOut);
+          lvl.animate(dragon).now({ vx: 500, vy: 0 }, ANIM_TIME, lvl.animate.easeInOut);
           lvl.animate(dragon.view).now({ r: PI }, ANIM_TIME, lvl.animate.easeInOut);
         } else if (roll < 0.75) {
-          lvl.animate(dragon).now({ vx: 0, vy: -1000 }, ANIM_TIME, lvl.animate.easeInOut);
+          lvl.animate(dragon).now({ vx: 0, vy: -500 }, ANIM_TIME, lvl.animate.easeInOut);
           lvl.animate(dragon.view).now({ r: PI / 2 }, ANIM_TIME, lvl.animate.easeInOut);
         } else {
-          lvl.animate(dragon).now({ vx: 0, vy: 1000 }, ANIM_TIME, lvl.animate.easeInOut);
+          lvl.animate(dragon).now({ vx: 0, vy: 500 }, ANIM_TIME, lvl.animate.easeInOut);
           lvl.animate(dragon.view).now({ r: 3 * PI / 2 }, ANIM_TIME, lvl.animate.easeInOut);
         }
       }), ANIM_TIME);
@@ -63,13 +63,17 @@ exports = Class(GC.Application, function () {
       lvl.camera.follow(dragon);
     };
 
-    var dragonCount = 500;
+    var dragonCount = 200;
     for (var i = 0; i < dragonCount; i++) {
       spawnDragon(i);
     }
 
+    lvl.camera.followPaddingTop = 25;
+    lvl.camera.followPaddingBottom = 25;
+    lvl.camera.followPaddingLeft = 50;
+    lvl.camera.followPaddingRight = 50;
     lvl.camera.minZoom = 0.01;
-    lvl.camera.maxZoom = 2;
+    lvl.camera.maxZoom = 1;
   };
 
   this.launchUI = function () {};

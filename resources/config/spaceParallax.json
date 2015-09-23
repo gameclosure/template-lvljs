@@ -26,16 +26,16 @@
       ]
     },
     {
-      "xMultiplier": 0.25,
+      "xMultiplier": 0.6,
       "xCanSpawn": true,
       "xCanRelease": true,
       "xGapRange": [50, 250],
-      "yMultiplier": 0.25,
+      "yMultiplier": 0.6,
       "yCanSpawn": true,
       "yCanRelease": true,
       "yGapRange": [50, 250],
       "zIndex": 5,
-      "scaleMultiplier": 0.75,
+      "scaleMultiplier": 0.6,
       "pieceOptions": [
         {
           "scale": 0.8,

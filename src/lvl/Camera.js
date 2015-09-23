@@ -4,6 +4,7 @@ import .shapes.Rect as Rect;
 var min = Math.min;
 var max = Math.max;
 var pow = Math.pow;
+var abs = Math.abs;
 var MIN_NUM = -Number.MAX_VALUE;
 var MAX_NUM = Number.MAX_VALUE;
 var readOnlyProp = utils.addReadOnlyProperty;
@@ -14,21 +15,21 @@ var validatedProp = utils.addValidatedProperty;
  * - defines the public lvl.camera API
  */
 var Camera = Class("Camera", function () {
-  var _lastX;
-  var _lastY;
-  var _lastZoom;
-  var _width;
-  var _height;
-  var _followTargets;
-  var _followRect;
+  var lastX;
+  var lastY;
+  var lastZoom;
+  var panVelocityX;
+  var panVelocityY;
+  var zoomVelocity;
+  var width;
+  var height;
+  var followTargets;
+  var followRect;
 
   this.init = function () {
-    _width = backend.getViewportWidth();
-    _height = backend.getViewportHeight();
+    width = backend.getViewportWidth();
+    height = backend.getViewportHeight();
 
-    // TODO: max speeds and max zoom speed
-    // TODO: follow bounds - PADDING TRBL - where can targets go within
-    // TODO: world bounds - where can the camera go
     // TODO: Object.defineProp ... __animatableProperties
 
     this.reset();
@@ -36,13 +37,13 @@ var Camera = Class("Camera", function () {
   };
 
   // read-only camera properties
-  readOnlyProp(this, 'width', function () { return _width; });
-  readOnlyProp(this, 'height', function () { return _height; });
-  readOnlyProp(this, 'centerX', function () { return this.x + _width / 2; });
-  readOnlyProp(this, 'centerY', function () { return this.y + _height / 2; });
+  readOnlyProp(this, 'width', function () { return width; });
+  readOnlyProp(this, 'height', function () { return height; });
+  readOnlyProp(this, 'centerX', function () { return this.x + width / 2; });
+  readOnlyProp(this, 'centerY', function () { return this.y + height / 2; });
   readOnlyProp(this, 'top', function () { return this.y; });
-  readOnlyProp(this, 'right', function () { return this.x + _width; });
-  readOnlyProp(this, 'bottom', function () { return this.y + _height; });
+  readOnlyProp(this, 'right', function () { return this.x + width; });
+  readOnlyProp(this, 'bottom', function () { return this.y + height; });
   readOnlyProp(this, 'left', function () { return this.x; });
 
   this.reset = function () {
@@ -65,12 +66,23 @@ var Camera = Class("Camera", function () {
     this.followPaddingBottom = 0;
     this.followPaddingLeft = 0;
 
+    // camera movement constraints
+    this.maxPanVelocityX = 500;
+    this.maxPanVelocityY = 500;
+    this.maxZoomVelocity = 0.5;
+    this.panAccelerationX = 1000;
+    this.panAccelerationY = 1000;
+    this.zoomAcceleration = 1;
+
     // private camera properties
-    _lastX = this.x;
-    _lastY = this.y;
-    _lastZoom = this.zoom;
-    _followTargets = [];
-    _followRect = new Rect(this);
+    lastX = this.x;
+    lastY = this.y;
+    lastZoom = this.zoom;
+    panVelocityX = 0;
+    panVelocityY = 0;
+    zoomVelocity = 0;
+    followTargets = [];
+    followRect = new Rect(this);
   };
 
   validatedProp(this, 'minX', function (value) {
@@ -110,160 +122,201 @@ var Camera = Class("Camera", function () {
   });
 
   validatedProp(this, 'followPaddingLeft', function (value) {
-    if (value + this.followPaddingRight > _width) {
+    if (value + this.followPaddingRight > width) {
       throw new Error("Camera padding left + right cannot exceed width!");
     }
   });
 
   validatedProp(this, 'followPaddingRight', function (value) {
-    if (value + this.followPaddingLeft > _width) {
+    if (value + this.followPaddingLeft > width) {
       throw new Error("Camera padding left + right cannot exceed width!");
     }
   });
 
   validatedProp(this, 'followPaddingTop', function (value) {
-    if (value + this.followPaddingBottom > _height) {
+    if (value + this.followPaddingBottom > height) {
       throw new Error("Camera padding top + bottom cannot exceed height!");
     }
   });
 
   validatedProp(this, 'followPaddingBottom', function (value) {
-    if (value + this.followPaddingTop > _height) {
+    if (value + this.followPaddingTop > height) {
       throw new Error("Camera padding top + bottom cannot exceed height!");
     }
   });
 
-  this.moveTo = function (x, y) {
-    // the camera can't be manually controlled and following simultaneously
-    this.stopFollowingAll();
+  validatedProp(this, 'maxPanVelocityX', function (value) {
+    if (value < 0) {
+      throw new Error("Camera pan velocity must be >= 0!");
+    }
+  });
 
+  validatedProp(this, 'maxPanVelocityY', function (value) {
+    if (value < 0) {
+      throw new Error("Camera pan velocity must be >= 0!");
+    }
+  });
+
+  validatedProp(this, 'maxZoomVelocity', function (value) {
+    if (value < 0) {
+      throw new Error("Camera zoom velocity must be >= 0!");
+    }
+  });
+
+  validatedProp(this, 'panAccelerationX', function (value) {
+    if (value < 0) {
+      throw new Error("Camera pan acceleration must be >= 0!");
+    }
+  });
+
+  validatedProp(this, 'panAccelerationY', function (value) {
+    if (value < 0) {
+      throw new Error("Camera pan acceleration must be >= 0!");
+    }
+  });
+
+  validatedProp(this, 'zoomAcceleration', function (value) {
+    if (value < 0) {
+      throw new Error("Camera zoom acceleration must be >= 0!");
+    }
+  });
+
+  this.moveTo = function (x, y) {
+    this.stopFollowingAll();
     this.x = x;
     this.y = y;
   };
 
   this.moveBy = function (dx, dy) {
-    // the camera can't be manually controlled and following simultaneously
     this.stopFollowingAll();
-
     this.x += dx;
     this.y += dy;
   };
 
   this.zoomTo = function (z) {
-    // the camera can't be manually controlled and following simultaneously
     this.stopFollowingAll();
-
-    // TODO: constrain
     this.zoom = z;
   };
 
   this.zoomBy = function (dz) {
-    // the camera can't be manually controlled and following simultaneously
     this.stopFollowingAll();
-
-    // delta zoom is multiplicative
     this.zoom *= dz;
   };
 
+  // add an Actor to the camera's list of follow targets
   this.follow = function (target, opts) {
     opts = opts || {};
     if (target.__class__ !== "Actor") {
       throw new Error("Camera can only follow Actors!");
     }
-
-    _followTargets.push(target);
+    followTargets.push(target);
   };
 
+  // remove an Actor from the camera's list of follow targets
   this.stopFollowing = function (target) {
-    var i = _followTargets.indexOf(target);
+    var i = followTargets.indexOf(target);
     if (i >= 0) {
-      _followTargets.splice(i, 1);
+      followTargets.splice(i, 1);
     }
   };
 
+  // remove all Actors from the camera's list of follow targets
   this.stopFollowingAll = function () {
-    _followTargets = [];
+    followTargets.length = 0;
   };
-
-  // TODO: devkit should limit global tick to ~100 ms max! BIG TICKS BREAK STUFF
 
   // process changes to camera state by applying them to the backend
   function onTick (dt) {
+    // follow actors around the world by panning and zooming
+    if (followTargets.length) {
+      followTargetActors.call(this, dt);
+    }
+
     // constrain the camera within its physical bounds
     this.x = min(this.maxX, max(this.minX, this.x));
     this.y = min(this.maxY, max(this.minY, this.y));
     this.zoom = min(this.maxZoom, max(this.minZoom, this.zoom));
 
-    if (_followTargets.length) {
-      followTargets.call(this, dt);
-    }
-
-    var dx = this.x - _lastX;
-    var dy = this.y - _lastY;
-    var dz = this.zoom / _lastZoom;
+    // apply deltas to the backend
+    var dx = this.x - lastX;
+    var dy = this.y - lastY;
+    var dz = this.zoom / lastZoom;
     backend.moveViewportBy(dx, dy);
     backend.scaleViewportBy(dz);
 
-    _lastX = this.x;
-    _lastY = this.y;
-    _lastZoom = this.zoom;
+    // save state for this tick to apply deltas next tick
+    lastX = this.x;
+    lastY = this.y;
+    lastZoom = this.zoom;
   };
 
-  function followTargets () {
-    // TODO: remove deprecated API lagProps
-    this.lagX = 0;
-    this.lagY = 0;
-    this.lagZoom = 0;
-
-    // _followRect position and dimensions calculated by target spread
+  function followTargetActors (dt) {
+    // followRect position and dimensions calculated by target spread
+    var secs = dt / 1000;
     var minX = MAX_NUM;
     var minY = MAX_NUM;
     var maxX = MIN_NUM;
     var maxY = MIN_NUM;
-    _followTargets.forEach(function (target) {
+    followTargets.forEach(function (target) {
       minX = min(target.entity.minX, minX);
       minY = min(target.entity.minY, minY);
       maxX = max(target.entity.maxX, maxX);
       maxY = max(target.entity.maxY, maxY);
     });
-    _followRect.x = minX;
-    _followRect.y = minY;
-    _followRect.width = maxX - minX;
-    _followRect.height = maxY - minY;
+    followRect.x = minX;
+    followRect.y = minY;
+    followRect.width = maxX - minX;
+    followRect.height = maxY - minY;
 
-    // camera center moves horizontally towards _followRect center
-    var dx = _followRect.centerX - this.centerX;
-    if (dx < 0) {
-      var pct = dx < -this.lagX ? 1 : pow(dx / -this.lagX, 2);
-      this.x += pct * dx;
-    } else if (dx > 0) {
-      var pct = dx > this.lagX ? 1 : pow(dx / this.lagX, 2);
-      this.x += pct * dx;
+    // camera horizontal velocity aims to move camera center towards follow center
+    var dx = followRect.centerX - this.centerX;
+    if (dx < 0 && followRect.left < this.left + this.followPaddingLeft) {
+      panVelocityX = max(panVelocityX - secs * this.panAccelerationX, -this.maxPanVelocityX);
+    } else if (dx > 0 && followRect.right > this.right - this.followPaddingRight) {
+      panVelocityX = min(panVelocityX + secs * this.panAccelerationX, this.maxPanVelocityX);
     }
 
-    // camera center moves vertically towards _followRect center
-    var dy = _followRect.centerY - this.centerY;
-    if (dy < 0) {
-      var pct = dy < -this.lagY ? 1 : pow(dy / -this.lagY, 2);
-      this.y += pct * dy;
-    } else if (dy > 0) {
-      var pct = dy > this.lagY ? 1 : pow(dy / this.lagY, 2);
-      this.y += pct * dy;
+    // camera vertical velocity aims to move camera center towards follow center
+    var dy = followRect.centerY - this.centerY;
+    if (dy < 0 && followRect.top < this.top + this.followPaddingTop) {
+      panVelocityY = max(panVelocityY - secs * this.panAccelerationY, -this.maxPanVelocityY);
+    } else if (dy > 0 && followRect.bottom > this.bottom - this.followPaddingBottom) {
+      panVelocityY = min(panVelocityY + secs * this.panAccelerationY, this.maxPanVelocityY);
     }
 
-    // camera zoom to fit all targets, constrained within minZoom and maxZoom
-    // var effectiveWidth = _width * this.zoom;
-    // var effectiveHeight = _height * this.zoom;
-
-    var zoom = min(_width / _followRect.width, _height / _followRect.height);
-    zoom = min(this.maxZoom, max(this.minZoom, zoom));
+    // camera zoom velocity aims to move camera zoom towards ideal follow zoom
+    var paddedWidth = width - this.followPaddingLeft - this.followPaddingRight;
+    var paddedHeight = height - this.followPaddingTop - this.followPaddingBottom;
+    var zoom = min(paddedWidth / followRect.width, paddedHeight / followRect.height);
     var dz = zoom - this.zoom;
     if (dz < 0) {
-      var pct = dz < -this.lagZoom ? 1 : pow(dz / -this.lagZoom, 2);
-      this.zoom += pct * dz;
+      zoomVelocity = max(zoomVelocity - secs * this.zoomAcceleration, -this.maxZoomVelocity);
     } else if (dz > 0) {
-      var pct = dz > this.lagZoom ? 1 : pow(dz / this.lagZoom, 2);
-      this.zoom += pct * dz;
+      zoomVelocity = min(zoomVelocity + secs * this.zoomAcceleration, this.maxZoomVelocity);
+    }
+
+    // finally, update camera position and zoom
+    this.x += secs * panVelocityX;
+    this.y += secs * panVelocityY;
+    this.zoom += secs * zoomVelocity * this.zoom;
+
+    // if the camera overshoots, slow down!
+    if (dx > 0 && this.centerX >= followRect.centerX) {
+      panVelocityX *= 0.5;
+    } else if (dx < 0 && this.centerX <= followRect.centerX) {
+      panVelocityX *= 0.5;
+    }
+
+    if (dy > 0 && this.centerY >= followRect.centerY) {
+      panVelocityY *= 0.5;
+    } else if (dy < 0 && this.centerY <= followRect.centerY) {
+      panVelocityY *= 0.5;
+    }
+
+    if (dz > 0 && this.zoom >= zoom) {
+      zoomVelocity *= 0.5;
+    } else if (dz < 0 && this.zoom <= zoom) {
+      zoomVelocity *= 0.5;
     }
   };
 });

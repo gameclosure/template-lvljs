@@ -36,6 +36,8 @@ var Level = Class("Level", function () {
     throw new Error("TODO");
   };
 
+  // TODO: devkit should limit global tick to ~100 ms max! BIG TICKS BREAK STUFF
+
   // TODO: track and clear all animations on reset?
   this.animate = animate;
 
