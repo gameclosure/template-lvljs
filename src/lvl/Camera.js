@@ -266,6 +266,11 @@ var Camera = Class("Camera", function () {
     followRect.width = maxX - minX;
     followRect.height = maxY - minY;
 
+    // TODO: constrain camera to world before follow as well as after
+    // TODO: kill velocities when camera hits physical bounds
+    // TODO: calculate zoom first, and move x + y after based on scaled rect
+    // TODO: test and iterate
+
     // camera horizontal velocity aims to move camera center towards follow center
     var dx = followRect.centerX - this.centerX;
     if (dx < 0 && followRect.left < this.left + this.followPaddingLeft) {
