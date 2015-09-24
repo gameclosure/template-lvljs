@@ -40,6 +40,10 @@ var Level = Class("Level", function () {
     }
   };
 
+  this.addGroup = function () {
+    throw new Error("TODO");
+  };
+
   this.addParallax = function (resource) {
     throw new Error("TODO");
   };

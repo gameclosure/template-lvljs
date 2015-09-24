@@ -22,12 +22,6 @@ exports = Class(GC.Application, function () {
     var parallax = lvl.resources.loadParallaxFromJSON('resources/config/spaceParallax.json');
     lvl.bg.add(parallax);
 
-    // lvl.addParallax(forest);
-    // lvl.bg.add(forest); // by default get section name 'background'
-    // lvl.fg.add(forest); /// by default get section name 'foreground'
-    // lvl.fg.add(mist, {sectionName: 'scaryMist'})
-    // lvl.bg.autoScrollBy(0, 250); // MAYBE ?
-
     // Input API Tests
     lvl.input.on('touchstart', function (data) {
       logger.log('TOUCH START:', data.x, data.y, data.touchID);
@@ -62,7 +56,6 @@ exports = Class(GC.Application, function () {
         }
       }), ANIM_TIME);
 
-      // Camera API Tests
       lvl.camera.follow(dragon);
     };
 
@@ -71,6 +64,7 @@ exports = Class(GC.Application, function () {
       spawnDragon(i);
     }
 
+    // Camera API Tests
     lvl.camera.followPaddingTop = 25;
     lvl.camera.followPaddingBottom = 25;
     lvl.camera.followPaddingLeft = 50;
@@ -79,6 +73,16 @@ exports = Class(GC.Application, function () {
     lvl.camera.maxZoom = 1;
   };
 });
+
+
+
+// TODO: PARALLAX NOTES
+// lvl.addParallax(forest);
+// lvl.bg.add(forest); // by default get section name 'background'
+// lvl.fg.add(forest); /// by default get section name 'foreground'
+// lvl.fg.add(mist, {sectionName: 'scaryMist'})
+// lvl.bg.autoScrollBy(0, 250); // MAYBE ?
+
 
 
 // TODO: COLLISION NOTES
@@ -96,8 +100,6 @@ exports = Class(GC.Application, function () {
 //   o1.resolveCollision(o2);
 // })
 
-
-
 // bounds.defaultCollides = [true] / false
 
 // bounds.removeCollidesWith(...)
@@ -109,13 +111,9 @@ exports = Class(GC.Application, function () {
 //   collison.resolve();
 // })
 
-
 // camera.follow(bounds);
-
 
 // bounds.onBorderCollision(player, function() {
 //   resolve(bounds, player);
 //   // move player back in box.
 // })
-
-// TODO : world / camera / etc bounding rects
