@@ -58,18 +58,23 @@ exports.registerInputHandler = function (eventName, callback) {
   uiView.registerInputHandler(eventName, callback);
 };
 
-// TODO: the camera should probably control this
 // set view dimensions, but guarantee scale to fit full screen
-exports.setFullScreenDimensions = function (width, height) {
-  exports.setCustomDimensions(
+exports.setFullScreenViewportDimensions = function (width, height) {
+  exports.setCustomViewportDimensions(
     isLandscape ? DEVICE_WIDTH * (height / DEVICE_HEIGHT) : width,
     isLandscape ? height : DEVICE_HEIGHT * (width / DEVICE_WIDTH),
-    isLandscape ? DEVICE_HEIGHT / height : DEVICE_WIDTH / width);
+    isLandscape ? DEVICE_HEIGHT / height : DEVICE_WIDTH / width,
+    false);
 };
 
-// TODO: the camera should probably control this
+// set view dimensions, contained and letter-boxed within the device
+exports.setLetterBoxedViewportDimensions = function (width, height) {
+  var scale = Math.min(DEVICE_WIDTH / width, DEVICE_HEIGHT / height);
+  exports.setCustomViewportDimensions(width, height, scale, true);
+};
+
 // set view dimensions and scale, without restriction
-exports.setCustomDimensions = function (width, height, scale) {
+exports.setCustomViewportDimensions = function (width, height, scale, clip) {
   viewWidth = width || DEFAULT_WIDTH;
   viewHeight = height || DEFAULT_HEIGHT;
   viewScale = scale || 1;
@@ -82,6 +87,7 @@ exports.setCustomDimensions = function (width, height, scale) {
     view.style.width = viewWidth;
     view.style.height = viewHeight;
     view.style.scale = viewScale;
+    view.style.clip = clip || false;
   }, this);
 };
 
@@ -318,7 +324,7 @@ var LayerView = Class(View, function () {
     // parallax update independently since layers have different relative motion
     this._parallaxes.forEach(function (parallax) {
       // TODO: should applying the scale to the position be handled by parallax?
-      parallax.update(-this._x * this._scale, -this._y * this._scale);
+      parallax.update(-this._x * this._scale, -this._y * this._scale, dt);
       parallax.setScale(this._scale);
     }, this);
 
@@ -461,7 +467,7 @@ var levelView = new LayerView('level', { superview: rootView });
 var foregroundView = new LayerView('foreground', { superview: rootView });
 var uiView = new UIView ({ superview: rootView });
 
-exports.setFullScreenDimensions(viewWidth, viewHeight);
+exports.setFullScreenViewportDimensions(viewWidth, viewHeight);
 
 // update the scenery and level views
 function forEachWorldView (fn, ctx) {

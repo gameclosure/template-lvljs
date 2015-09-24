@@ -4,7 +4,7 @@
   "dependencies": {
     "devkit-core": "https://github.com/gameclosure/devkit-core#v3.0.2",
     "devkit-entities": "https://github.com/gameclosure/devkit-entities#v0.5.1",
-    "devkit-parallax": "https://github.com/gameclosure/devkit-parallax#v0.3.0"
+    "devkit-parallax": "https://github.com/gameclosure/devkit-parallax#v0.3.1"
   },
   "ios": {
     "bundleID": "co.weeby.producer.mxc.test"
@@ -16,7 +16,7 @@
     "stagingDomain": "staging.example.com"
   },
   "supportedOrientations": [
-    "landscape"
+    "portrait"
   ],
   "title": "test"
 }

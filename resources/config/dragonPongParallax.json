@@ -1,0 +1,96 @@
+{
+  "background": [
+    {
+      "xMultiplier": 0,
+      "yMultiplier": 0,
+      "xCanSpawn": true,
+      "xCanRelease": true,
+      "yCanSpawn": false,
+      "yCanRelease": false,
+      "pieceOptions": [
+        {
+          "image": "resources/images/dragonpong/bg.png"
+        }
+      ]
+    },
+    {
+      "xMultiplier": 0.15,
+      "xVelocity": -15,
+      "yMultiplier": 0,
+      "xCanSpawn": true,
+      "xCanRelease": true,
+      "yCanSpawn": false,
+      "yCanRelease": false,
+      "pieceOptions": [
+        {
+          "y": 1024,
+          "yAlign": "bottom",
+          "opacity": 0.92,
+          "image": "resources/images/dragonpong/bgclouds.png"
+        }
+      ]
+    },
+    {
+      "xMultiplier": 0.35,
+      "xVelocity": 35,
+      "yMultiplier": 0,
+      "xCanSpawn": true,
+      "xCanRelease": true,
+      "yCanSpawn": false,
+      "yCanRelease": false,
+      "pieceOptions": [
+        {
+          "flipY": true,
+          "image": "resources/images/dragonpong/cloud1.png"
+        }
+      ]
+    },
+    {
+      "xMultiplier": 0.7,
+      "xVelocity": 70,
+      "yMultiplier": 0,
+      "xCanSpawn": true,
+      "xCanRelease": true,
+      "yCanSpawn": false,
+      "yCanRelease": false,
+      "pieceOptions": [
+        {
+          "flipY": true,
+          "image": "resources/images/dragonpong/cloud2.png"
+        }
+      ]
+    },
+    {
+      "xMultiplier": 0.35,
+      "xVelocity": -35,
+      "yMultiplier": 0,
+      "xCanSpawn": true,
+      "xCanRelease": true,
+      "yCanSpawn": false,
+      "yCanRelease": false,
+      "pieceOptions": [
+        {
+          "y": 1024,
+          "yAlign": "bottom",
+          "image": "resources/images/dragonpong/cloud1.png"
+        }
+      ]
+    },
+    {
+      "xMultiplier": 0.7,
+      "xVelocity": -70,
+      "yMultiplier": 0,
+      "xCanSpawn": true,
+      "xCanRelease": true,
+      "yCanSpawn": false,
+      "yCanRelease": false,
+      "pieceOptions": [
+        {
+          "y": 1024,
+          "yAlign": "bottom",
+          "image": "resources/images/dragonpong/cloud2.png"
+        }
+      ]
+    }
+  ]
+}

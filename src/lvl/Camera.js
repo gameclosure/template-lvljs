@@ -322,6 +322,19 @@ var Camera = Class("Camera", function () {
       zoomVelocity *= 0.5;
     }
   };
+
+  // define camera viewport dimensions and allows letter-boxing with fixedAspectRatio
+  this.setCustomViewportDimensions = function (width, height, fixedAspectRatio) {
+    if (fixedAspectRatio) {
+      backend.setLetterBoxedViewportDimensions(width, height);
+    } else {
+      backend.setFullScreenViewportDimensions(width, height);
+    }
+
+    // update camera viewport
+    width = backend.getViewportWidth();
+    height = backend.getViewportHeight();
+  };
 });
 
 // singleton class

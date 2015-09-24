@@ -79,16 +79,6 @@ var Level = Class("Level", function () {
   this.getActorsAtScreenPosition = function (x, y) {
     throw new Error("TODO");
   };
-
-  // TODO: move this concept / API to camera viewport
-  this.setFullScreenDimensions = function (width, height) {
-    backend.setFullScreenDimensions(width, height);
-  };
-
-  // TODO: move this concept / API to camera viewport
-  this.setCustomDimensions = function (width, height, scale) {
-    backend.setCustomDimensions(width, height, scale);
-  };
 });
 
 // singleton Level API
