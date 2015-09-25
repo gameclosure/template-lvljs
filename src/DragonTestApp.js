@@ -7,7 +7,6 @@ exports = Class(GC.Application, function () {
   this.initUI = function () {
     // TODO: move to lvl
     import .lvl;
-    lvl.initializeWithView(this.view);
 
     // Sound API Tests
     // var sfx = lvl.resources.loadSound('resources/sounds/v_fever_a.mp3');

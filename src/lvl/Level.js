@@ -50,11 +50,6 @@ var Level = Class("Level", function () {
     backend.onTick(updateScreenBounds);
   };
 
-  // TODO: remove / fix this
-  this.initializeWithView = function (view) {
-    this._view = view;
-  };
-
   this.reset = function () {
     // TODO: reset backend first, then reset lvl API
     throw new Error("TODO");

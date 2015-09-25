@@ -1,14 +1,8 @@
 // TODO: clean up GC.Application / lvl imports situation
 var lvl;
 exports = Class(GC.Application, function () {
-  this.initUI = function () {
-    lvl = jsio('import .lvl');
-    lvl.initializeWithView(this.view);
-  };
-
-  this.launchUI = function () {
-    startGame();
-  };
+  this.initUI = function () { lvl = jsio('import .lvl'); };
+  this.launchUI = function () { startGame(); };
 });
 
 
