@@ -209,8 +209,10 @@ exports.removeViewsFromActor = function (actor) {
   var entity = actor.entity;
   var viewList = getViewListByEntityID(entity.uid);
   viewList.forEach(function (view) {
-    var superview = view.getSuperview();
-    superview.remove(view);
+    // TODO: fix this double superview lookup, it could easily break
+    var _nonParallaxRoot = view.getSuperview();
+    var layer = _nonParallaxRoot.getSuperview();
+    layer.remove(view);
   }, this);
   setViewListByEntityID(entity.uid, []);
 };

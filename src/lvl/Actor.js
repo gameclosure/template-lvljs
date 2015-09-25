@@ -50,6 +50,27 @@ exports = Class("Actor", function () {
     backend.stopSpriteAnimation(this);
   };
 
+  // this actor checks each tick to see if it collides with target
+  this.collidesWith = function (target, handler) {
+    handler = handler || defaultCollisionHandler;
+    // TODO: track collision handlers and allow them to be removed
+    backend.onTick(bind(this, function () {
+      if (this.entity.collidesWith(target.entity || target)) {
+        handler(this, target);
+      }
+    }));
+  };
+
+  // a function to remove collision handlers between actors
+  this.ignoresCollisionsWith = function (target) {
+    throw new Error("TODO");
+  };
+
+  // by default, just push actors apart
+  function defaultCollisionHandler (a, b) {
+    a.entity.resolveCollisionWith(b.entity || b);
+  };
+
   // XXX: These are all just literally pasted from Entity for now.
 
   // expose x position

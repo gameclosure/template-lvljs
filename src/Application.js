@@ -39,7 +39,10 @@ function startGame () {
   var playerResource = lvl.resources.loadSpriteFromJSON(PLAYER_URL);
   var player = lvl.addActor(playerResource);
 
-  // player.collidesWith(lvl.bounds, onPlayerHitBounds);
+  player.collidesWith(lvl.bounds.screenLeft, onPlayerHitWall);
+  player.collidesWith(lvl.bounds.screenRight, onPlayerHitWall);
+  player.collidesWith(lvl.bounds.screenTop, onPlayerHitPoison);
+  player.collidesWith(lvl.bounds.screenBottom, onPlayerHitPoison);
 
   function onTouchStart (touch) {
     if (!player) { return; }
@@ -51,5 +54,28 @@ function startGame () {
     player.startSprite("fly");
   };
 
-  function onPlayerHitBounds () {};
+  function onPlayerHitWall (player, wall) {
+    var currDir = player.vx > 0 ? 1 : -1;
+    var newDir = wall === lvl.bounds.screenRight ? -1 : 1;
+    if (newDir === currDir) { return; }
+    player.vx = newDir * PLAYER_VX;
+    player.view.flipX = newDir > 0;
+
+    // if (difficulty < 1) { difficulty += DIFFICULTY_RAMP; }
+    // player.vx = (PLAYER_VX + PLAYER_VX * 0.1 * difficulty) * newDir;
+    // player.flipX = newDir > 0;
+    // wallObstacles.forEachActiveActor(function (oldObstacle) {
+    //   animateObstacle(oldObstacle, newDir, true);
+    // });
+    // scoreText.setText(++score);
+    // effects.squish(scoreText, { duration: 300, loop: false, scale: 3 });
+    // spawnObstacles(newDir);
+  };
+
+  function onPlayerHitPoison () {
+    if (!player) { return; }
+    player.destroy();
+    player = null;
+    // TODO: game over and reset
+  };
 };
