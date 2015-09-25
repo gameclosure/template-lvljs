@@ -31,10 +31,10 @@ var Level = Class("Level", function () {
     throw new Error("TODO");
   };
 
-  this.addActor = function (resource, geometryOverrides) {
+  this.addActor = function (resource, opts) {
     var type = resource.getType();
     if (type === 'sprite' || type === 'image') {
-      return new Actor(resource, geometryOverrides);
+      return new Actor(resource, opts);
     } else {
       throw new Error("Invalid Resource Type for Actor:", type);
     }

@@ -42,7 +42,7 @@ var Input = Class("Input", function () {
       callback.call(callback._ctx, {
         x: eventData.x,
         y: eventData.y,
-        touchID: eventData.touchID
+        id: eventData.id
       });
     }
   };

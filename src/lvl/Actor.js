@@ -14,11 +14,9 @@ var entityPool = new EntityPool();
 backend.onTick(bind(entityPool, 'update'));
 
 exports = Class("Actor", function () {
-  // create a new actor
-  this.init = function (resource, geometryOverrides) {
-    var geoOpts = merge(geometryOverrides, resource.getOpts().geometry);
-    this.entity = entityPool.obtain({ hitOpts: geoOpts });
-
+  this.init = function (resource, opts) {
+    opts = applyDefaultsOpts(resource, opts);
+    this.entity = entityPool.obtain(opts);
     // TODO: backend supports multiple views per actor, but this API does not
     this.view = new ActorView(resource);
     backend.createViewForActor(this);
@@ -109,6 +107,26 @@ exports = Class("Actor", function () {
     get: function () { return this.entity.fixed; },
     set: function (value) { this.entity.fixed = value; }
   });
+
+  function applyDefaultsOpts (resource, opts) {
+    opts = opts || {};
+
+    // TODO: allow actual instance of shape to be passed in opts
+    var shapeConfig = merge(opts.shape, resource.getShapeConfig());
+
+    // default position to the center of the screen
+    if (opts.x === undefined && shapeConfig.x === undefined) {
+      opts.x = backend.getViewportX() + backend.getViewportWidth() / 2;
+    }
+    if (opts.y === undefined && shapeConfig.y === undefined) {
+      opts.y = backend.getViewportY() + backend.getViewportHeight() / 2;
+    }
+
+    // EntityModel expects hitOpts
+    opts.hitOpts = shapeConfig;
+
+    return opts;
+  };
 });
 
 

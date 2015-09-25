@@ -10,11 +10,19 @@ var Resource = exports = Class("Resource", function () {
     return this._opts;
   };
 
-  this.getVisualOpts = function () {
+  this.getShapeConfig = function () {
+    if (this._type === 'parallax') {
+      throw new Error("Resources of type parallax cannot have a shape!");
+    } else {
+      return this._opts.shape;
+    }
+  };
+
+  this.getViewConfig = function () {
     if (this._type === 'parallax') {
       return this._opts;
     } else {
-      return this._opts.visual;
+      return this._opts.view;
     }
   };
 

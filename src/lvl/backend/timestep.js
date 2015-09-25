@@ -22,6 +22,14 @@ exports.reset = function () {
   throw new Error("TODO");
 };
 
+exports.getViewportX = function () {
+  return viewX;
+};
+
+exports.getViewportY = function () {
+  return viewY;
+};
+
 exports.getViewportWidth = function () {
   return viewWidth;
 };
@@ -31,12 +39,18 @@ exports.getViewportHeight = function () {
 };
 
 exports.moveViewportTo = function (x, y) {
+  viewX = x;
+  viewY = y;
+
   forEachWorldView(function (view, i) {
     view.scrollTo(x, y);
   });
 };
 
 exports.moveViewportBy = function (dx, dy) {
+  viewX += dx;
+  viewY += dy;
+
   forEachWorldView(function (view, i) {
     view.scrollBy(dx, dy);
   });
@@ -111,10 +125,13 @@ exports.clearBackground = function () {
 
 exports.createViewFromResource = function (resource, parent) {
   var type = resource.getType();
-  var opts = resource.getVisualOpts();
+  var opts = resource.getViewConfig();
 
   switch (type) {
     case 'sprite':
+      if (opts.loop === undefined) { opts.loop = true; }
+      if (opts.autoStart === undefined) { opts.autoStart = true; }
+      if (opts.frameRate === undefined) { opts.frameRate = 24; }
       var sprite = spriteViewPool.obtainView(opts);
       sprite.resetAllAnimations(opts);
       sprite.__pool = spriteViewPool;
@@ -254,7 +271,7 @@ var LayerView = Class(View, function () {
   this.add = function (view, resource, opts) {
     var type = resource.getType();
     if (type === 'parallax') {
-      var config = resource.getVisualOpts();
+      var config = resource.getViewConfig();
       var section = (opts && opts.section) || this.type || 'background';
       var layers = config[section];
       if (layers) {
@@ -380,7 +397,7 @@ var UIView = Class(View, function () {
       handler('touchstart', {
         x: pt.x,
         y: pt.y,
-        touchID: startEvent.id
+        id: startEvent.id
       });
     }
     this.startDrag();
@@ -396,7 +413,7 @@ var UIView = Class(View, function () {
       handler('touchmove', {
         x: pt.x,
         y: pt.y,
-        touchID: moveEvent.id
+        id: moveEvent.id
       });
     }
   };
@@ -409,7 +426,7 @@ var UIView = Class(View, function () {
       handler('touchend', {
         x: pt.x,
         y: pt.y,
-        touchID: stopEvent.id
+        id: stopEvent.id
       });
     }
   };
@@ -425,7 +442,7 @@ var UIView = Class(View, function () {
       handler('touchend', {
         x: pt.x,
         y: pt.y,
-        touchID: stopEvent.id
+        id: stopEvent.id
       });
     }
   };
@@ -458,6 +475,8 @@ var UIView = Class(View, function () {
 
 var rootView = GC.app.view;
 var isLandscape = DEVICE_WIDTH > DEVICE_HEIGHT;
+var viewX = 0;
+var viewY = 0;
 var viewWidth = isLandscape ? DEFAULT_HEIGHT : DEFAULT_WIDTH;
 var viewHeight = isLandscape ? DEFAULT_WIDTH : DEFAULT_HEIGHT;
 var viewScale;

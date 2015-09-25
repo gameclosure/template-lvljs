@@ -21,13 +21,13 @@ exports = Class(GC.Application, function () {
 
     // Input API Tests
     lvl.input.on('touchstart', function (data) {
-      logger.log('TOUCH START:', data.x, data.y, data.touchID);
+      logger.log('TOUCH START:', data.x, data.y, data.id);
     }, this);
     lvl.input.on('touchend', function (data) {
-      logger.log('TOUCH END:', data.x, data.y, data.touchID);
+      logger.log('TOUCH END:', data.x, data.y, data.id);
     }, this);
     lvl.input.on('touchmove', function (data) {
-      logger.log('TOUCH MOVE:', data.x, data.y, data.touchID);
+      logger.log('TOUCH MOVE:', data.x, data.y, data.id);
     }, this);
 
     // Actor API Tests
