@@ -11,14 +11,37 @@ jsio('import .Camera', { context: { backend: backend } });
 jsio('import .Camera');
 jsio('import .Input', { context: { backend: backend } });
 jsio('import .Input');
+jsio('import .Input', { context: { backend: backend } });
+jsio('import .Input');
+jsio('import .resources', { context: { backend: backend } });
+jsio('import .resources');
+jsio('import .sounds', { context: { backend: backend } });
+jsio('import .sounds');
+jsio('import .shapes', { context: { backend: backend } });
+jsio('import .shapes');
 
 var Level = Class("Level", function () {
   this.init = function () {
+    // attach special class instances
     this.bg = new Scenery('background');
     this.fg = new Scenery('foreground');
+
+    // attach special class singletons
     this.ui = UI;
     this.camera = Camera;
     this.input = Input;
+
+    // attach library modules
+    this.resources = resources;
+    this.sounds = sounds;
+    this.shapes = shapes;
+
+    // collideable bounds that stick to the screen (camera viewport edges)
+    // this.bounds = {};
+    // this.bounds.screenTop = new Rect();
+    // this.bounds.screenRight = new Rect();
+    // this.bounds.screenBottom = new Rect();
+    // this.bounds.screenLeft = new Rect();
   };
 
   // TODO: remove / fix this

@@ -1,13 +1,5 @@
+// TODO: clean up GC.Application / lvl imports situation
 var lvl;
-
-var BG_WIDTH = 576;
-var BG_HEIGHT = 1024;
-var PLAYER_VX = 280;
-var PLAYER_JUMP_VY = -600;
-var GRAVITY = 1500;
-var PARALLAX_URL = 'resources/config/dragonPongParallax.json';
-var PLAYER_URL = 'resources/config/dragonPongPlayer.json';
-
 exports = Class(GC.Application, function () {
   this.initUI = function () {
     lvl = jsio('import .lvl');
@@ -19,8 +11,18 @@ exports = Class(GC.Application, function () {
   };
 });
 
+
+
 var PI = Math.PI;
 var random = Math.random;
+
+var BG_WIDTH = 576;
+var BG_HEIGHT = 1024;
+var PLAYER_VX = 280;
+var PLAYER_JUMP_VY = -600;
+var GRAVITY = 1500;
+var PARALLAX_URL = 'resources/config/dragonPongParallax.json';
+var PLAYER_URL = 'resources/config/dragonPongPlayer.json';
 
 function startGame () {
   // set letter-boxed viewport; TODO: get 3:4 aspect ratio art
@@ -37,6 +39,8 @@ function startGame () {
   var playerResource = lvl.resources.loadSpriteFromJSON(PLAYER_URL);
   var player = lvl.addActor(playerResource);
 
+  // player.collidesWith(lvl.bounds, onPlayerHitBounds);
+
   function onTouchStart (touch) {
     if (!player) { return; }
     if (player.vx === 0) {
@@ -46,4 +50,6 @@ function startGame () {
     player.vy = PLAYER_JUMP_VY;
     player.startSprite("fly");
   };
+
+  function onPlayerHitBounds () {};
 };
