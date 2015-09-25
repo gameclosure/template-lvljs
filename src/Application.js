@@ -2,6 +2,9 @@ var lvl;
 
 var BG_WIDTH = 576;
 var BG_HEIGHT = 1024;
+var PLAYER_VX = 280;
+var PLAYER_JUMP_VY = -600;
+var GRAVITY = 1500;
 var PARALLAX_URL = 'resources/config/dragonPongParallax.json';
 var PLAYER_URL = 'resources/config/dragonPongPlayer.json';
 
@@ -32,9 +35,15 @@ function startGame () {
 
   // add the player to the game
   var playerResource = lvl.resources.loadSpriteFromJSON(PLAYER_URL);
-  lvl.addActor(playerResource);
-};
+  var player = lvl.addActor(playerResource);
 
-function onTouchStart (touch) {
-  logger.log('TOUCH START:', touch.x, touch.y, touch.id);
+  function onTouchStart (touch) {
+    if (!player) { return; }
+    if (player.vx === 0) {
+      player.vx = PLAYER_VX;
+      player.ay = GRAVITY;
+    }
+    player.vy = PLAYER_JUMP_VY;
+    player.startSprite("fly");
+  };
 };

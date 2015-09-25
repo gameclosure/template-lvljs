@@ -11,11 +11,15 @@ EntityModel.prototype._validate = function () { return true; };
 
 // pool physical entities and update them each tick
 var entityPool = new EntityPool();
-backend.onTick(bind(entityPool, 'update'));
+backend.onTick(function (dt) {
+  // entities expects pixels per millisecond; convert to pixels per second
+  entityPool.update(dt / 1000);
+});
 
 exports = Class("Actor", function () {
   this.init = function (resource, opts) {
     opts = applyDefaultsOpts(resource, opts);
+    this.resource = resource;
     this.entity = entityPool.obtain(opts);
     // TODO: backend supports multiple views per actor, but this API does not
     this.view = new ActorView(resource);
@@ -26,6 +30,24 @@ exports = Class("Actor", function () {
   this.destroy = function () {
     backend.removeViewsFromActor(this);
     entityPool.release(this.entity);
+  };
+
+  // start one of the actor's sprite animations
+  this.startSprite = function (animation, opts) {
+    if (this.resource.getType() !== 'sprite') {
+      throw new Error("This Actor was not created with a sprite resource!");
+    }
+
+    backend.startSpriteAnimation(this, animation, opts);
+  };
+
+  // stop the actor's sprite animations
+  this.stopSprite = function () {
+    if (this.resource.getType() !== 'sprite') {
+      throw new Error("This Actor was not created with a sprite resource!");
+    }
+
+    backend.stopSpriteAnimation(this);
   };
 
   // XXX: These are all just literally pasted from Entity for now.
@@ -56,16 +78,16 @@ exports = Class("Actor", function () {
   Object.defineProperty(this, 'vx', {
     enumerable: true,
     configurable: true,
-    get: function () { return this.entity.vx * 1000; },
-    set: function (value) { this.entity.vx = value / 1000; }
+    get: function () { return this.entity.vx; },
+    set: function (value) { this.entity.vx = value; }
   });
 
   // expose y velocity
   Object.defineProperty(this, 'vy', {
     enumerable: true,
     configurable: true,
-    get: function () { return this.entity.vy * 1000; },
-    set: function (value) { this.entity.vy = value / 1000; }
+    get: function () { return this.entity.vy; },
+    set: function (value) { this.entity.vy = value; }
   });
 
   // expose x acceleration
@@ -134,11 +156,10 @@ exports = Class("Actor", function () {
 var ActorView = Class("ActorView", function () {
   var ALLOWED_KEYS = {};
 
-  this.init = function (resource) {
+  this.init = function () {
     this._properties = {};
     this._propertyGetter = null;
     this._propertySetter = null;
-    this.resource = resource;
   };
 
   this.onPropertyGet = function (cb) {
@@ -158,18 +179,6 @@ var ActorView = Class("ActorView", function () {
   this.getProperties = function () {
     return this._properties;
   };
-
-  Object.defineProperty(this, '_viewBacking', {
-    enumerable: false,
-    configurable: false,
-    get: function () { return this.__viewBacking; },
-    set: function (value) {
-      if (this._viewBacking) {
-        throw new Error("Can't overwrite _viewBacking");
-      }
-      this.__viewBacking = value;
-    }
-  });
 
   makeProxy.call(this, 'zIndex');
   makeProxy.call(this, 'r');

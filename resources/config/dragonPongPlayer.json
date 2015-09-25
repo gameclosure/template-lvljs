@@ -3,6 +3,7 @@
     "radius": 40
   },
   "view": {
+    "flipX": true,
     "offsetX": -82,
     "offsetY": -104,
     "width": 163,

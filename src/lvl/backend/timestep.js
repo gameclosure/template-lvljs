@@ -123,6 +123,36 @@ exports.clearBackground = function () {
   backgroundView.clear();
 };
 
+exports.startSpriteAnimation = function (actor, animation, opts) {
+  var id = actor.view.__uid;
+  var view = getViewByID(id);
+
+  animation = animation || view._opts.defaultAnimation;
+  opts = opts || {};
+
+  // we use a callback to keep the sprite visible and pause on the final frame
+  var callback = opts.callback;
+  opts.callback = function () {
+    view.pause();
+    var currentAnimation = view._animations[animation];
+    if (currentAnimation) {
+      var frames = currentAnimation.frames;
+      view.setImage(frames[frames.length - 1]);
+    }
+    // call the user provided callback if one exists
+    callback && callback();
+  };
+
+  view.startAnimation(animation, opts);
+  view.resume();
+};
+
+exports.stopSpriteAnimation = function (actor) {
+  var id = actor.view.__uid;
+  var view = getViewByID(id);
+  view.pause();
+};
+
 exports.createViewFromResource = function (resource, parent) {
   var type = resource.getType();
   var opts = resource.getViewConfig();
@@ -154,8 +184,9 @@ exports.createViewFromResource = function (resource, parent) {
 };
 
 exports.createViewForActor = function (actor) {
-  var view = exports.createViewFromResource(actor.view.resource, levelView);
-  actor.view._viewBacking = view;
+  var view = exports.createViewFromResource(actor.resource, levelView);
+  setViewByID(view.uid, view);
+  actor.view.__uid = view.uid;
   actor.view.update(view.style);
   actor.view.onPropertyGet(function (name) { return view.style[name]; });
   actor.view.onPropertySet(function (name, value) { view.style[name] = value; });
@@ -166,7 +197,7 @@ exports.attachViewToActor = function (view, actor) {
   var entity = actor.entity;
   var viewList = getViewListByEntityID(entity.uid);
   viewList.push(view);
-  levelView.add(view, actor.view.resource);
+  levelView.add(view, actor.resource);
   setEntityByViewID(view.uid, entity);
 };
 
@@ -181,11 +212,20 @@ exports.removeViewsFromActor = function (actor) {
 };
 
 // TODO: move these to LayerView Class ?
-var _viewMap = {};
-var _entityMap = {};
+var viewsByID = {};
+var viewListsByEntityID = {};
+var entitiesByViewID = {};
+
+function getViewByID (id) {
+  return viewsByID[id];
+};
+
+function setViewByID (id, view) {
+  viewsByID[id] = view;
+};
 
 function getViewListByEntityID (id) {
-  var mapping = _viewMap[id];
+  var mapping = viewListsByEntityID[id];
   if (!mapping) {
     mapping = setViewListByEntityID(id, []);
   }
@@ -193,15 +233,15 @@ function getViewListByEntityID (id) {
 };
 
 function setViewListByEntityID (id, list) {
-  return _viewMap[id] = list;
+  return viewListsByEntityID[id] = list;
 };
 
 function getEntityByViewID (id) {
-  return _entityMap[id];
+  return entitiesByViewID[id];
 };
 
 function setEntityByViewID (id, entity) {
-  return _entityMap[id] = entity;
+  return entitiesByViewID[id] = entity;
 };
 
 // TODO: track and remove subscriptions?
