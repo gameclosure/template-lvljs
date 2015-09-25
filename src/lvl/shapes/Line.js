@@ -1,4 +1,5 @@
 import ..utils;
+import .Shape;
 
 var min = Math.min;
 var max = Math.max;
@@ -6,11 +7,12 @@ var random = Math.random;
 var readOnlyProp = utils.addReadOnlyProperty;
 
 // this class represenets a line segment
-exports = Class("Line", function () {
+exports = Class("Line", Shape, function () {
+  var superProto = Shape.prototype;
+
   this.init = function (opts) {
     opts = opts || {};
-    this.x = opts.x || 0;
-    this.y = opts.y || 0;
+    superProto.init.call(this, opts);
     this.x2 = opts.x2 || 0;
     this.y2 = opts.y2 || 0;
   };

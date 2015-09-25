@@ -22,18 +22,22 @@ exports.reset = function () {
   throw new Error("TODO");
 };
 
+// unscaled world-view x
 exports.getViewportX = function () {
   return viewX;
 };
 
+// unscaled world-view y
 exports.getViewportY = function () {
   return viewY;
 };
 
+// unscaled world-view width
 exports.getViewportWidth = function () {
   return viewWidth;
 };
 
+// unscaled world-view height
 exports.getViewportHeight = function () {
   return viewHeight;
 };

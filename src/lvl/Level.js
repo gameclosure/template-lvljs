@@ -21,7 +21,11 @@ jsio('import .shapes', { context: { backend: backend } });
 jsio('import .shapes');
 
 var Level = Class("Level", function () {
+  var lvl;
+
   this.init = function () {
+    lvl = this;
+
     // attach special class instances
     this.bg = new Scenery('background');
     this.fg = new Scenery('foreground');
@@ -37,11 +41,13 @@ var Level = Class("Level", function () {
     this.shapes = shapes;
 
     // collideable bounds that stick to the screen (camera viewport edges)
-    // this.bounds = {};
-    // this.bounds.screenTop = new Rect();
-    // this.bounds.screenRight = new Rect();
-    // this.bounds.screenBottom = new Rect();
-    // this.bounds.screenLeft = new Rect();
+    this.bounds = {};
+    this.bounds.screenTop = shapes.getRect();
+    this.bounds.screenRight = shapes.getRect();
+    this.bounds.screenBottom = shapes.getRect();
+    this.bounds.screenLeft = shapes.getRect();
+    updateScreenBounds();
+    backend.onTick(updateScreenBounds);
   };
 
   // TODO: remove / fix this
@@ -101,6 +107,33 @@ var Level = Class("Level", function () {
   // ordered by zIndex, top-most first
   this.getActorsAtScreenPosition = function (x, y) {
     throw new Error("TODO");
+  };
+
+  function updateScreenBounds () {
+    var x = lvl.camera.getViewportX();
+    var y = lvl.camera.getViewportY();
+    var w = lvl.camera.getViewportWidth();
+    var h = lvl.camera.getViewportHeight();
+
+    lvl.bounds.screenTop.x = x - w;
+    lvl.bounds.screenTop.y = y - h;
+    lvl.bounds.screenTop.width = 3 * w;
+    lvl.bounds.screenTop.height = h;
+
+    lvl.bounds.screenRight.x = x + w;
+    lvl.bounds.screenRight.y = y - h;
+    lvl.bounds.screenRight.width = w;
+    lvl.bounds.screenRight.height = 3 * h;
+
+    lvl.bounds.screenBottom.x = x - w;
+    lvl.bounds.screenBottom.y = y + h;
+    lvl.bounds.screenBottom.width = 3 * w;
+    lvl.bounds.screenBottom.height = h;
+
+    lvl.bounds.screenLeft.x = x - w;
+    lvl.bounds.screenLeft.y = y - h;
+    lvl.bounds.screenLeft.width = w;
+    lvl.bounds.screenLeft.height = 3 * h;
   };
 });
 

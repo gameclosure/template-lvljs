@@ -223,6 +223,34 @@ var Camera = Class("Camera", function () {
     followTargets.length = 0;
   };
 
+  // return the left-most x-value within the world that the camera can see
+  this.getViewportX = function () {
+    var x = backend.getViewportX();
+    var w = backend.getViewportWidth();
+    var zw = w / this.zoom;
+    return x + w / 2 - zw / 2;
+  };
+
+  // return the top-most y-value within the world that the camera can see
+  this.getViewportY = function () {
+    var y = backend.getViewportY();
+    var h = backend.getViewportHeight();
+    var zh = h / this.zoom;
+    return y + h / 2 - zh / 2;
+  };
+
+  // return the width of the camera's view into the world
+  this.getViewportWidth = function () {
+    var w = backend.getViewportWidth();
+    return w / this.zoom;
+  };
+
+  // return the height of the camera's view into the world
+  this.getViewportHeight = function () {
+    var h = backend.getViewportHeight();
+    return h / this.zoom;
+  };
+
   // process changes to camera state by applying them to the backend
   function onTick (dt) {
     // follow actors around the world by panning and zooming

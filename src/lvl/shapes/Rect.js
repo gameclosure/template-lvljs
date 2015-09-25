@@ -1,14 +1,16 @@
 import ..utils;
+import .Shape;
 
 var random = Math.random;
 var readOnlyProp = utils.addReadOnlyProperty;
 
 // this class represenets an axis-aligned rectangle
-exports = Class("Rect", function () {
+exports = Class("Rect", Shape, function () {
+  var superProto = Shape.prototype;
+
   this.init = function (opts) {
     opts = opts || {};
-    this.x = opts.x || 0;
-    this.y = opts.y || 0;
+    superProto.init.call(this, opts);
     this.width = opts.width || 0;
     this.height = opts.height || 0;
   };

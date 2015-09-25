@@ -1,3 +1,4 @@
+import .Shape;
 import .Rect;
 import .Circle;
 import .Line;

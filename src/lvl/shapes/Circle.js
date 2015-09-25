@@ -1,4 +1,5 @@
 import ..utils;
+import .Shape;
 
 var PI = Math.PI;
 var TAU = 2 * PI;
@@ -9,11 +10,12 @@ var random = Math.random;
 var readOnlyProp = utils.addReadOnlyProperty;
 
 // this class represenets a circle
-exports = Class("Circle", function () {
+exports = Class("Circle", Shape, function () {
+  var superProto = Shape.prototype;
+
   this.init = function (opts) {
     opts = opts || {};
-    this.x = opts.x || 0;
-    this.y = opts.y || 0;
+    superProto.init.call(this, opts);
     this.radius = opts.radius || 0;
   };
 
