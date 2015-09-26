@@ -37,7 +37,6 @@ exports = Class("Actor", function () {
     if (this.resource.getType() !== 'sprite') {
       throw new Error("This Actor was not created with a sprite resource!");
     }
-
     backend.startSpriteAnimation(this, animation, opts);
   };
 
@@ -46,10 +45,10 @@ exports = Class("Actor", function () {
     if (this.resource.getType() !== 'sprite') {
       throw new Error("This Actor was not created with a sprite resource!");
     }
-
     backend.stopSpriteAnimation(this);
   };
 
+  // TODO: shortcuts in collidesWith, i.e. "left" for lvl.bounds.screenLeft
   // this actor checks each tick to see if it collides with target
   this.collidesWith = function (target, handler) {
     handler = handler || defaultCollisionHandler;

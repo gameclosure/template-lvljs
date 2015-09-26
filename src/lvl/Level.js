@@ -13,6 +13,7 @@ jsio('import .Input', { context: { backend: backend } });
 jsio('import .Input');
 jsio('import .Input', { context: { backend: backend } });
 jsio('import .Input');
+// TODO: modules should be singular
 jsio('import .resources', { context: { backend: backend } });
 jsio('import .resources');
 jsio('import .sounds', { context: { backend: backend } });
