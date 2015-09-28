@@ -23,14 +23,14 @@ function startGame () {
   lvl.camera.setCustomViewportDimensions(BG_WIDTH, BG_HEIGHT, true);
 
   // add background parallax
-  var parallaxResource = lvl.resources.loadParallaxFromJSON(PARALLAX_URL);
+  var parallaxResource = lvl.resource.loadParallaxFromJSON(PARALLAX_URL);
   lvl.bg.add(parallaxResource);
 
   // subscribe to player touch events
   lvl.input.on('touchstart', onTouchStart);
 
   // add the player to the game
-  var playerResource = lvl.resources.loadSpriteFromJSON(PLAYER_URL);
+  var playerResource = lvl.resource.loadSpriteFromJSON(PLAYER_URL);
   var player = lvl.addActor(playerResource);
 
   player.collidesWith(lvl.bounds.screenLeft, onPlayerHitWall);

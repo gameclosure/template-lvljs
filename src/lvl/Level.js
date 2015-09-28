@@ -13,13 +13,12 @@ jsio('import .Input', { context: { backend: backend } });
 jsio('import .Input');
 jsio('import .Input', { context: { backend: backend } });
 jsio('import .Input');
-// TODO: modules should be singular
-jsio('import .resources', { context: { backend: backend } });
-jsio('import .resources');
-jsio('import .sounds', { context: { backend: backend } });
-jsio('import .sounds');
-jsio('import .shapes', { context: { backend: backend } });
-jsio('import .shapes');
+jsio('import .resource', { context: { backend: backend } });
+jsio('import .resource');
+jsio('import .sound', { context: { backend: backend } });
+jsio('import .sound');
+jsio('import .shape', { context: { backend: backend } });
+jsio('import .shape');
 
 var Level = Class("Level", function () {
   var lvl;
@@ -37,16 +36,16 @@ var Level = Class("Level", function () {
     this.input = Input;
 
     // attach library modules
-    this.resources = resources;
-    this.sounds = sounds;
-    this.shapes = shapes;
+    this.resource = resource;
+    this.sound = sound;
+    this.shape = shape;
 
     // collideable bounds that stick to the screen (camera viewport edges)
     this.bounds = {};
-    this.bounds.screenTop = shapes.getRect({ fixed: true });
-    this.bounds.screenRight = shapes.getRect({ fixed: true });
-    this.bounds.screenBottom = shapes.getRect({ fixed: true });
-    this.bounds.screenLeft = shapes.getRect({ fixed: true });
+    this.bounds.screenTop = shape.getRect({ fixed: true });
+    this.bounds.screenRight = shape.getRect({ fixed: true });
+    this.bounds.screenBottom = shape.getRect({ fixed: true });
+    this.bounds.screenLeft = shape.getRect({ fixed: true });
     updateScreenBounds();
     backend.onTick(updateScreenBounds);
   };
