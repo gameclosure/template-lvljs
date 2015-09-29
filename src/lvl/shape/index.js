@@ -3,14 +3,16 @@ import .Rect;
 import .Circle;
 import .Line;
 
-exports.getRect = function (opts) {
+exports.createRect = function (opts) {
   return new Rect(opts);
 };
 
-exports.getCircle = function (opts) {
+exports.createCircle = function (opts) {
   return new Circle(opts);
 };
 
-exports.getLine = function (opts) {
+exports.createLine = function (opts) {
   return new Line(opts);
 };
+
+// TODO: expose shape classes?

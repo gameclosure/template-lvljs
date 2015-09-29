@@ -42,10 +42,10 @@ var Level = Class("Level", function () {
 
     // collideable bounds that stick to the screen (camera viewport edges)
     this.bounds = {};
-    this.bounds.screenTop = shape.getRect({ fixed: true });
-    this.bounds.screenRight = shape.getRect({ fixed: true });
-    this.bounds.screenBottom = shape.getRect({ fixed: true });
-    this.bounds.screenLeft = shape.getRect({ fixed: true });
+    this.bounds.screenTop = shape.createRect({ fixed: true });
+    this.bounds.screenRight = shape.createRect({ fixed: true });
+    this.bounds.screenBottom = shape.createRect({ fixed: true });
+    this.bounds.screenLeft = shape.createRect({ fixed: true });
     updateScreenBounds();
     backend.onTick(updateScreenBounds);
   };
