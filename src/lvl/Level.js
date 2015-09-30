@@ -1,6 +1,14 @@
 import animate;
 
 // XXX: TODO: FIXME: COMPILER BUG
+jsio('import .resource', { context: { backend: backend } });
+jsio('import .resource');
+jsio('import .sound', { context: { backend: backend } });
+jsio('import .sound');
+jsio('import .shape', { context: { backend: backend } });
+jsio('import .shape');
+jsio('import .physics', { context: { backend: backend } });
+jsio('import .physics');
 jsio('import .Actor', { context: { backend: backend } });
 jsio('import .Actor');
 jsio('import .Scenery', { context: { backend: backend } });
@@ -13,12 +21,6 @@ jsio('import .Input', { context: { backend: backend } });
 jsio('import .Input');
 jsio('import .Input', { context: { backend: backend } });
 jsio('import .Input');
-jsio('import .resource', { context: { backend: backend } });
-jsio('import .resource');
-jsio('import .sound', { context: { backend: backend } });
-jsio('import .sound');
-jsio('import .shape', { context: { backend: backend } });
-jsio('import .shape');
 
 var Level = Class("Level", function () {
   var lvl;
@@ -26,19 +28,19 @@ var Level = Class("Level", function () {
   this.init = function () {
     lvl = this;
 
-    // attach special class instances
-    this.bg = new Scenery('background');
-    this.fg = new Scenery('foreground');
-
-    // attach special class singletons
-    this.ui = UI;
-    this.camera = Camera;
-    this.input = Input;
-
     // attach library modules
     this.resource = resource;
     this.sound = sound;
     this.shape = shape;
+    this.physics = physics;
+    Actor.setPhysics(physics);
+
+    // attach special class instances and singletons
+    this.bg = new Scenery('background');
+    this.fg = new Scenery('foreground');
+    this.ui = UI;
+    this.camera = Camera;
+    this.input = Input;
 
     // collideable bounds that stick to the screen (camera viewport edges)
     this.bounds = {};
@@ -48,6 +50,11 @@ var Level = Class("Level", function () {
     this.bounds.screenLeft = shape.createRect({ fixed: true });
     updateScreenBounds();
     backend.onTick(updateScreenBounds);
+    // add easy default shortcuts for screen bounds events
+    this.physics.createEventHandlerShortcut('top', this.bounds.screenTop);
+    this.physics.createEventHandlerShortcut('right', this.bounds.screenRight);
+    this.physics.createEventHandlerShortcut('bottom', this.bounds.screenBottom);
+    this.physics.createEventHandlerShortcut('left', this.bounds.screenLeft);
   };
 
   this.reset = function () {

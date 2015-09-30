@@ -3,12 +3,13 @@ import entities.Entity as Entity;
 import entities.EntityModel as EntityModel;
 import entities.EntityPool as EntityPool;
 
+var uid = 0;
 var readOnlyProp = utils.addReadOnlyProperty;
+var physics;
 
 // Entity patches
 Entity.prototype.viewClass = null;
 EntityModel.prototype._validate = function () { return true; };
-
 // pool physical entities and update them each tick
 var entityPool = new EntityPool();
 backend.onTick(function (dt) {
@@ -16,9 +17,10 @@ backend.onTick(function (dt) {
   entityPool.update(dt / 1000);
 });
 
-exports = Class("Actor", function () {
+var Actor = exports = Class("Actor", function () {
   this.init = function (resource, opts) {
     opts = applyDefaultsOpts(resource, opts);
+    this.uid = this.__class__ + uid++;
     this.resource = resource;
     this.entity = entityPool.obtain(opts);
     // TODO: backend supports multiple views per actor, but this API does not
@@ -48,26 +50,15 @@ exports = Class("Actor", function () {
     backend.stopSpriteAnimation(this);
   };
 
-  // TODO: shortcuts in collidesWith, i.e. "left" for lvl.bounds.screenLeft
   // this actor checks each tick to see if it collides with target
   this.collidesWith = function (target, handler) {
-    handler = handler || defaultCollisionHandler;
-    // TODO: track collision handlers and allow them to be removed
-    backend.onTick(bind(this, function () {
-      if (this.entity.collidesWith(target.entity || target)) {
-        handler(this, target);
-      }
-    }));
+    physics.addCollisionHandler(this, target, handler);
   };
 
+  // TODO: this is the opposite of "collidesWith", better ideas?
   // a function to remove collision handlers between actors
-  this.ignoresCollisionsWith = function (target) {
-    throw new Error("TODO");
-  };
-
-  // by default, just push actors apart
-  function defaultCollisionHandler (a, b) {
-    a.entity.resolveCollisionWith(b.entity || b);
+  this.passesThrough = function (target) {
+    physics.removeCollisionHandler(this, target);
   };
 
   // XXX: These are all just literally pasted from Entity for now.
@@ -240,3 +231,8 @@ var ActorView = Class("ActorView", function () {
     }
   };
 });
+
+
+
+// TODO: global lvl API? other solution?
+exports.setPhysics = function (p) { physics = p; };

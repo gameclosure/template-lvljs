@@ -7,9 +7,9 @@
     "devkit-parallax": "https://github.com/gameclosure/devkit-parallax#v0.3.1"
   },
   "ios": {
-    "bundleID": "co.weeby.producer.mxc.test"
+    "bundleID": "co.weeby.lvljs"
   },
-  "shortName": "test",
+  "shortName": "lvljs",
   "studio": {
     "domain": "studio.example.com",
     "name": "Your Studio Name",
@@ -18,5 +18,5 @@
   "supportedOrientations": [
     "portrait"
   ],
-  "title": "test"
+  "title": "lvl.js Test"
 }

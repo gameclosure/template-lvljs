@@ -33,10 +33,10 @@ function startGame () {
   var playerResource = lvl.resource.loadSpriteFromJSON(PLAYER_URL);
   var player = lvl.addActor(playerResource);
 
-  player.collidesWith(lvl.bounds.screenLeft, onPlayerHitWall);
-  player.collidesWith(lvl.bounds.screenRight, onPlayerHitWall);
-  player.collidesWith(lvl.bounds.screenTop, onPlayerHitPoison);
-  player.collidesWith(lvl.bounds.screenBottom, onPlayerHitPoison);
+  player.collidesWith('left', onPlayerHitWall);
+  player.collidesWith('right', onPlayerHitWall);
+  player.collidesWith('top', onPlayerHitPoison);
+  player.collidesWith('bottom', onPlayerHitPoison);
 
   function onTouchStart (touch) {
     if (!player) { return; }
