@@ -55,9 +55,8 @@ var Actor = exports = Class("Actor", function () {
     physics.addCollisionHandler(this, target, handler);
   };
 
-  // TODO: this is the opposite of "collidesWith", better ideas?
   // a function to remove collision handlers between actors
-  this.passesThrough = function (target) {
+  this.removeCollidesWith = function (target) {
     physics.removeCollisionHandler(this, target);
   };
 
