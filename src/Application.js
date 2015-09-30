@@ -57,7 +57,6 @@ function startGame () {
 
     // if (difficulty < 1) { difficulty += DIFFICULTY_RAMP; }
     // player.vx = (PLAYER_VX + PLAYER_VX * 0.1 * difficulty) * newDir;
-    // player.flipX = newDir > 0;
     // wallObstacles.forEachActiveActor(function (oldObstacle) {
     //   animateObstacle(oldObstacle, newDir, true);
     // });

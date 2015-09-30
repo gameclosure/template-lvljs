@@ -250,7 +250,7 @@ function setEntityByViewID (id, entity) {
   return entitiesByViewID[id] = entity;
 };
 
-// TODO: track and remove subscriptions?
+// call a function each tick, drives lvl engine
 exports.onTick = function (cb) {
   GC.app.engine.on('Tick', cb);
 };

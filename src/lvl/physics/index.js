@@ -6,7 +6,7 @@ var handlers = {
 var eventHandlerShortcuts = {};
 
 // check collisions each tick
-backend.onTick(bind(this, function () {
+backend.onTick(function (dt) {
   // TODO: support groups as subjects
   var collisionHandlers = handlers.collision;
   for (var key in collisionHandlers) {
@@ -28,7 +28,7 @@ backend.onTick(bind(this, function () {
       }
     }
   }
-}));
+});
 
 
 
@@ -90,6 +90,9 @@ var EventHandler = Class("EventHandler", function () {
     var index = list.indexOf(this);
     if (index >= 0) {
       list.splice(index, 1);
+    }
+    if (list.length === 0) {
+      delete typeHandlers[this.id];
     }
   };
 

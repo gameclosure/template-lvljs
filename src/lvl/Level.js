@@ -22,6 +22,19 @@ jsio('import .Input');
 jsio('import .Input', { context: { backend: backend } });
 jsio('import .Input');
 
+
+
+// update timers each tick
+var timerUID = 0;
+var timers = {};
+backend.onTick(function (dt) {
+  for (var key in timers) {
+    timers[key].tick(dt);
+  }
+});
+
+
+
 var Level = Class("Level", function () {
   var lvl;
 
@@ -84,26 +97,24 @@ var Level = Class("Level", function () {
   // TODO: track and clear all animations on reset?
   this.animate = animate;
 
-  this.setTimeout = function (fn, duration) {
-    // TODO: track and clear all timeouts on reset?
-    // TODO: implement version that ticks w backend
-    return setTimeout(fn, duration);
+  this.setTimeout = function (callback, duration) {
+    var timer = new EventTimer(callback, duration, 'timeout');
+    return timer.uid;
   };
 
   this.clearTimeout = function (id) {
-    // TODO: implement version that ticks w backend
-    return clearTimeout(id);
+    var timer = timers[id];
+    timer && timer.unregister();
   };
 
-  this.setInterval = function (fn, duration) {
-    // TODO: track and clear all intervals on reset?
-    // TODO: implement version that ticks w backend
-    return setInterval(fn, duration);
+  this.setInterval = function (callback, duration) {
+    var timer = new EventTimer(callback, duration, 'interval');
+    return timer.uid;
   };
 
   this.clearInterval = function (id) {
-    // TODO: implement version that ticks w backend
-    return clearInterval(id);
+    var timer = timers[id];
+    timer && timer.unregister();
   };
 
   // ordered by zIndex, top-most first
@@ -141,3 +152,38 @@ var Level = Class("Level", function () {
 
 // singleton Level API
 exports = new Level();
+
+
+
+// event timer class for tracking setTimeout, setInterval etc.
+var EventTimer = Class("EventTimer", function () {
+  this.init = function (callback, duration, type) {
+    this.callback = callback;
+    this.duration = duration;
+    this.type = type;
+    this.elapsed = 0;
+    this.uid = timerUID++;
+    this.register();
+  };
+
+  this.register = function () {
+    timers[this.uid] = this;
+    return this.uid;
+  };
+
+  this.unregister = function () {
+    delete timers[this.uid];
+  };
+
+  this.tick = function (dt) {
+    this.elapsed += dt;
+    if (this.elapsed >= this.duration) {
+      this.callback();
+      if (this.type === 'interval') {
+        this.elapsed -= this.duration;
+      } else {
+        this.unregister();
+      }
+    }
+  };
+});
