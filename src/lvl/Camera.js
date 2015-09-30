@@ -28,8 +28,6 @@ var Camera = Class("Camera", function () {
     width = backend.getViewportWidth();
     height = backend.getViewportHeight();
 
-    // TODO: Object.defineProp ... __animatableProperties
-
     this.reset();
     backend.onTick(bind(this, onTick));
   };

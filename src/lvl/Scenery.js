@@ -4,6 +4,8 @@ exports = Class("Scenery", function () {
     this.type = type;
   };
 
+  this.reset = function () {};
+
   this.add = function (resource, opts) {
     if (this.type === 'foreground') {
       backend.addToForeground(resource, opts);

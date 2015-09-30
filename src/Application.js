@@ -69,6 +69,10 @@ function startGame () {
     if (!player) { return; }
     player.destroy();
     player = null;
-    // TODO: game over and reset
+    lvl.setTimeout(function () {
+      // TODO: startGame moves into lvl?
+      lvl.reset();
+      startGame();
+    }, 2000);
   };
 };

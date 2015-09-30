@@ -7,8 +7,6 @@ jsio('import .sound', { context: { backend: backend } });
 jsio('import .sound');
 jsio('import .shape', { context: { backend: backend } });
 jsio('import .shape');
-jsio('import .physics', { context: { backend: backend } });
-jsio('import .physics');
 jsio('import .Actor', { context: { backend: backend } });
 jsio('import .Actor');
 jsio('import .Scenery', { context: { backend: backend } });
@@ -21,17 +19,8 @@ jsio('import .Input', { context: { backend: backend } });
 jsio('import .Input');
 jsio('import .Input', { context: { backend: backend } });
 jsio('import .Input');
-
-
-
-// update timers each tick
-var timerUID = 0;
-var timers = {};
-backend.onTick(function (dt) {
-  for (var key in timers) {
-    timers[key].tick(dt);
-  }
-});
+jsio('import .Physics', { context: { backend: backend } });
+jsio('import .Physics');
 
 
 
@@ -45,8 +34,6 @@ var Level = Class("Level", function () {
     this.resource = resource;
     this.sound = sound;
     this.shape = shape;
-    this.physics = physics;
-    Actor.setPhysics(physics);
 
     // attach special class instances and singletons
     this.bg = new Scenery('background');
@@ -54,6 +41,27 @@ var Level = Class("Level", function () {
     this.ui = UI;
     this.camera = Camera;
     this.input = Input;
+    this.physics = Physics;
+    Actor.setPhysics(this.physics);
+
+    // reset lvl state
+    this.reset();
+
+    // update screen bounds as camera moves
+    backend.onTick(updateScreenBounds);
+  };
+
+  this.reset = function () {
+    // always reset backend first
+    backend.reset();
+
+    // reset all stateful classes
+    this.bg.reset();
+    this.fg.reset();
+    this.ui.reset();
+    this.camera.reset();
+    this.input.reset();
+    this.physics.reset();
 
     // collideable bounds that stick to the screen (camera viewport edges)
     this.bounds = {};
@@ -62,17 +70,12 @@ var Level = Class("Level", function () {
     this.bounds.screenBottom = shape.createRect({ fixed: true });
     this.bounds.screenLeft = shape.createRect({ fixed: true });
     updateScreenBounds();
-    backend.onTick(updateScreenBounds);
+
     // add easy default shortcuts for screen bounds events
     this.physics.createEventHandlerShortcut('top', this.bounds.screenTop);
     this.physics.createEventHandlerShortcut('right', this.bounds.screenRight);
     this.physics.createEventHandlerShortcut('bottom', this.bounds.screenBottom);
     this.physics.createEventHandlerShortcut('left', this.bounds.screenLeft);
-  };
-
-  this.reset = function () {
-    // TODO: reset backend first, then reset lvl API
-    throw new Error("TODO");
   };
 
   this.addActor = function (resource, opts) {
@@ -93,8 +96,8 @@ var Level = Class("Level", function () {
   };
 
   // TODO: devkit should limit global tick to ~100 ms max! BIG TICKS BREAK STUFF
-
   // TODO: track and clear all animations on reset?
+  // TODO: Object.defineProp animatableProperties on classes like camera
   this.animate = animate;
 
   this.setTimeout = function (callback, duration) {
@@ -154,6 +157,15 @@ var Level = Class("Level", function () {
 exports = new Level();
 
 
+
+// update timers each tick
+var timerUID = 0;
+var timers = {};
+backend.onTick(function (dt) {
+  for (var key in timers) {
+    timers[key].tick(dt);
+  }
+});
 
 // event timer class for tracking setTimeout, setInterval etc.
 var EventTimer = Class("EventTimer", function () {

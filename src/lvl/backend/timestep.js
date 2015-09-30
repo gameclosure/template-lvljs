@@ -14,12 +14,33 @@ var DEFAULT_HEIGHT = 1024;
 var DEVICE_WIDTH = device.screen.width;
 var DEVICE_HEIGHT = device.screen.height;
 
+var rootView = GC.app.view;
+var isLandscape = DEVICE_WIDTH > DEVICE_HEIGHT;
+
+var viewX;
+var viewY;
+var viewWidth;
+var viewHeight;
+var viewScale;
+
 /**
  * Timestep Backend API
  */
 
+// reset the backend state, recycle views etc
 exports.reset = function () {
-  throw new Error("TODO");
+  viewX = 0;
+  viewY = 0;
+  viewWidth = isLandscape ? DEFAULT_HEIGHT : DEFAULT_WIDTH;
+  viewHeight = isLandscape ? DEFAULT_WIDTH : DEFAULT_HEIGHT;
+  viewScale;
+
+  backgroundView.reset();
+  levelView.reset();
+  foregroundView.reset();
+  uiView.reset();
+
+  exports.setFullScreenViewportDimensions(viewWidth, viewHeight);
 };
 
 // unscaled world-view x
@@ -42,6 +63,7 @@ exports.getViewportHeight = function () {
   return viewHeight;
 };
 
+// move the world views (from lvl.camera.x and y)
 exports.moveViewportTo = function (x, y) {
   viewX = x;
   viewY = y;
@@ -51,6 +73,7 @@ exports.moveViewportTo = function (x, y) {
   });
 };
 
+// move the world views (from lvl.camera.x and y)
 exports.moveViewportBy = function (dx, dy) {
   viewX += dx;
   viewY += dy;
@@ -60,18 +83,21 @@ exports.moveViewportBy = function (dx, dy) {
   });
 };
 
+// scale the world views (from lvl.camera.zoom)
 exports.scaleViewportTo = function (s) {
   forEachWorldView(function (view, i) {
     view.scaleTo(s);
   });
 };
 
+// multiplicatively scale the world views (from lvl.camera.zoom)
 exports.scaleViewportBy = function (ds) {
   forEachWorldView(function (view, i) {
     view.scaleBy(ds);
   });
 };
 
+// lvl.input registers handlers in the backend
 exports.registerInputHandler = function (eventName, callback) {
   uiView.registerInputHandler(eventName, callback);
 };
@@ -120,11 +146,11 @@ exports.addToBackground = function (resource, opts) {
 };
 
 exports.clearForeground = function () {
-  foregroundView.clear();
+  foregroundView.reset();
 };
 
 exports.clearBackground = function () {
-  backgroundView.clear();
+  backgroundView.reset();
 };
 
 exports.startSpriteAnimation = function (actor, animation, opts) {
@@ -295,8 +321,14 @@ var LayerView = Class(View, function () {
 
   this.init = function (type, opts) {
     superProto.init.call(this, opts);
+
+    this._x = 0;
+    this._y = 0;
+    this._scale = 1;
     this.type = type;
-    this._reset();
+    this._parallaxes = [];
+    this._otherViews = [];
+
     this._nonParallaxRoot = new View({
       parent: this,
       anchorX: this.style.width / 2,
@@ -306,12 +338,18 @@ var LayerView = Class(View, function () {
     });
   };
 
-  this._reset = function () {
+  this.reset = function () {
+    for (var i = this._parallaxes.length - 1; i >= 0; i--) {
+      this.remove(this._parallaxes[i]);
+    }
+
+    for (var i = this._otherViews.length - 1; i >= 0; i--) {
+      this.remove(this._otherViews[i]);
+    }
+
     this._x = 0;
     this._y = 0;
     this._scale = 1;
-    this._parallaxes = [];
-    this._otherViews = [];
   };
 
   this.add = function (view, resource, opts) {
@@ -350,18 +388,6 @@ var LayerView = Class(View, function () {
       view.__pool.releaseView(view);
       this._otherViews.splice(otherIndex, 1);
     }
-  };
-
-  this.clear = function () {
-    for (var i = this._parallaxes.length - 1; i >= 0; i--) {
-      this.remove(this._parallaxes[i]);
-    }
-
-    for (var i = this._otherViews.length - 1; i >= 0; i--) {
-      this.remove(this._otherViews[i]);
-    }
-
-    this._reset();
   };
 
   this.scrollTo = function (x, y) {
@@ -421,19 +447,15 @@ var UIView = Class(View, function () {
 
   this.init = function (opts) {
     superProto.init.call(this, opts);
-    this._reset();
+    this.reset();
   };
 
-  this._reset = function () {
+  this.reset = function () {
     // TODO: support mouse over and other events?
+    // TODO: this.removeAllSubviews() ... recycle into pools
     this.inputStartHandlers = [];
     this.inputMoveHandlers = [];
     this.inputStopHandlers = [];
-  };
-
-  this.clear = function () {
-    // TODO: this.removeAllSubviews() ... recycle into pools
-    this._reset();
   };
 
   this.onInputStart = function (startEvent, startPoint) {
@@ -515,25 +537,6 @@ var UIView = Class(View, function () {
 
 
 
-/**
- * Timestep Backend View Hierarchy
- */
-
-var rootView = GC.app.view;
-var isLandscape = DEVICE_WIDTH > DEVICE_HEIGHT;
-var viewX = 0;
-var viewY = 0;
-var viewWidth = isLandscape ? DEFAULT_HEIGHT : DEFAULT_WIDTH;
-var viewHeight = isLandscape ? DEFAULT_WIDTH : DEFAULT_HEIGHT;
-var viewScale;
-
-var backgroundView = new LayerView('background', { superview: rootView });
-var levelView = new LayerView('level', { superview: rootView });
-var foregroundView = new LayerView('foreground', { superview: rootView });
-var uiView = new UIView ({ superview: rootView });
-
-exports.setFullScreenViewportDimensions(viewWidth, viewHeight);
-
 // update the scenery and level views
 function forEachWorldView (fn, ctx) {
   var subviews = rootView.getSubviews();
@@ -553,3 +556,14 @@ function forEachView (fn, ctx) {
     fn.call(this, view, i);
   }
 };
+
+
+
+/**
+ * Timestep Backend View Hierarchy
+ */
+
+var backgroundView = new LayerView('background', { superview: rootView });
+var levelView = new LayerView('level', { superview: rootView });
+var foregroundView = new LayerView('foreground', { superview: rootView });
+var uiView = new UIView ({ superview: rootView });

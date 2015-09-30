@@ -1,4 +1,49 @@
 
+/**
+ * Physics Module API
+ */
+
+var Physics = Class("Physics", function () {
+  this.reset = function () {
+    handlers = {
+      collision: {}
+    };
+    eventHandlerShortcuts = {};
+  };
+
+  // add a collision handler that fires a callback when a and b collide
+  this.addCollisionHandler = function (a, b, callback) {
+    return new EventHandler(a, b, callback, 'collision');
+  };
+
+  // remove a collision handler that's tracking a and b
+  this.removeCollisionHandler = function (a, b) {
+    var collisionHandlers = handlers.collision;
+    var id = getHandlerID(a, b);
+    var handlerList = collisionHandlers[id];
+    if (handlerList) {
+      for (var i = handlerList.length - 1; i >= 0; i--) {
+        handlerList[i].unregister();
+      }
+    }
+  };
+
+  // create a string shortcut to easily access events with certain objects
+  this.createEventHandlerShortcut = function (shortcut, obj) {
+    if (typeof shortcut !== 'string') {
+      throw new Error("Event handler shortcuts must be strings:", shortcut);
+    } else if (eventHandlerShortcuts[shortcut]) {
+      throw new Error("Event handler shortcuts cannot be overwritten:", shortcut);
+    }
+    eventHandlerShortcuts[shortcut] = obj;
+  };
+});
+
+// singleton physics API
+exports = new Physics();
+
+
+
 // TODO: other types of event handlers, like onEnters, onExits, onEntered, etc
 var handlers = {
   collision: {}
@@ -29,42 +74,6 @@ backend.onTick(function (dt) {
     }
   }
 });
-
-
-
-
-/**
- * Physics Module API
- */
-
-// add a collision handler that fires a callback when a and b collide
-exports.addCollisionHandler = function (a, b, callback) {
-  return new EventHandler(a, b, callback, 'collision');
-};
-
-// remove a collision handler that's tracking a and b
-exports.removeCollisionHandler = function (a, b) {
-  var collisionHandlers = handlers.collision;
-  var id = getHandlerID(a, b);
-  var handlerList = collisionHandlers[id];
-  if (handlerList) {
-    for (var i = handlerList.length - 1; i >= 0; i--) {
-      handlerList[i].unregister();
-    }
-  }
-};
-
-// create a string shortcut to easily access events with certain objects
-exports.createEventHandlerShortcut = function (shortcut, obj) {
-  if (typeof shortcut !== 'string') {
-    throw new Error("Event handler shortcuts must be strings:", shortcut);
-  } else if (eventHandlerShortcuts[shortcut]) {
-    throw new Error("Event handler shortcuts cannot be overwritten:", shortcut);
-  }
-  eventHandlerShortcuts[shortcut] = obj;
-};
-
-
 
 // class used to track and manage events, like collisions, between two subject
 var EventHandler = Class("EventHandler", function () {
@@ -108,8 +117,6 @@ var EventHandler = Class("EventHandler", function () {
     return obj;
   };
 });
-
-
 
 // default event handler callbacks by type
 var defaultCallbacks = {
