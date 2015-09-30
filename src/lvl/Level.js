@@ -240,6 +240,14 @@ var Group = Class("Group", function () {
     }
   };
 
+  this.collidesWith = function (target, handler) {
+    lvl.physics.addCollisionHandler(this, target, handler);
+  };
+
+  this.cancelCollidesWith = function (target) {
+    lvl.physics.removeCollisionHandler(this, target);
+  };
+
   this.forEach = function (fn, ctx) {
     var actors = this.actors;
     for (var i = actors.length - 1; i >= 0; i--) {

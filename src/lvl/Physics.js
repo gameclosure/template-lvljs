@@ -48,32 +48,60 @@ exports = new Physics();
 var handlers = {
   collision: {}
 };
+var eventFunctions = {
+  collision: 'collidesWith'
+};
 var eventHandlerShortcuts = {};
 
 // check collisions each tick
 backend.onTick(function (dt) {
-  // TODO: support groups as subjects
-  var collisionHandlers = handlers.collision;
-  for (var key in collisionHandlers) {
-    var handlerList = collisionHandlers[key];
-    for (var i = 0; i < handlerList.length; i++) {
-      var handler = handlerList[i];
-      var subjectA = handler.subjectA;
-      var subjectB = handler.subjectB;
-      var a = subjectA.entity || subjectA;
-      var b = subjectB.entity || subjectB;
-      if (a.collidesWith) {
-        if (a.collidesWith(b)) {
-          handler.callback(subjectA, subjectB);
-        }
-      } else if (b.collidesWith) {
-        if (b.collidesWith(a)) {
-          handler.callback(subjectA, subjectB);
-        }
-      }
+  for (var type in handlers) {
+    var handlersByType = handlers[type];
+    for (var uid in handlersByType) {
+      handleEventsByType(handlersByType[uid], type);
     }
   }
 });
+
+function handleEventsByType (handlerList, type) {
+  var fnName = eventFunctions[type];
+  for (var i = 0; i < handlerList.length; i++) {
+    var handler = handlerList[i];
+    var subjectA = handler.subjectA;
+    var subjectB = handler.subjectB;
+    var isGroupA = subjectA.__class__ === "Group";
+    var isGroupB = subjectB.__class__ === "Group";
+    if (isGroupA && isGroupB) {
+      subjectA.forEach(function (actorA) {
+        subjectB.forEach(function (actorB) {
+          checkForEvent(actorA, actorB, handler, fnName);
+        }, this);
+      }, this);
+    } else if (isGroupA) {
+      subjectA.forEach(function (actorA) {
+        checkForEvent(actorA, subjectB, handler, fnName);
+      }, this);
+    } else if (isGroupB) {
+      subjectB.forEach(function (actorB) {
+        checkForEvent(subjectA, actorB, handler, fnName);
+      }, this);
+    } else {
+      checkForEvent(subjectA, subjectB, handler, fnName);
+    }
+  }
+};
+
+function checkForEvent (actorA, actorB, handler, fnName) {
+  var a = actorA.entity || actorA;
+  var b = actorB.entity || actorB;
+  var aFn = a[fnName];
+  var bFn = b[fnName];
+  if (aFn) {
+    aFn.call(a, b) && handler.callback(actorA, actorB);
+  } else if (bFn) {
+    bFn.call(b, a) && handler.callback(actorA, actorB);
+  }
+};
 
 // class used to track and manage events, like collisions, between two subject
 var EventHandler = Class("EventHandler", function () {
@@ -87,21 +115,21 @@ var EventHandler = Class("EventHandler", function () {
   };
 
   this.register = function () {
-    var typeHandlers = handlers[this.type];
-    var list = typeHandlers[this.id] || [];
+    var handlersByType = handlers[this.type];
+    var list = handlersByType[this.id] || [];
     list.push(this);
-    typeHandlers[this.id] = list;
+    handlersByType[this.id] = list;
   };
 
   this.unregister = function () {
-    var typeHandlers = handlers[this.type];
-    var list = typeHandlers[this.id] || [];
+    var handlersByType = handlers[this.type];
+    var list = handlersByType[this.id] || [];
     var index = list.indexOf(this);
     if (index >= 0) {
       list.splice(index, 1);
     }
     if (list.length === 0) {
-      delete typeHandlers[this.id];
+      delete handlersByType[this.id];
     }
   };
 

@@ -56,8 +56,8 @@ var Actor = exports = Class("Actor", function () {
     physics.addCollisionHandler(this, target, handler);
   };
 
-  // a function to remove collision handlers between actors
-  this.removeCollidesWith = function (target) {
+  // a function to cancel collision handlers between actors
+  this.cancelCollidesWith = function (target) {
     physics.removeCollisionHandler(this, target);
   };
 
