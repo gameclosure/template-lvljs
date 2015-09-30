@@ -63,6 +63,9 @@ var Level = Class("Level", function () {
     this.input.reset();
     this.physics.reset();
 
+    // group cache
+    this.groups = {};
+
     // collideable bounds that stick to the screen (camera viewport edges)
     this.bounds = {};
     this.bounds.screenTop = shape.createRect({ fixed: true });
@@ -81,14 +84,23 @@ var Level = Class("Level", function () {
   this.addActor = function (resource, opts) {
     var type = resource.getType();
     if (type === 'sprite' || type === 'image') {
-      return new Actor(resource, opts);
+      var actor = new Actor(resource, opts);
+      var group = opts && opts.group;
+      if (typeof group === 'string') {
+        group = this.groups[group] || this.addGroup(group);
+      }
+      group && group.add(actor);
+      return actor;
     } else {
       throw new Error("Invalid Resource Type for Actor:", type);
     }
   };
 
-  this.addGroup = function () {
-    throw new Error("TODO");
+  this.addGroup = function (uid) {
+    if (this.groups[uid]) {
+      throw new Error("A Group already exists with unique ID:", uid);
+    }
+    return this.groups[uid] = new Group(uid);
   };
 
   this.addParallax = function (resource) {
@@ -196,6 +208,42 @@ var EventTimer = Class("EventTimer", function () {
       } else {
         this.unregister();
       }
+    }
+  };
+});
+
+
+
+// Group Class for easily managing sets of actors simultaneously
+var Group = Class("Group", function () {
+  this.init = function (uid) {
+    this.uid = uid;
+    this.actors = [];
+  };
+
+  this.reset = function () {
+    this.actors.length = 0;
+  };
+
+  this.add = function (actor) {
+    if (actor.__class__ !== "Actor") {
+      throw new Error("Groups only accept instances of Actor as members!");
+    }
+    actor.group = this;
+    this.actors.push(actor);
+  };
+
+  this.remove = function (actor) {
+    var index = this.actors.indexOf(actor);
+    if (index >= 0) {
+      this.actors.splice(index, 1);
+    }
+  };
+
+  this.forEach = function (fn, ctx) {
+    var actors = this.actors;
+    for (var i = actors.length - 1; i >= 0; i--) {
+      fn.call(ctx, actors[i], i);
     }
   };
 });

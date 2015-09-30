@@ -30,6 +30,7 @@ var Actor = exports = Class("Actor", function () {
 
   // remove the actor from gameplay
   this.destroy = function () {
+    this.group && this.group.remove(this);
     backend.removeViewsFromActor(this);
     entityPool.release(this.entity);
   };

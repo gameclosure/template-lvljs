@@ -9,6 +9,7 @@
     "width": 163,
     "height": 208,
     "url": "resources/images/dragonpong/character",
-    "defaultAnimation": "idle"
+    "defaultAnimation": "idle",
+    "frameRate": 15
   }
 }
