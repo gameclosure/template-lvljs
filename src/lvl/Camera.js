@@ -25,9 +25,6 @@ var Camera = Class("Camera", function () {
   var followRect;
 
   this.init = function () {
-    width = backend.getViewportWidth();
-    height = backend.getViewportHeight();
-
     this.reset();
     backend.onTick(bind(this, onTick));
   };
@@ -74,6 +71,8 @@ var Camera = Class("Camera", function () {
     lastX = this.x;
     lastY = this.y;
     lastZoom = this.zoom;
+    width = backend.getViewportWidth();
+    height = backend.getViewportHeight();
     panVelocityX = 0;
     panVelocityY = 0;
     zoomVelocity = 0;

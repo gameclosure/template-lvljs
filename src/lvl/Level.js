@@ -7,6 +7,8 @@ jsio('import .sound', { context: { backend: backend } });
 jsio('import .sound');
 jsio('import .shape', { context: { backend: backend } });
 jsio('import .shape');
+jsio('import .util', { context: { backend: backend } });
+jsio('import .util');
 jsio('import .Actor', { context: { backend: backend } });
 jsio('import .Actor');
 jsio('import .Scenery', { context: { backend: backend } });
@@ -34,6 +36,7 @@ var Level = Class("Level", function () {
     this.resource = resource;
     this.sound = sound;
     this.shape = shape;
+    this.util = util;
 
     // attach special class instances and singletons
     this.bg = new Scenery('background');
@@ -97,6 +100,9 @@ var Level = Class("Level", function () {
   };
 
   this.addGroup = function (uid) {
+    if (uid === undefined) {
+      uid = "Group" + groupUID++;
+    }
     if (this.groups[uid]) {
       throw new Error("A Group already exists with unique ID:", uid);
     }
@@ -215,6 +221,7 @@ var EventTimer = Class("EventTimer", function () {
 
 
 // Group Class for easily managing sets of actors simultaneously
+var groupUID = 0;
 var Group = Class("Group", function () {
   this.init = function (uid) {
     this.uid = uid;

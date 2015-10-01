@@ -5,6 +5,8 @@ import ui.ImageView as ImageView;
 import ui.SpriteView as SpriteView;
 import ui.ViewPool as ViewPool;
 import parallax.Parallax as Parallax;
+import ui.resource.loader as loader;
+var imageMap = loader.getMap();
 
 var imageViewPool = new ViewPool({ ctor: ImageView });
 var spriteViewPool = new ViewPool({ ctor: SpriteView });
@@ -200,6 +202,7 @@ exports.createViewFromResource = function (resource, parent) {
 
     case 'image':
       var image = imageViewPool.obtainView(opts);
+      image.setImage(opts.image || opts.url);
       image.__pool = imageViewPool;
       return image;
       break;
@@ -241,6 +244,56 @@ exports.removeViewsFromActor = function (actor) {
     layer.remove(view);
   }, this);
   setViewListByEntityID(entity.uid, []);
+};
+
+// allow the backend to apply nice defaults
+exports.applyDefaultImageOpts = function (opts) {
+  var shape = opts.shape;
+  var view = applyDefaultImageDimensions(opts.view);
+  // width and height will cause radius to be ignored so don't set for circles
+  if (shape && !shape.radius) {
+    shape.image = view.image;
+    shape.url = view.url;
+    applyDefaultImageDimensions(shape);
+  }
+  return opts;
+};
+
+function applyDefaultImageDimensions (opts) {
+  opts = opts || {};
+  var imageID = opts.image || opts.url;
+  if (!imageID) { return opts; }
+
+  // First check if sprite animation exists
+  var map;
+  var spriteData = SpriteView.allAnimations[imageID];
+  if (spriteData) {
+    // Grab the first animation frame
+    for (var prop in spriteData) {
+      map = spriteData[prop][0];
+      break;
+    }
+  } else {
+    map = imageMap[imageID];
+  }
+
+  // auto-size based on provided width and/or height
+  if (map) {
+    var imgWidth = map.w + map.marginLeft + map.marginRight;
+    var imgHeight = map.h + map.marginTop + map.marginBottom;
+    if (!opts.width && !opts.height) {
+      opts.width = imgWidth;
+      opts.height = imgHeight;
+    } else if (!opts.width) {
+      var scale = opts.height / imgHeight;
+      opts.width = scale * imgWidth;
+    } else if (!opts.height) {
+      var scale = opts.width / imgWidth;
+      opts.height = scale * imgHeight;
+    }
+  }
+
+  return opts;
 };
 
 // TODO: move these to LayerView Class ?

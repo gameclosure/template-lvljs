@@ -1,0 +1,10 @@
+{
+  "shape": {
+    "radius": 28,
+    "offsetX": 50
+  },
+  "view": {
+    "offsetY": -20,
+    "url": "resources/images/dragonpong/spear.png"
+  }
+}
