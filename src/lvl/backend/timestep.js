@@ -249,24 +249,26 @@ exports.removeViewsFromActor = function (actor) {
 // allow the backend to apply nice defaults
 exports.applyDefaultImageOpts = function (opts) {
   var shape = opts.shape;
-  var view = applyDefaultImageDimensions(opts.view);
-  // width and height will cause radius to be ignored so don't set for circles
-  if (shape && !shape.radius) {
-    shape.image = view.image;
-    shape.url = view.url;
-    applyDefaultImageDimensions(shape);
+  var view = opts.view;
+  if (view) {
+    applyDefaultImageDimensions(view, view.image || view.url);
+    // width and height will cause radius to be ignored so don't set for circles
+    if (shape && !shape.radius) {
+      applyDefaultImageDimensions(shape, view.image || view.url);
+    }
   }
   return opts;
 };
 
-function applyDefaultImageDimensions (opts) {
-  opts = opts || {};
-  var imageID = opts.image || opts.url;
-  if (!imageID) { return opts; }
+// copied from devkit-entities, this fn applies image dimensions as defaults
+function applyDefaultImageDimensions (opts, url) {
+  if (!opts || !url) {
+    return opts;
+  }
 
   // First check if sprite animation exists
   var map;
-  var spriteData = SpriteView.allAnimations[imageID];
+  var spriteData = SpriteView.allAnimations[url];
   if (spriteData) {
     // Grab the first animation frame
     for (var prop in spriteData) {
@@ -274,7 +276,7 @@ function applyDefaultImageDimensions (opts) {
       break;
     }
   } else {
-    map = imageMap[imageID];
+    map = imageMap[url];
   }
 
   // auto-size based on provided width and/or height
