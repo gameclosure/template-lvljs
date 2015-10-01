@@ -41,7 +41,7 @@ function startGame () {
   var scoreResource = lvl.resource.loadImageTextFromJSON(SCORE_URL);
   var scoreText = lvl.ui.add(scoreResource);
   var score = 0;
-  // scoreText.setText(score);
+  scoreText.setText(score);
 
   // subscribe to player touch events
   lvl.input.on('touchstart', onTouchStart);
@@ -82,7 +82,7 @@ function startGame () {
     difficulty = min(DIFFICULTY_MAX, difficulty + DIFFICULTY_STEP);
     hideSpears();
     spawnSpears(newDir);
-    // scoreText.setText(++score);
+    scoreText.setText(++score);
     // effects.squish(scoreText, { duration: 300, loop: false, scale: 3 });
   };
 

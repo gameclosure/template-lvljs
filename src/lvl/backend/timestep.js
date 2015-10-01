@@ -142,6 +142,7 @@ exports.setCustomViewportDimensions = function (width, height, scale, clip) {
 exports.addToUI = function (resource, opts) {
   var view = exports.createViewFromResource(resource, uiView);
   uiView.add(view, resource, opts);
+  return view.uid;
 };
 
 exports.addToForeground = function (resource, opts) {
@@ -164,6 +165,18 @@ exports.clearForeground = function () {
 
 exports.clearBackground = function () {
   backgroundView.reset();
+};
+
+exports.updateUI = function (wrapper, method, opts) {
+  var view = uiView.getViewByID(wrapper.uid);
+  switch (method) {
+    case 'setText':
+      view.setText(opts.text || '');
+      break;
+
+    default:
+      throw new Error("No such UI method implemented in backend", method);
+  }
 };
 
 exports.startSpriteAnimation = function (actor, animation, opts) {
@@ -291,8 +304,8 @@ exports.applyDefaultImageTextOpts = function (opts) {
         image: characters[key]
       };
     }
+    view.characterData = characters;
   }
-  opts.characterData = characters;
   return opts;
 };
 
@@ -567,6 +580,20 @@ var UIView = Class(View, function () {
       view.__pool.releaseView(view);
       this._uiViews.splice(index, 1);
     }
+  };
+
+  this.getViewByID = function (uid) {
+    var view = null;
+    this._uiViews.forEach(function (v) {
+      if (v.uid === uid) {
+        view = v;
+      }
+    }, this);
+
+    if (!view) {
+      throw new Error("No UI View found for uid", uid);
+    }
+    return view;
   };
 
   this.onInputStart = function (startEvent, startPoint) {
