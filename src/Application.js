@@ -21,6 +21,7 @@ var GRAVITY = 1500;
 var SPEAR_SLOTS = 7;
 var SPEAR_MARGIN = 150;
 var SPEAR_SPACING = (BG_HEIGHT - SPEAR_MARGIN * 2) / (SPEAR_SLOTS - 1);
+var SPEAR_LENGTH = 90;
 var DIFFICULTY_STEP = 0.05;
 var DIFFICULTY_MAX = 1;
 var PARALLAX_URL = 'resources/config/dragonPongParallax.json';
@@ -46,7 +47,9 @@ function startGame () {
   var spearResource = lvl.resource.loadImageFromJSON(SPEAR_URL);
   var spears = lvl.addGroup('spears');
   var difficulty = 0;
+  var gameOver = false;
 
+  // set up player collision handlers
   player.collidesWith('left', onPlayerHitWall);
   player.collidesWith('right', onPlayerHitWall);
   player.collidesWith('top', onGameOver);
@@ -54,7 +57,7 @@ function startGame () {
   player.collidesWith(spears, onGameOver);
 
   function onTouchStart (touch) {
-    if (!player) { return; }
+    if (gameOver) { return; }
     if (player.vx === 0) {
       player.vx = PLAYER_VX;
       player.ay = GRAVITY;
@@ -70,12 +73,9 @@ function startGame () {
     player.vx = newDir * PLAYER_VX;
     player.view.flipX = newDir > 0;
     difficulty = min(DIFFICULTY_MAX, difficulty + DIFFICULTY_STEP);
-    // hide and destroy old spears
-    spears.forEach(function (spear) { animateSpear(spear, newDir, true); });
-    // spawn new spears
+    hideSpears();
     spawnSpears(newDir);
 
-    // player.vx = (PLAYER_VX + PLAYER_VX * 0.1 * difficulty) * newDir;
     // scoreText.setText(++score);
     // effects.squish(scoreText, { duration: 300, loop: false, scale: 3 });
   };
@@ -91,34 +91,49 @@ function startGame () {
           ? lvl.camera.left - spear.view.width
           : lvl.camera.right;
         spear.y = SPEAR_MARGIN + i * SPEAR_SPACING;
-        animateSpear(spear, direction, false);
+        animateSpear(spear, false);
       }
     }
+  };
+
+  function hideSpears () {
+    spears.forEach(function (spear) {
+      animateSpear(spear, true);
+    });
   };
 
   function getSpearPositions () {
     var spearPositions = [];
     var count = floor(difficulty * (SPEAR_SLOTS - 2)) + 1;
     for (var i = 0; i < SPEAR_SLOTS; i++) {
-      spearPositions[i] = i < count;
+      spearPositions[i] = gameOver ? true : i < count;
     }
     return lvl.util.shuffle(spearPositions);
   };
 
-  function animateSpear (spear, direction, destroy) {
+  function animateSpear (spear, destroy) {
+    var direction = (destroy ? -1 : 1) * (spear.view.flipX ? -1 : 1);
+    var easing = destroy ? lvl.animate.easeIn : lvl.animate.easeOut;
+    var length = gameOver ? spear.view.width : SPEAR_LENGTH;
     lvl.animate(spear)
-      .now({ x: spear.x - spear.view.width * direction }, 400)
+      .now({ x: spear.x - length * direction }, 400, easing)
       .then(function () { destroy && spear.destroy(); });
   };
 
   function onGameOver () {
-    if (!player) { return; }
+    if (gameOver) { return; }
     player.destroy();
-    player = null;
+    gameOver = true;
+    hideSpears();
+    spawnSpears(-1);
+    spawnSpears(1);
     lvl.setTimeout(function () {
-      // TODO: startGame moves into lvl?
-      lvl.reset();
-      startGame();
+      hideSpears();
+      lvl.setTimeout(function () {
+        // TODO: startGame moves into lvl?
+        lvl.reset();
+        startGame();
+      }, 500);
     }, 2000);
   };
 };

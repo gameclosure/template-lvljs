@@ -33,6 +33,7 @@ var Actor = exports = Class("Actor", function () {
     this.group && this.group.remove(this);
     backend.removeViewsFromActor(this);
     entityPool.release(this.entity);
+    physics.removeAllEventHandlersFromSubject(this);
   };
 
   // start one of the actor's sprite animations

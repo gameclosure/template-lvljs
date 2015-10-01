@@ -28,6 +28,21 @@ var Physics = Class("Physics", function () {
     }
   };
 
+  this.removeAllEventHandlersFromSubject = function (subject) {
+    for (var type in handlers) {
+      var handlersByType = handlers[type];
+      for (var uid in handlersByType) {
+        var handlerList = handlersByType[uid];
+        for (var i = 0; i < handlerList.length; i++) {
+          var handler = handlerList[i];
+          if (handler.subjectA === subject || handler.subjectB === subject) {
+            handler.unregister();
+          }
+        }
+      }
+    }
+  };
+
   // create a string shortcut to easily access events with certain objects
   this.createEventHandlerShortcut = function (shortcut, obj) {
     if (typeof shortcut !== 'string') {
