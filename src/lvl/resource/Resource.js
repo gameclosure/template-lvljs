@@ -44,6 +44,8 @@ var Resource = exports = Class("Resource", function () {
   function applyBackendDefaults () {
     if (this._type === 'image' || this._type === 'sprite') {
       this._opts = backend.applyDefaultImageOpts(this._opts);
+    } else if (this._type === 'imageText') {
+      this._opts = backend.applyDefaultImageTextOpts(this._opts);
     }
   };
 });

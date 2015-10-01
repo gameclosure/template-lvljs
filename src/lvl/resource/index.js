@@ -40,6 +40,12 @@ exports.loadParallaxFromJSON = function (fullPath) {
   return resource;
 };
 
+exports.loadImageTextFromJSON = function (fullPath) {
+  var resource = new Resource(fullPath, 'imageText');
+  resource.loadOptsFromJSONFullPath();
+  return resource;
+};
+
 exports.loadEmptyResource = function () {
   return new Resource();
 };

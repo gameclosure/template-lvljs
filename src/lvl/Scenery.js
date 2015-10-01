@@ -4,6 +4,7 @@ exports = Class("Scenery", function () {
     this.type = type;
   };
 
+  // TODO: remove this if we don't need it
   this.reset = function () {};
 
   this.add = function (resource, opts) {

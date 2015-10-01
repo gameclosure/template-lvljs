@@ -27,6 +27,7 @@ var DIFFICULTY_MAX = 1;
 var PARALLAX_URL = 'resources/config/dragonPongParallax.json';
 var PLAYER_URL = 'resources/config/dragonPongPlayer.json';
 var SPEAR_URL = 'resources/config/dragonPongSpear.json';
+var SCORE_URL = 'resources/config/dragonPongScore.json';
 
 function startGame () {
   // set letter-boxed viewport; TODO: get 3:4 aspect ratio art
@@ -35,6 +36,12 @@ function startGame () {
   // add background parallax
   var parallaxResource = lvl.resource.loadParallaxFromJSON(PARALLAX_URL);
   lvl.bg.add(parallaxResource);
+
+  // add score text to our UI
+  var scoreResource = lvl.resource.loadImageTextFromJSON(SCORE_URL);
+  var scoreText = lvl.ui.add(scoreResource);
+  var score = 0;
+  // scoreText.setText(score);
 
   // subscribe to player touch events
   lvl.input.on('touchstart', onTouchStart);
@@ -75,7 +82,6 @@ function startGame () {
     difficulty = min(DIFFICULTY_MAX, difficulty + DIFFICULTY_STEP);
     hideSpears();
     spawnSpears(newDir);
-
     // scoreText.setText(++score);
     // effects.squish(scoreText, { duration: 300, loop: false, scale: 3 });
   };

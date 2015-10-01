@@ -3,6 +3,7 @@ import AudioManager;
 import ui.View as View;
 import ui.ImageView as ImageView;
 import ui.SpriteView as SpriteView;
+import ui.ScoreView as ScoreView;
 import ui.ViewPool as ViewPool;
 import parallax.Parallax as Parallax;
 import ui.resource.loader as loader;
@@ -10,6 +11,7 @@ var imageMap = loader.getMap();
 
 var imageViewPool = new ViewPool({ ctor: ImageView });
 var spriteViewPool = new ViewPool({ ctor: SpriteView });
+var scoreViewPool = new ViewPool({ ctor: ScoreView });
 
 var DEFAULT_WIDTH = 576;
 var DEFAULT_HEIGHT = 1024;
@@ -137,6 +139,11 @@ exports.setCustomViewportDimensions = function (width, height, scale, clip) {
   }, this);
 };
 
+exports.addToUI = function (resource, opts) {
+  var view = exports.createViewFromResource(resource, uiView);
+  uiView.add(view, resource, opts);
+};
+
 exports.addToForeground = function (resource, opts) {
   var view = exports.createViewFromResource(resource, foregroundView);
   foregroundView.add(view, resource, opts);
@@ -145,6 +152,10 @@ exports.addToForeground = function (resource, opts) {
 exports.addToBackground = function (resource, opts) {
   var view = exports.createViewFromResource(resource, backgroundView);
   backgroundView.add(view, resource, opts);
+};
+
+exports.clearUI = function () {
+  uiView.reset();
 };
 
 exports.clearForeground = function () {
@@ -207,6 +218,16 @@ exports.createViewFromResource = function (resource, parent) {
       return image;
       break;
 
+    case 'imageText':
+      var imageText = scoreViewPool.obtainView(opts);
+      imageText._spacing = opts._spacing || 0;
+      imageText._horizontalAlign = opts.horizontalAlign || opts.textAlign || 'center';
+      imageText._verticalAlign = opts.verticalAlign || 'middle';
+      imageText.setCharacterData(opts.characterData);
+      imageText.__pool = scoreViewPool;
+      return imageText;
+      break;
+
     case 'parallax':
       return new Parallax({ parent: parent });
       break;
@@ -257,6 +278,21 @@ exports.applyDefaultImageOpts = function (opts) {
       applyDefaultImageDimensions(shape, view.image || view.url);
     }
   }
+  return opts;
+};
+
+exports.applyDefaultImageTextOpts = function (opts) {
+  var view = opts.view;
+  var characters = view && view.characters;
+  if (characters) {
+    characters = merge({}, characters);
+    for (var key in characters) {
+      characters[key] = {
+        image: characters[key]
+      };
+    }
+  }
+  opts.characterData = characters;
   return opts;
 };
 
@@ -408,10 +444,11 @@ var LayerView = Class(View, function () {
   };
 
   this.add = function (view, resource, opts) {
+    opts = opts || {};
     var type = resource.getType();
     if (type === 'parallax') {
       var config = resource.getViewConfig();
-      var section = (opts && opts.section) || this.type || 'background';
+      var section = opts.section || this.type || 'background';
       var layers = config[section];
       if (layers) {
         view.reset(layers);
@@ -502,15 +539,34 @@ var UIView = Class(View, function () {
 
   this.init = function (opts) {
     superProto.init.call(this, opts);
+
+    this._uiViews = [];
     this.reset();
   };
 
   this.reset = function () {
+    for (var i = this._uiViews.length - 1; i >= 0; i--) {
+      this.remove(this._uiViews[i]);
+    }
+
     // TODO: support mouse over and other events?
-    // TODO: this.removeAllSubviews() ... recycle into pools
     this.inputStartHandlers = [];
     this.inputMoveHandlers = [];
     this.inputStopHandlers = [];
+  };
+
+  this.add = function (view, resource, opts) {
+    this.addSubview(view);
+    this._uiViews.push(view);
+  };
+
+  this.remove = function (view) {
+    var index = this._uiViews.indexOf(view);
+    if (index >= 0) {
+      view.removeFromSuperview();
+      view.__pool.releaseView(view);
+      this._uiViews.splice(index, 1);
+    }
   };
 
   this.onInputStart = function (startEvent, startPoint) {
