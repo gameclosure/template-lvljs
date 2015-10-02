@@ -233,7 +233,7 @@ exports.createViewFromResource = function (resource, parent) {
 
     case 'imageText':
       var imageText = scoreViewPool.obtainView(opts);
-      imageText._spacing = opts._spacing || 0;
+      imageText._spacing = opts.spacing || 0;
       imageText._horizontalAlign = opts.horizontalAlign || opts.textAlign || 'center';
       imageText._verticalAlign = opts.verticalAlign || 'middle';
       imageText.setCharacterData(opts.characterData);
@@ -571,6 +571,37 @@ var UIView = Class(View, function () {
   this.add = function (view, resource, opts) {
     this.addSubview(view);
     this._uiViews.push(view);
+
+    // TODO: differentiate between TextView and ScoreView alignment props?
+    switch (opts.horizontalAlign || opts.hAlign) {
+      case 'left':
+        view.style.x = 0;
+        break;
+
+      case 'center':
+      case 'middle':
+        view.style.x = (this.style.width - view.style.width) / 2;
+        break;
+
+      case 'right':
+        view.style.x = this.style.width - view.style.width;
+        break;
+    }
+
+    switch (opts.verticalAlign || opts.vAlign) {
+      case 'top':
+        view.style.y = 0;
+        break;
+
+      case 'center':
+      case 'middle':
+        view.style.y = (this.style.height - view.style.height) / 2;
+        break;
+
+      case 'bottom':
+        view.style.y = this.style.height - view.style.height;
+        break;
+    }
   };
 
   this.remove = function (view) {

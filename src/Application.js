@@ -39,7 +39,7 @@ function startGame () {
 
   // add score text to our UI
   var scoreResource = lvl.resource.loadImageTextFromJSON(SCORE_URL);
-  var scoreText = lvl.ui.add(scoreResource);
+  var scoreText = lvl.ui.add(scoreResource, { hAlign: 'center', vAlign: 'top' });
   var score = 0;
   scoreText.setText(score);
 

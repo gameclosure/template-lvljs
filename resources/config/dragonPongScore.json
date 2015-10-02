@@ -4,7 +4,7 @@
     "height": 120,
     "anchorX": 250,
     "anchorY": 60,
-    "spacing": -7,
+    "spacing": -11,
     "characters": {
       "0": "resources/images/dragonpong/0.png",
       "1": "resources/images/dragonpong/1.png",
