@@ -9,9 +9,9 @@ import parallax.Parallax as Parallax;
 import ui.resource.loader as loader;
 var imageMap = loader.getMap();
 
-var imageViewPool = new ViewPool({ ctor: ImageView, initCount: 1 });
-var spriteViewPool = new ViewPool({ ctor: SpriteView, initCount: 1 });
-var scoreViewPool = new ViewPool({ ctor: ScoreView, initCount: 1 });
+var imageViewPool = new ViewPool({ ctor: ImageView });
+var spriteViewPool = new ViewPool({ ctor: SpriteView });
+var scoreViewPool = new ViewPool({ ctor: ScoreView });
 
 var DEFAULT_WIDTH = 576;
 var DEFAULT_HEIGHT = 1024;
@@ -139,9 +139,13 @@ exports.setCustomViewportDimensions = function (width, height, scale, clip) {
   }, this);
 };
 
-exports.addToUI = function (resource, opts) {
+exports.addToUI = function (proxy, resource, opts) {
   var view = exports.createViewFromResource(resource, uiView, opts);
   uiView.add(view, resource, opts);
+  proxy.__uid = view.uid;
+  proxy.update(view.style);
+  proxy.onPropertyGet(function (name) { return view.style[name]; });
+  proxy.onPropertySet(function (name, value) { view.style[name] = value; });
   return view.uid;
 };
 
@@ -167,8 +171,8 @@ exports.clearBackground = function () {
   backgroundView.reset();
 };
 
-exports.updateUI = function (wrapper, method, opts) {
-  var view = uiView.getViewByID(wrapper.uid);
+exports.updateUI = function (proxy, method, opts) {
+  var view = uiView.getViewByID(proxy.__uid);
   switch (method) {
     case 'setText':
       view.setText('' + opts.text || '');

@@ -1,3 +1,4 @@
+import .ViewProxy;
 
 var UI = Class("UI", function () {
   // TODO: remove this if we don't need it
@@ -7,8 +8,9 @@ var UI = Class("UI", function () {
   this.reset = function () {};
 
   this.add = function (resource, opts) {
-    var uid = backend.addToUI(resource, opts);
-    return new UIView(resource, uid, opts);
+    var proxy = new UIView(resource);
+    backend.addToUI(proxy, resource, opts);
+    return proxy;
   };
 
   this.clear = function () {
@@ -22,11 +24,13 @@ exports = new UI();
 
 
 // UIView Class API returned by lvl.ui.add()
-var UIView = Class("UIView", function () {
-  this.init = function (resource, uid, opts) {
-    this.uid = uid;
+var UIView = Class("UIView", ViewProxy, function () {
+  var superProto = ViewProxy.prototype;
+
+  this.init = function (resource) {
+    superProto.init.call(this);
+
     this.resource = resource;
-    // TODO: do we need opts here?
   };
 
   this.setText = function (text) {

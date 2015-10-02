@@ -142,16 +142,15 @@ function startGame () {
 
     // animate game over text and then reset the game
     var gameOverText = lvl.ui.add(gameOverResource, {
-      // TODO: this scale doesn't actually apply
       scale: 0,
       hAlign: 'center',
       vAlign: 'center'
     });
-    // TODO: this animate doesn't actually apply
     lvl.animate(gameOverText)
-      .now({ scale: 1.25 }, 2000, lvl.animate.easeOutBounce)
+      .now({ scale: 1.4 }, 800, lvl.animate.easeOutBounce)
+      .wait(1200)
       .then(hideSpears)
-      .then({ scale: 0 }, 500, lvl.animate.easeIn)
+      .then({ scale: 0 }, 500, lvl.animate.easeOut)
       .then(function () {
         // TODO: startGame moves into lvl?
         lvl.reset();
