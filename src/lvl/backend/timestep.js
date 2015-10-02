@@ -171,7 +171,7 @@ exports.updateUI = function (wrapper, method, opts) {
   var view = uiView.getViewByID(wrapper.uid);
   switch (method) {
     case 'setText':
-      view.setText(opts.text || '');
+      view.setText('' + opts.text || '');
       break;
 
     default:
