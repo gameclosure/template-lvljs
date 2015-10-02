@@ -28,6 +28,7 @@ var PARALLAX_URL = 'resources/config/dragonPongParallax.json';
 var PLAYER_URL = 'resources/config/dragonPongPlayer.json';
 var SPEAR_URL = 'resources/config/dragonPongSpear.json';
 var SCORE_URL = 'resources/config/dragonPongScore.json';
+var GAME_OVER_URL = 'resources/config/dragonPongGameOver.json';
 
 function startGame () {
   // set letter-boxed viewport; TODO: get 3:4 aspect ratio art
@@ -42,6 +43,9 @@ function startGame () {
   var scoreText = lvl.ui.add(scoreResource, { hAlign: 'center', vAlign: 'top' });
   var score = 0;
   scoreText.setText(score);
+
+  // load game over art for later
+  var gameOverResource = lvl.resource.loadImageFromJSON(GAME_OVER_URL);
 
   // subscribe to player touch events
   lvl.input.on('touchstart', onTouchStart);
@@ -130,16 +134,28 @@ function startGame () {
     if (gameOver) { return; }
     player.destroy();
     gameOver = true;
+
+    // show spears on all sides
     hideSpears();
     spawnSpears(-1);
     spawnSpears(1);
-    lvl.setTimeout(function () {
-      hideSpears();
-      lvl.setTimeout(function () {
+
+    // animate game over text and then reset the game
+    var gameOverText = lvl.ui.add(gameOverResource, {
+      // TODO: this scale doesn't actually apply
+      scale: 0,
+      hAlign: 'center',
+      vAlign: 'center'
+    });
+    // TODO: this animate doesn't actually apply
+    lvl.animate(gameOverText)
+      .now({ scale: 1.25 }, 2000, lvl.animate.easeOutBounce)
+      .then(hideSpears)
+      .then({ scale: 0 }, 500, lvl.animate.easeIn)
+      .then(function () {
         // TODO: startGame moves into lvl?
         lvl.reset();
         startGame();
-      }, 500);
-    }, 2000);
+      });
   };
 };

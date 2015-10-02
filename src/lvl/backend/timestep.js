@@ -9,9 +9,9 @@ import parallax.Parallax as Parallax;
 import ui.resource.loader as loader;
 var imageMap = loader.getMap();
 
-var imageViewPool = new ViewPool({ ctor: ImageView });
-var spriteViewPool = new ViewPool({ ctor: SpriteView });
-var scoreViewPool = new ViewPool({ ctor: ScoreView });
+var imageViewPool = new ViewPool({ ctor: ImageView, initCount: 1 });
+var spriteViewPool = new ViewPool({ ctor: SpriteView, initCount: 1 });
+var scoreViewPool = new ViewPool({ ctor: ScoreView, initCount: 1 });
 
 var DEFAULT_WIDTH = 576;
 var DEFAULT_HEIGHT = 1024;
@@ -212,42 +212,60 @@ exports.stopSpriteAnimation = function (actor) {
 exports.createViewFromResource = function (resource, parent) {
   var type = resource.getType();
   var opts = resource.getViewConfig();
+  var view = null;
+
+  // default opts help reset pooled views
+  opts.x = opts.x || 0;
+  opts.y = opts.y || 0;
+  opts.zIndex = opts.zIndex || 0;
+  opts.r = opts.r || 0;
+  opts.offsetX = opts.offsetX || 0;
+  opts.offsetY = opts.offsetY || 0;
+  opts.anchorX = opts.anchorX || 0;
+  opts.anchorY = opts.anchorY || 0;
+  opts.width = opts.width || 0;
+  opts.height = opts.height || 0;
+  opts.scale = opts.scale !== undefined ? opts.scale : 1;
+  opts.scaleX = opts.scaleX !== undefined ? opts.scaleX : 1;
+  opts.scaleY = opts.scaleY !== undefined ? opts.scaleY : 1;
+  opts.opacity = opts.opacity !== undefined ? opts.opacity : 1;
+  opts.flipX = opts.flipX || false;
+  opts.flipY = opts.flipY || false;
+  opts.compositeOperation = opts.compositeOperation || '';
 
   switch (type) {
     case 'sprite':
       if (opts.loop === undefined) { opts.loop = true; }
       if (opts.autoStart === undefined) { opts.autoStart = true; }
       if (opts.frameRate === undefined) { opts.frameRate = 24; }
-      var sprite = spriteViewPool.obtainView(opts);
-      sprite.resetAllAnimations(opts);
-      sprite.__pool = spriteViewPool;
-      return sprite;
+      view = spriteViewPool.obtainView(opts);
+      view.resetAllAnimations(opts);
+      view.__pool = spriteViewPool;
       break;
 
     case 'image':
-      var image = imageViewPool.obtainView(opts);
-      image.setImage(opts.image || opts.url);
-      image.__pool = imageViewPool;
-      return image;
+      var view = imageViewPool.obtainView(opts);
+      view.setImage(opts.image || opts.url);
+      view.__pool = imageViewPool;
       break;
 
     case 'imageText':
-      var imageText = scoreViewPool.obtainView(opts);
-      imageText._spacing = opts.spacing || 0;
-      imageText._horizontalAlign = opts.horizontalAlign || opts.textAlign || 'center';
-      imageText._verticalAlign = opts.verticalAlign || 'middle';
-      imageText.setCharacterData(opts.characterData);
-      imageText.__pool = scoreViewPool;
-      return imageText;
+      var view = scoreViewPool.obtainView(opts);
+      view._spacing = opts.spacing || 0;
+      view._horizontalAlign = opts.horizontalAlign || opts.textAlign || 'center';
+      view._verticalAlign = opts.verticalAlign || 'middle';
+      view.setCharacterData(opts.characterData);
+      view.__pool = scoreViewPool;
       break;
 
     case 'parallax':
-      return new Parallax({ parent: parent });
+      view = new Parallax({ parent: parent });
       break;
 
     default:
       throw new Error("Invalid Resource Type for a View: " + type);
   }
+  return view;
 };
 
 exports.createViewForActor = function (actor) {

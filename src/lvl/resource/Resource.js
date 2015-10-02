@@ -8,23 +8,17 @@ var Resource = exports = Class("Resource", function () {
   };
 
   this.getOpts = function () {
-    return this._opts;
+    return JSON.parse(JSON.stringify(this._opts));
   };
 
   this.getShapeConfig = function () {
-    if (this._type === 'parallax') {
-      throw new Error("Resources of type parallax cannot have a shape!");
-    } else {
-      return this._opts.shape;
-    }
+    var opts = this._opts.shape || this._opts;
+    return JSON.parse(JSON.stringify(opts));
   };
 
   this.getViewConfig = function () {
-    if (this._type === 'parallax') {
-      return this._opts;
-    } else {
-      return this._opts.view;
-    }
+    var opts = this._opts.view || this._opts;
+    return JSON.parse(JSON.stringify(opts));
   };
 
   this.loadOptsFromJSONFullPath = function () {
