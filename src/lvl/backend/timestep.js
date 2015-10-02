@@ -140,18 +140,18 @@ exports.setCustomViewportDimensions = function (width, height, scale, clip) {
 };
 
 exports.addToUI = function (resource, opts) {
-  var view = exports.createViewFromResource(resource, uiView);
+  var view = exports.createViewFromResource(resource, uiView, opts);
   uiView.add(view, resource, opts);
   return view.uid;
 };
 
 exports.addToForeground = function (resource, opts) {
-  var view = exports.createViewFromResource(resource, foregroundView);
+  var view = exports.createViewFromResource(resource, foregroundView, opts);
   foregroundView.add(view, resource, opts);
 };
 
 exports.addToBackground = function (resource, opts) {
-  var view = exports.createViewFromResource(resource, backgroundView);
+  var view = exports.createViewFromResource(resource, backgroundView, opts);
   backgroundView.add(view, resource, opts);
 };
 
@@ -209,9 +209,9 @@ exports.stopSpriteAnimation = function (actor) {
   view.pause();
 };
 
-exports.createViewFromResource = function (resource, parent) {
+exports.createViewFromResource = function (resource, parent, opts) {
+  opts = merge(opts, resource.getViewConfig());
   var type = resource.getType();
-  var opts = resource.getViewConfig();
   var view = null;
 
   // default opts help reset pooled views
