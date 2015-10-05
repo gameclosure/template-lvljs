@@ -1,12 +1,13 @@
-import animate;
 
 // XXX: TODO: FIXME: COMPILER BUG
+jsio('import .effect', { context: { backend: backend } });
+jsio('import .effect');
 jsio('import .resource', { context: { backend: backend } });
 jsio('import .resource');
-jsio('import .sound', { context: { backend: backend } });
-jsio('import .sound');
 jsio('import .shape', { context: { backend: backend } });
 jsio('import .shape');
+jsio('import .sound', { context: { backend: backend } });
+jsio('import .sound');
 jsio('import .util', { context: { backend: backend } });
 jsio('import .util');
 jsio('import .Actor', { context: { backend: backend } });
@@ -33,9 +34,11 @@ var Level = Class("Level", function () {
     lvl = this;
 
     // attach library modules
+    this.animate = effect.animate;
+    this.effect = effect;
     this.resource = resource;
-    this.sound = sound;
     this.shape = shape;
+    this.sound = sound;
     this.util = util;
 
     // attach special class instances and singletons
@@ -112,11 +115,6 @@ var Level = Class("Level", function () {
   this.addParallax = function (resource) {
     throw new Error("TODO");
   };
-
-  // TODO: devkit should limit global tick to ~100 ms max! BIG TICKS BREAK STUFF
-  // TODO: track and clear all animations on reset?
-  // TODO: Object.defineProp animatableProperties on classes like camera
-  this.animate = animate;
 
   this.setTimeout = function (callback, duration) {
     var timer = new EventTimer(callback, duration, 'timeout');
