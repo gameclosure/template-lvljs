@@ -67,6 +67,8 @@ var Camera = Class("Camera", function () {
     this.panAccelerationY = 1000;
     this.zoomAcceleration = 1;
 
+    // TODO: elasticity / easing when camera reaches destination
+
     // private camera properties
     lastX = this.x;
     lastY = this.y;
@@ -323,29 +325,36 @@ var Camera = Class("Camera", function () {
       zoomVelocity = min(zoomVelocity + secs * this.zoomAcceleration, this.maxZoomVelocity);
     }
 
-    // finally, update camera position and zoom
-    this.x += secs * panVelocityX;
-    this.y += secs * panVelocityY;
-    this.zoom += secs * zoomVelocity * this.zoom;
+    var x = this.x + secs * panVelocityX;
+    var y = this.y + secs * panVelocityY;
+    var z = this.zoom + secs * zoomVelocity * this.zoom;
 
     // if the camera overshoots, slow down!
-    if (dx > 0 && this.centerX >= followRect.centerX) {
-      panVelocityX *= 0.5;
-    } else if (dx < 0 && this.centerX <= followRect.centerX) {
-      panVelocityX *= 0.5;
+    if ((panVelocityX > 0 && followRect.centerX - this.centerX <= 0)
+      || (panVelocityX < 0 && followRect.centerX - this.centerX >= 0))
+    {
+      panVelocityX = 0;
+      x = this.x + dx;
     }
 
-    if (dy > 0 && this.centerY >= followRect.centerY) {
-      panVelocityY *= 0.5;
-    } else if (dy < 0 && this.centerY <= followRect.centerY) {
-      panVelocityY *= 0.5;
+    if ((panVelocityY > 0 && followRect.centerY - this.centerY <= 0)
+      || (panVelocityY < 0 && followRect.centerY - this.centerY >= 0))
+    {
+      panVelocityY = 0;
+      y = this.y + dy;
     }
 
-    if (dz > 0 && this.zoom >= zoom) {
-      zoomVelocity *= 0.5;
-    } else if (dz < 0 && this.zoom <= zoom) {
-      zoomVelocity *= 0.5;
+    if ((zoomVelocity > 0 && zoom - this.zoom <= 0)
+      || (zoomVelocity < 0 && zoom - this.zoom >= 0))
+    {
+      zoomVelocity = 0;
+      z = this.zoom + dz;
     }
+
+    // finally, update camera position and zoom
+    this.x = x;
+    this.y = y;
+    this.zoom = z;
   };
 
   // define camera viewport dimensions and allows letter-boxing with fixedAspectRatio

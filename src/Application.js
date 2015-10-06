@@ -122,6 +122,8 @@ function startGame () {
   };
 
   function animateSpear (spear, destroy) {
+    // TODO: rotate slighty on poke out
+    // TODO: add tiny-archer sfx
     var direction = (destroy ? -1 : 1) * (spear.view.flipX ? -1 : 1);
     var easing = destroy ? lvl.animate.easeIn : lvl.animate.easeOut;
     var length = gameOver ? spear.view.width : SPEAR_LENGTH;

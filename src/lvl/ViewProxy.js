@@ -3,6 +3,7 @@
  * ViewProxy
  * a wrapper class for backend views
  */
+// TODO: rename to View
 var ViewProxy = exports = Class("ViewProxy", function () {
   var ALLOWED_KEYS = {};
 

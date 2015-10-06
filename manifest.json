@@ -16,7 +16,8 @@
     "stagingDomain": "staging.example.com"
   },
   "supportedOrientations": [
-    "portrait"
+    "portrait",
+    "landscape"
   ],
   "title": "lvl.js Test"
 }

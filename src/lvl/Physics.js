@@ -107,6 +107,7 @@ function handleEventsByType (handlerList, type) {
 };
 
 function checkForEvent (actorA, actorB, handler, fnName) {
+  // TODO: comment this stuff it's confusing
   var a = actorA.entity || actorA;
   var b = actorB.entity || actorB;
   var aFn = a[fnName];
