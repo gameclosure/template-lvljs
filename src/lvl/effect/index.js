@@ -14,7 +14,7 @@ var keys = Object.keys(animate);
 for (var index in keys) {
   var key = keys[index];
   if (key.indexOf('Animator') === -1) {
-    exports[key] = animate[key];
+    exports.animate[key] = animate[key];
   }
 }
 
