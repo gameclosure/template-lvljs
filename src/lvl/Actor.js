@@ -17,6 +17,8 @@ backend.onTick(function (dt) {
   // entities expects pixels per millisecond; convert to pixels per second
   entityPool.update(dt / 1000);
 });
+// patch EntityModel update to Actor update
+var entityModelUpdate = EntityModel.prototype.update;
 
 var Actor = exports = Class("Actor", function () {
   this.init = function (resource, opts) {
@@ -24,6 +26,7 @@ var Actor = exports = Class("Actor", function () {
     this.uid = this.__class__ + uid++;
     this.resource = resource;
     this.entity = entityPool.obtain(opts);
+    this.entity.model.update = bind(this, updateActor);
     // TODO: backend supports multiple views per actor, but this API does not
     this.view = new ActorView(resource);
     backend.createViewForActor(this);
@@ -35,6 +38,16 @@ var Actor = exports = Class("Actor", function () {
     backend.removeViewsFromActor(this);
     entityPool.release(this.entity);
     physics.removeAllEventHandlersFromSubject(this);
+  };
+
+  // have this actor follow a target actor through the world
+  this.follow = function (target, opts) {
+    throw new Error("TODO");
+  };
+
+  // stop following current actor
+  this.stopFollowing = function() {
+    throw new Error("TODO");
   };
 
   // start one of the actor's sprite animations
@@ -142,6 +155,12 @@ var Actor = exports = Class("Actor", function () {
     get: function () { return this.entity.fixed; },
     set: function (value) { this.entity.fixed = value; }
   });
+
+  function updateActor (dt) {
+    entityModelUpdate.call(this.entity.model, dt);
+
+    // TODO: Actor update outside of entities?
+  };
 
   function applyDefaultsOpts (resource, opts) {
     opts = opts || {};
