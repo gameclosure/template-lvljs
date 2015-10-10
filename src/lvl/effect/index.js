@@ -103,7 +103,7 @@ registerAnimationEffect('shake', function (subject, opts, anim) {
 
 
 
-// rotate a view
+// rotate
 registerAnimationEffect('spin', function (subject, opts, anim) {
   var ttl = opts.duration;
   var ss = subject.style || subject;
@@ -114,21 +114,23 @@ registerAnimationEffect('spin', function (subject, opts, anim) {
 
 
 
-/*
-// make a view squish like jelly
-exports.squish = function (view, opts, anim) {
+// squish like jelly
+registerAnimationEffect('squish', function (subject, opts, anim) {
   var ttl = opts.duration;
   var dt = ttl / 4;
-  var vs = view.style;
-  var dsx = vs.scaleX * ((1 + 0.1 * opts.scale) - 1);
-  var dsy = vs.scaleY * ((1 + 0.1 * opts.scale) - 1);
+  var ss = subject.style || subject;
+  var dsx = ss.scaleX * ((1 + 0.1 * opts.magnitude) - 1);
+  var dsy = ss.scaleY * ((1 + 0.1 * opts.magnitude) - 1);
 
-  anim.then({ scaleX: vs.scaleX - dsx, scaleY: vs.scaleY + dsy }, dt, animate.easeOut)
-    .then({ scaleX: vs.scaleX, scaleY: vs.scaleY }, dt, animate.easeIn)
-    .then({ scaleX: vs.scaleX + dsx, scaleY: vs.scaleY - dsy }, dt, animate.easeOut)
-    .then({ scaleX: vs.scaleX, scaleY: vs.scaleY }, dt, animate.easeIn);
-};
+  anim.then({ scaleX: ss.scaleX - dsx, scaleY: ss.scaleY + dsy }, dt, animate.easeOut)
+    .then({ scaleX: ss.scaleX, scaleY: ss.scaleY }, dt, animate.easeIn)
+    .then({ scaleX: ss.scaleX + dsx, scaleY: ss.scaleY - dsy }, dt, animate.easeOut)
+    .then({ scaleX: ss.scaleX, scaleY: ss.scaleY }, dt, animate.easeIn);
+});
 
+
+
+/*
 // sway a view back and forth
 exports.sway = function (view, opts, anim) {
   var ttl = opts.duration;

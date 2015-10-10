@@ -87,7 +87,7 @@ function startGame () {
     hideSpears();
     spawnSpears(newDir);
     scoreText.setText(++score);
-    // effects.squish(scoreText, { duration: 300, loop: false, scale: 3 });
+    lvl.effect.squish(scoreText, { duration: 350, magnitude: 2 });
   };
 
   function spawnSpears (direction) {
