@@ -32,17 +32,23 @@ var viewScale;
  */
 
 // reset the backend state, recycle views etc
-exports.reset = function () {
+exports.reset = function (lvl) {
   viewX = 0;
   viewY = 0;
   viewWidth = isLandscape ? DEFAULT_HEIGHT : DEFAULT_WIDTH;
   viewHeight = isLandscape ? DEFAULT_WIDTH : DEFAULT_HEIGHT;
-  viewScale;
+  viewScale = 1;
 
   backgroundView.reset();
   levelView.reset();
   foregroundView.reset();
   uiView.reset();
+
+  attachProxyToView(lvl.root, rootView);
+  attachProxyToView(lvl.bg, backgroundView);
+  attachProxyToView(lvl.view, levelView);
+  attachProxyToView(lvl.fg, foregroundView);
+  attachProxyToView(lvl.ui, uiView);
 
   exports.setFullScreenViewportDimensions(viewWidth, viewHeight);
 };
@@ -142,10 +148,7 @@ exports.setCustomViewportDimensions = function (width, height, scale, clip) {
 exports.addToUI = function (proxy, resource, opts) {
   var view = exports.createViewFromResource(resource, uiView, opts);
   uiView.add(view, resource, opts);
-  proxy.__uid = view.uid;
-  proxy.update(view.style);
-  proxy.onPropertyGet(function (name) { return view.style[name]; });
-  proxy.onPropertySet(function (name, value) { view.style[name] = value; });
+  attachProxyToView(proxy, view);
   return view.uid;
 };
 
@@ -275,10 +278,7 @@ exports.createViewFromResource = function (resource, parent, opts) {
 exports.createViewForActor = function (actor) {
   var view = exports.createViewFromResource(actor.resource, levelView);
   setViewByID(view.uid, view);
-  actor.view.__uid = view.uid;
-  actor.view.update(view.style);
-  actor.view.onPropertyGet(function (name) { return view.style[name]; });
-  actor.view.onPropertySet(function (name, value) { view.style[name] = value; });
+  attachProxyToView(actor.view, view);
   exports.attachViewToActor(view, actor);
 };
 
@@ -727,6 +727,13 @@ var UIView = Class(View, function () {
 });
 
 
+
+// attach a timestep backend view to the proxy view API exposed to devs
+function attachProxyToView (proxy, view) {
+  proxy.__uid = view.uid;
+  proxy.onPropertyGet(function (name) { return view.style[name]; });
+  proxy.onPropertySet(function (name, value) { view.style[name] = value; });
+};
 
 // update the scenery and level views
 function forEachWorldView (fn, ctx) {

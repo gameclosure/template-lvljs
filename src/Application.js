@@ -134,8 +134,9 @@ function startGame () {
 
   function onGameOver () {
     if (gameOver) { return; }
-    player.destroy();
     gameOver = true;
+    player.destroy();
+    lvl.effect.shake(lvl.root);
 
     // show spears on all sides
     hideSpears();

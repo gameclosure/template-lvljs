@@ -1,5 +1,11 @@
 import animate;
 
+var PI = Math.PI;
+var TAU = 2 * PI;
+var sin = Math.sin;
+var cos = Math.cos;
+var random = Math.random;
+
 // TODO: singleton class to manage state?
 var animations = [];
 exports.reset = function () {
@@ -34,35 +40,7 @@ for (var index in keys) {
 
 
 
-// register special animation functions for common effects
-function registerAnimationEffect (name, fn) {
-  exports[name] = bind(exports, function (target, opts) {
-    // default opts
-    opts = opts || {};
-    opts.magnitude = opts.magnitude !== undefined ? opts.magnitude : 1;
-    opts.duration = opts.duration !== undefined ? opts.duration : 1000;
-    opts.loop = opts.loop !== undefined ? opts.loop : true;
-    // prefer view over the target if it exists
-    var subject = target.view || target;
-    // prep animations and ensure safe completion if already active
-    var anim = this.animate(subject, name);
-    anim.interrupting = true;
-    anim.commit();
-    anim.interrupting = false;
-    fn.call(this, subject, opts, anim);
-    // clean up callback at the end of the animation function
-    anim.then(bind(this, function () {
-      // loop the animation function?
-      if (opts.loop && !anim.interrupting) {
-        anim.clear();
-        this[name](subject, opts);
-      }
-    }));
-    return anim;
-  });
-};
-
-// hover a view up and down
+// hover up and down
 registerAnimationEffect('hover', function (subject, opts, anim) {
   var ttl = opts.duration;
   var dt = ttl / 4;
@@ -77,20 +55,19 @@ registerAnimationEffect('hover', function (subject, opts, anim) {
 
 
 
-/*
-// shake a view rapidly, great for screen shaking like earthquakes
-exports.shake = function (view, opts, anim) {
+// shake rapidly, great for screen shaking like earthquakes
+registerAnimationEffect('shake', function (subject, opts, anim) {
   var ttl = opts.duration;
   var dt = ttl / 16;
-  var m = 1.75 * opts.scale;
-  var vs = view.style;
-  var x = vs.x;
-  var y = vs.y;
-  var s = vs.scale;
-  var ax = vs.anchorX;
-  var ay = vs.anchorY;
-  vs.anchorX = vs.width / 2;
-  vs.anchorY = vs.height / 2;
+  var m = 1.75 * opts.magnitude;
+  var ss = subject.style || subject;
+  var x = ss.offsetX;
+  var y = ss.offsetY;
+  var s = ss.scale;
+  var ax = ss.anchorX;
+  var ay = ss.anchorY;
+  ss.anchorX = ss.width / 2;
+  ss.anchorY = ss.height / 2;
   var r1 = TAU * random();
   var r2 = TAU * random();
   var r3 = TAU * random();
@@ -106,24 +83,26 @@ exports.shake = function (view, opts, anim) {
   var r13 = TAU * random();
   var r14 = TAU * random();
 
-  anim.then({ scale: s * (1 + 0.05 * m) }, dt, animate.easeIn)
-    .then({ x: x + 14 * m * cos(r1), y: y + 14 * m * sin(r1), scale: s * (1 + 0.046 * m) }, dt, animate.easeOut)
-    .then({ x: x + 13 * m * cos(r2), y: y + 13 * m * sin(r2), scale: s * (1 + 0.042 * m) }, dt, animate.easeInOut)
-    .then({ x: x + 12 * m * cos(r3), y: y + 12 * m * sin(r3), scale: s * (1 + 0.038 * m) }, dt, animate.easeInOut)
-    .then({ x: x + 11 * m * cos(r4), y: y + 11 * m * sin(r4), scale: s * (1 + 0.034 * m) }, dt, animate.easeInOut)
-    .then({ x: x + 10 * m * cos(r5), y: y + 10 * m * sin(r5), scale: s * (1 + 0.030 * m) }, dt, animate.easeInOut)
-    .then({ x: x + 9 * m * cos(r6), y: y + 9 * m * sin(r6), scale: s * (1 + 0.026 * m) }, dt, animate.easeInOut)
-    .then({ x: x + 8 * m * cos(r7), y: y + 8 * m * sin(r7), scale: s * (1 + 0.022 * m) }, dt, animate.easeInOut)
-    .then({ x: x + 7 * m * cos(r8), y: y + 7 * m * sin(r8), scale: s * (1 + 0.018 * m) }, dt, animate.easeInOut)
-    .then({ x: x + 6 * m * cos(r9), y: y + 6 * m * sin(r9), scale: s * (1 + 0.014 * m) }, dt, animate.easeInOut)
-    .then({ x: x + 5 * m * cos(r10), y: y + 5 * m * sin(r10), scale: s * (1 + 0.010 * m) }, dt, animate.easeInOut)
-    .then({ x: x + 4 * m * cos(r11), y: y + 4 * m * sin(r11), scale: s * (1 + 0.008 * m) }, dt, animate.easeInOut)
-    .then({ x: x + 3 * m * cos(r12), y: y + 3 * m * sin(r12), scale: s * (1 + 0.006 * m) }, dt, animate.easeInOut)
-    .then({ x: x + 2 * m * cos(r13), y: y + 2 * m * sin(r13), scale: s * (1 + 0.004 * m) }, dt, animate.easeInOut)
-    .then({ x: x + 1 * m * cos(r14), y: y + 1 * m * sin(r14), scale: s * (1 + 0.002 * m) }, dt, animate.easeInOut)
-    .then({ x: x, y: y, anchorX: ax, anchorY: ay, scale: s }, dt, animate.easeIn);
-};
+  anim.then({ scale: s * (1 + 0.05 * m) }, dt, this.animate.easeIn)
+    .then({ offsetX: x + 14 * m * cos(r1), offsetY: y + 14 * m * sin(r1), scale: s * (1 + 0.046 * m) }, dt, this.animate.easeOut)
+    .then({ offsetX: x + 13 * m * cos(r2), offsetY: y + 13 * m * sin(r2), scale: s * (1 + 0.042 * m) }, dt, this.animate.easeInOut)
+    .then({ offsetX: x + 12 * m * cos(r3), offsetY: y + 12 * m * sin(r3), scale: s * (1 + 0.038 * m) }, dt, this.animate.easeInOut)
+    .then({ offsetX: x + 11 * m * cos(r4), offsetY: y + 11 * m * sin(r4), scale: s * (1 + 0.034 * m) }, dt, this.animate.easeInOut)
+    .then({ offsetX: x + 10 * m * cos(r5), offsetY: y + 10 * m * sin(r5), scale: s * (1 + 0.030 * m) }, dt, this.animate.easeInOut)
+    .then({ offsetX: x + 9 * m * cos(r6), offsetY: y + 9 * m * sin(r6), scale: s * (1 + 0.026 * m) }, dt, this.animate.easeInOut)
+    .then({ offsetX: x + 8 * m * cos(r7), offsetY: y + 8 * m * sin(r7), scale: s * (1 + 0.022 * m) }, dt, this.animate.easeInOut)
+    .then({ offsetX: x + 7 * m * cos(r8), offsetY: y + 7 * m * sin(r8), scale: s * (1 + 0.018 * m) }, dt, this.animate.easeInOut)
+    .then({ offsetX: x + 6 * m * cos(r9), offsetY: y + 6 * m * sin(r9), scale: s * (1 + 0.014 * m) }, dt, this.animate.easeInOut)
+    .then({ offsetX: x + 5 * m * cos(r10), offsetY: y + 5 * m * sin(r10), scale: s * (1 + 0.010 * m) }, dt, this.animate.easeInOut)
+    .then({ offsetX: x + 4 * m * cos(r11), offsetY: y + 4 * m * sin(r11), scale: s * (1 + 0.008 * m) }, dt, this.animate.easeInOut)
+    .then({ offsetX: x + 3 * m * cos(r12), offsetY: y + 3 * m * sin(r12), scale: s * (1 + 0.006 * m) }, dt, this.animate.easeInOut)
+    .then({ offsetX: x + 2 * m * cos(r13), offsetY: y + 2 * m * sin(r13), scale: s * (1 + 0.004 * m) }, dt, this.animate.easeInOut)
+    .then({ offsetX: x + 1 * m * cos(r14), offsetY: y + 1 * m * sin(r14), scale: s * (1 + 0.002 * m) }, dt, this.animate.easeInOut)
+    .then({ offsetX: x, offsetY: y, anchorX: ax, anchorY: ay, scale: s }, dt, this.animate.easeIn);
+});
 
+
+/*
 // rotate a view
 exports.spin = function (view, opts, anim) {
   var ttl = opts.duration;
@@ -160,3 +139,32 @@ exports.sway = function (view, opts, anim) {
     .then({ x: vs.x }, dt, animate.easeIn);
 };
 */
+
+
+// register special animation functions for common effects
+function registerAnimationEffect (name, fn) {
+  exports[name] = bind(exports, function (target, opts) {
+    // default opts
+    opts = opts || {};
+    opts.magnitude = opts.magnitude !== undefined ? opts.magnitude : 1;
+    opts.duration = opts.duration !== undefined ? opts.duration : 1000;
+    opts.loop = opts.loop !== undefined ? opts.loop : false;
+    // prefer view over the target if it exists
+    var subject = target.view || target;
+    // prep animations and ensure safe completion if already active
+    var anim = this.animate(subject, name);
+    anim.interrupting = true;
+    anim.commit();
+    anim.interrupting = false;
+    fn.call(this, subject, opts, anim);
+    // clean up callback at the end of the animation function
+    anim.then(bind(this, function () {
+      // loop the animation function?
+      if (opts.loop && !anim.interrupting) {
+        anim.clear();
+        this[name](subject, opts);
+      }
+    }));
+    return anim;
+  });
+};

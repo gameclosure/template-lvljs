@@ -1,16 +1,20 @@
-import .ViewProxy;
+import .View;
 
-var UI = Class("UI", function () {
+var UI = Class("UI", View, function () {
+  var superProto = View.prototype;
+
   // TODO: remove this if we don't need it
-  this.init = function () {};
+  this.init = function () {
+    superProto.init.call(this);
+  };
 
   // TODO: remove this if we don't need it
   this.reset = function () {};
 
   this.add = function (resource, opts) {
-    var proxy = new UIView(resource);
-    backend.addToUI(proxy, resource, opts);
-    return proxy;
+    var view = new UIView(resource);
+    backend.addToUI(view, resource, opts);
+    return view;
   };
 
   this.clear = function () {
@@ -24,12 +28,11 @@ exports = new UI();
 
 
 // UIView Class API returned by lvl.ui.add()
-var UIView = Class("UIView", ViewProxy, function () {
-  var superProto = ViewProxy.prototype;
+var UIView = Class("UIView", View, function () {
+  var superProto = View.prototype;
 
   this.init = function (resource) {
     superProto.init.call(this);
-
     this.resource = resource;
   };
 

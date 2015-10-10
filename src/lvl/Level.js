@@ -1,5 +1,7 @@
 
 // XXX: TODO: FIXME: COMPILER BUG
+jsio('import .View', { context: { backend: backend } });
+jsio('import .View');
 jsio('import .effect', { context: { backend: backend } });
 jsio('import .effect');
 jsio('import .resource', { context: { backend: backend } });
@@ -42,7 +44,9 @@ var Level = Class("Level", function () {
     this.util = util;
 
     // attach special class instances and singletons
+    this.root = new RootView();
     this.bg = new Scenery('background');
+    this.view = new LevelView();
     this.fg = new Scenery('foreground');
     this.ui = UI;
     this.camera = Camera;
@@ -59,7 +63,7 @@ var Level = Class("Level", function () {
 
   this.reset = function () {
     // always reset backend first
-    backend.reset();
+    backend.reset(this);
 
     // reset all stateful classes
     this.bg.reset();
@@ -167,6 +171,14 @@ var Level = Class("Level", function () {
     lvl.bounds.screenLeft.width = w;
     lvl.bounds.screenLeft.height = 3 * h;
   };
+});
+
+var LevelView = Class("LevelView", View, function () {
+  // proxy for level view backend
+});
+
+var RootView = Class("RootView", View, function () {
+  // proxy for the root view backend
 });
 
 // singleton Level API

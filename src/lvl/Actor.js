@@ -1,5 +1,5 @@
 import .utils;
-import .ViewProxy;
+import .View;
 import entities.Entity as Entity;
 import entities.EntityModel as EntityModel;
 import entities.EntityPool as EntityPool;
@@ -185,13 +185,13 @@ var Actor = exports = Class("Actor", function () {
 
 
 
-var ActorView = Class("ActorView", ViewProxy, function () {
-  var superProto = ViewProxy.prototype;
+var ActorView = Class("ActorView", View, function () {
+  var superProto = View.prototype;
 
   this.init = function () {
     superProto.init.call(this);
 
-    // TODO: extend ViewProxy specifically for Actors if needed
+    // TODO: extend View specifically for Actors if needed
   };
 });
 

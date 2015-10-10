@@ -1,6 +1,10 @@
+import .View;
 
-exports = Class("Scenery", function () {
+exports = Class("Scenery", View, function () {
+  var superProto = View.prototype;
+
   this.init = function (type) {
+    superProto.init.call(this);
     this.type = type;
   };
 
