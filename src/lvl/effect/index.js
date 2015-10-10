@@ -1,12 +1,26 @@
 import animate;
 
+// TODO: singleton class to manage state?
+var animations = [];
+exports.reset = function () {
+  animations.forEach(function (anim) {
+    anim.clear();
+  });
+  animations.length = 0;
+};
+
+
+
 // lvl.animate
 exports.animate = function (subject, groupID) {
   // TODO: should refs to timestep animate exist only in the backend?
   // TODO: devkit should limit global tick to ~100 ms max! BIG TICKS BREAK STUFF
-  // TODO: track and clear all animations on reset?
   // TODO: Object.defineProp animatableProperties on classes like camera
-  return animate(subject, groupID);
+  var anim = animate(subject, groupID);
+  if (animations.indexOf(anim) === -1) {
+    animations.push(anim);
+  }
+  return anim;
 };
 
 // grab transitions and helpful functions from timestep animate
@@ -18,24 +32,52 @@ for (var index in keys) {
   }
 }
 
-// TODO: make the below effects work in lvl
 
-/*
 
-// hover a view up and down
-exports.hover = function (target, opts) {
-  var anim = exports.animate(target);
-  var ttl = opts.duration;
-  var dt = ttl / 4;
-  var dy = 6 * opts.scale;
-  var vs = view.style;
-
-  anim.then({ y: vs.y - dy }, dt, animate.easeOut)
-    .then({ y: vs.y }, dt, animate.easeIn)
-    .then({ y: vs.y + dy }, dt, animate.easeOut)
-    .then({ y: vs.y }, dt, animate.easeIn);
+// register special animation functions for common effects
+function registerAnimationEffect (name, fn) {
+  exports[name] = bind(exports, function (target, opts) {
+    // default opts
+    opts = opts || {};
+    opts.magnitude = opts.magnitude !== undefined ? opts.magnitude : 1;
+    opts.duration = opts.duration !== undefined ? opts.duration : 1000;
+    opts.loop = opts.loop !== undefined ? opts.loop : true;
+    // prefer view over the target if it exists
+    var subject = target.view || target;
+    // prep animations and ensure safe completion if already active
+    var anim = this.animate(subject, name);
+    anim.interrupting = true;
+    anim.commit();
+    anim.interrupting = false;
+    fn.call(this, subject, opts, anim);
+    // clean up callback at the end of the animation function
+    anim.then(bind(this, function () {
+      // loop the animation function?
+      if (opts.loop && !anim.interrupting) {
+        anim.clear();
+        this[name](subject, opts);
+      }
+    }));
+    return anim;
+  });
 };
 
+// hover a view up and down
+registerAnimationEffect('hover', function (subject, opts, anim) {
+  var ttl = opts.duration;
+  var dt = ttl / 4;
+  var dy = 6 * opts.magnitude;
+  var s = subject.style || subject;
+
+  anim.then({ offsetY: s.offsetY - dy }, dt, this.animate.easeOut)
+    .then({ offsetY: s.offsetY }, dt, this.animate.easeIn)
+    .then({ offsetY: s.offsetY + dy }, dt, this.animate.easeOut)
+    .then({ offsetY: s.offsetY }, dt, this.animate.easeIn);
+});
+
+
+
+/*
 // shake a view rapidly, great for screen shaking like earthquakes
 exports.shake = function (view, opts, anim) {
   var ttl = opts.duration;
@@ -117,5 +159,4 @@ exports.sway = function (view, opts, anim) {
     .then({ x: vs.x + dx }, dt, animate.easeOut)
     .then({ x: vs.x }, dt, animate.easeIn);
 };
-
 */

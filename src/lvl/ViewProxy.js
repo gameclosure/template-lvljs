@@ -31,10 +31,12 @@ var ViewProxy = exports = Class("ViewProxy", function () {
     return this._properties;
   };
 
-  makeProxy.call(this, 'zIndex');
-  makeProxy.call(this, 'r');
+  makeProxy.call(this, 'offsetX');
+  makeProxy.call(this, 'offsetY');
   makeProxy.call(this, 'anchorX');
   makeProxy.call(this, 'anchorY');
+  makeProxy.call(this, 'zIndex');
+  makeProxy.call(this, 'r');
   makeProxy.call(this, 'width');
   makeProxy.call(this, 'height');
   makeProxy.call(this, 'scale');
