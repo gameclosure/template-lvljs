@@ -109,7 +109,7 @@ registerAnimationEffect('spin', function (subject, opts, anim) {
   var ss = subject.style || subject;
   var dr = TAU * opts.magnitude;
 
-  anim.then({ r: ss.r + dr }, ttl, animate.linear);
+  anim.then({ r: ss.r + dr }, ttl, this.animate.linear);
 });
 
 
@@ -122,28 +122,27 @@ registerAnimationEffect('squish', function (subject, opts, anim) {
   var dsx = ss.scaleX * ((1 + 0.1 * opts.magnitude) - 1);
   var dsy = ss.scaleY * ((1 + 0.1 * opts.magnitude) - 1);
 
-  anim.then({ scaleX: ss.scaleX - dsx, scaleY: ss.scaleY + dsy }, dt, animate.easeOut)
-    .then({ scaleX: ss.scaleX, scaleY: ss.scaleY }, dt, animate.easeIn)
-    .then({ scaleX: ss.scaleX + dsx, scaleY: ss.scaleY - dsy }, dt, animate.easeOut)
-    .then({ scaleX: ss.scaleX, scaleY: ss.scaleY }, dt, animate.easeIn);
+  anim.then({ scaleX: ss.scaleX - dsx, scaleY: ss.scaleY + dsy }, dt, this.animate.easeOut)
+    .then({ scaleX: ss.scaleX, scaleY: ss.scaleY }, dt, this.animate.easeIn)
+    .then({ scaleX: ss.scaleX + dsx, scaleY: ss.scaleY - dsy }, dt, this.animate.easeOut)
+    .then({ scaleX: ss.scaleX, scaleY: ss.scaleY }, dt, this.animate.easeIn);
 });
 
 
 
-/*
-// sway a view back and forth
-exports.sway = function (view, opts, anim) {
+// sway back and forth (horizontal hover)
+registerAnimationEffect('sway', function (subject, opts, anim) {
   var ttl = opts.duration;
   var dt = ttl / 4;
-  var dx = 6 * opts.scale;
-  var vs = view.style;
+  var dx = 6 * opts.magnitude;
+  var ss = subject.style || subject;
 
-  anim.then({ x: vs.x - dx }, dt, animate.easeOut)
-    .then({ x: vs.x }, dt, animate.easeIn)
-    .then({ x: vs.x + dx }, dt, animate.easeOut)
-    .then({ x: vs.x }, dt, animate.easeIn);
-};
-*/
+  anim.then({ offsetX: ss.offsetX - dx }, dt, this.animate.easeOut)
+    .then({ offsetX: ss.offsetX }, dt, this.animate.easeIn)
+    .then({ offsetX: ss.offsetX + dx }, dt, this.animate.easeOut)
+    .then({ offsetX: ss.offsetX }, dt, this.animate.easeIn);
+});
+
 
 
 // register special animation functions for common effects
