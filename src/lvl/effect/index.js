@@ -45,12 +45,12 @@ registerAnimationEffect('hover', function (subject, opts, anim) {
   var ttl = opts.duration;
   var dt = ttl / 4;
   var dy = 6 * opts.magnitude;
-  var s = subject.style || subject;
+  var ss = subject.style || subject;
 
-  anim.then({ offsetY: s.offsetY - dy }, dt, this.animate.easeOut)
-    .then({ offsetY: s.offsetY }, dt, this.animate.easeIn)
-    .then({ offsetY: s.offsetY + dy }, dt, this.animate.easeOut)
-    .then({ offsetY: s.offsetY }, dt, this.animate.easeIn);
+  anim.then({ offsetY: ss.offsetY - dy }, dt, this.animate.easeOut)
+    .then({ offsetY: ss.offsetY }, dt, this.animate.easeIn)
+    .then({ offsetY: ss.offsetY + dy }, dt, this.animate.easeOut)
+    .then({ offsetY: ss.offsetY }, dt, this.animate.easeIn);
 });
 
 
@@ -102,16 +102,19 @@ registerAnimationEffect('shake', function (subject, opts, anim) {
 });
 
 
-/*
+
 // rotate a view
-exports.spin = function (view, opts, anim) {
+registerAnimationEffect('spin', function (subject, opts, anim) {
   var ttl = opts.duration;
-  var vs = view.style;
-  var dr = TAU * opts.scale;
+  var ss = subject.style || subject;
+  var dr = TAU * opts.magnitude;
 
-  anim.then({ r: vs.r + dr }, ttl, animate.linear);
-};
+  anim.then({ r: ss.r + dr }, ttl, animate.linear);
+});
 
+
+
+/*
 // make a view squish like jelly
 exports.squish = function (view, opts, anim) {
   var ttl = opts.duration;

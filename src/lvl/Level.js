@@ -72,6 +72,7 @@ var Level = Class("Level", function () {
     this.camera.reset();
     this.input.reset();
     this.physics.reset();
+    this.effect.reset();
 
     // group cache
     this.groups = {};
