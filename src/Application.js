@@ -47,7 +47,6 @@ function startGame () {
   // load sounds and music
   var music = lvl.resource.loadMusic('resources/sounds/bgm_fever.mp3');
   lvl.sound.playMusic(music, { volume: 0.5 });
-
   // TODO: support multi-source sfx (sound manifest JSON)
   var flapSFX1 = lvl.resource.loadSound('resources/sounds/flap_a.mp3');
   var flapSFX2 = lvl.resource.loadSound('resources/sounds/flap_b.mp3');
@@ -107,7 +106,12 @@ function startGame () {
 
   function spawnSpears (direction) {
     var flipped = direction < 0;
-    var spearPositions = getSpearPositions();
+    var spearPositions = [];
+    var count = floor(difficulty * (SPEAR_SLOTS - 2)) + 1;
+    for (var i = 0; i < SPEAR_SLOTS; i++) {
+      spearPositions[i] = gameOver ? true : i < count;
+    }
+    lvl.util.shuffle(spearPositions);
     for (var i = 0; i < SPEAR_SLOTS; i++) {
       if (spearPositions[i]) {
         var spear = lvl.addActor(spearResource, { group: spears });
@@ -123,18 +127,7 @@ function startGame () {
   };
 
   function hideSpears () {
-    spears.forEach(function (spear) {
-      animateSpear(spear, true);
-    });
-  };
-
-  function getSpearPositions () {
-    var spearPositions = [];
-    var count = floor(difficulty * (SPEAR_SLOTS - 2)) + 1;
-    for (var i = 0; i < SPEAR_SLOTS; i++) {
-      spearPositions[i] = gameOver ? true : i < count;
-    }
-    return lvl.util.shuffle(spearPositions);
+    spears.forEach(function (spear) { animateSpear(spear, true); });
   };
 
   function animateSpear (spear, destroy) {
@@ -157,6 +150,7 @@ function startGame () {
 
   function onGameOver () {
     if (gameOver) { return; }
+    // TODO: death particle effect explosion
     gameOver = true;
     player.destroy();
     lvl.effect.shake(lvl.root);
