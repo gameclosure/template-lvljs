@@ -44,6 +44,20 @@ function startGame () {
   var score = 0;
   scoreText.setText(score);
 
+  // load sounds and music
+  var music = lvl.resource.loadMusic('resources/sounds/bgm_fever.mp3');
+  lvl.sound.playMusic(music, { volume: 0.5 });
+
+  // TODO: support multi-source sfx (sound manifest JSON)
+  var flapSFX1 = lvl.resource.loadSound('resources/sounds/flap_a.mp3');
+  var flapSFX2 = lvl.resource.loadSound('resources/sounds/flap_b.mp3');
+  var flapSFX3 = lvl.resource.loadSound('resources/sounds/flap_c.mp3');
+  var flapSFX = [flapSFX1, flapSFX2, flapSFX3];
+  var spearSFX1 = lvl.resource.loadSound('resources/sounds/hit_a.mp3');
+  var spearSFX2 = lvl.resource.loadSound('resources/sounds/hit_b.mp3');
+  var spearSFX3 = lvl.resource.loadSound('resources/sounds/hit_c.mp3');
+  var spearSFX = [spearSFX1, spearSFX2, spearSFX3];
+
   // load game over art for later
   var gameOverResource = lvl.resource.loadImageFromJSON(GAME_OVER_URL);
 
@@ -75,6 +89,7 @@ function startGame () {
     }
     player.vy = PLAYER_JUMP_VY;
     player.startSprite("fly");
+    lvl.sound.playSound(flapSFX[~~(random() * flapSFX.length)], { volume: 0.3 });
   };
 
   function onPlayerHitWall (player, wall) {
@@ -97,6 +112,7 @@ function startGame () {
       if (spearPositions[i]) {
         var spear = lvl.addActor(spearResource, { group: spears });
         spear.view.flipX = flipped;
+        spear.view.anchorX *= flipped ? -1 : 1;
         spear.x = flipped
           ? lvl.camera.left - spear.view.width
           : lvl.camera.right;
@@ -122,11 +138,18 @@ function startGame () {
   };
 
   function animateSpear (spear, destroy) {
-    // TODO: rotate slighty on poke out
-    // TODO: add tiny-archer sfx
     var direction = (destroy ? -1 : 1) * (spear.view.flipX ? -1 : 1);
     var easing = destroy ? lvl.animate.easeIn : lvl.animate.easeOut;
     var length = gameOver ? spear.view.width : SPEAR_LENGTH;
+    // shake the spear as if it's embedding into a wall
+    if (!destroy) {
+      lvl.sound.playSound(spearSFX[~~(random() * spearSFX.length)]);
+      lvl.effect.quiver(spear, {
+        magnitude: (0.175 + 0.075 * random()) * (random() < 0.5 ? 1 : -1),
+        duration: 500 + 250 * random()
+      });
+    }
+    // animate the spear onto the screen horizontally
     lvl.animate(spear)
       .now({ x: spear.x - length * direction }, 400, easing)
       .then(function () { destroy && spear.destroy(); });

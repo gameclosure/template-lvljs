@@ -4,6 +4,8 @@
     "offsetX": 50
   },
   "view": {
+    "anchorX": 464,
+    "anchorY": 20,
     "offsetY": -20,
     "url": "resources/images/dragonpong/spear.png"
   }

@@ -145,6 +145,26 @@ registerAnimationEffect('sway', function (subject, opts, anim) {
 
 
 
+// quiver, vibrate, like an arrow sticking into a wall
+registerAnimationEffect('quiver', function (subject, opts, anim) {
+  var ttl = opts.duration;
+  var dt = ttl / 8;
+  var dr = opts.magnitude * PI / 24;
+  var ss = subject.style || subject;
+
+  anim.then({ r: ss.r + dr }, dt / 2, this.animate.easeOut)
+    .then({ r: ss.r - 0.60 * dr }, dt, this.animate.easeInOut)
+    .then({ r: ss.r + 0.36 * dr }, dt, this.animate.easeInOut)
+    .then({ r: ss.r - 0.22 * dr }, dt, this.animate.easeInOut)
+    .then({ r: ss.r + 0.13 * dr }, dt, this.animate.easeInOut)
+    .then({ r: ss.r - 0.08 * dr }, dt, this.animate.easeInOut)
+    .then({ r: ss.r + 0.05 * dr }, dt, this.animate.easeInOut)
+    .then({ r: ss.r - 0.03 * dr }, dt, this.animate.easeInOut)
+    .then({ r: ss.r }, dt / 2, this.animate.easeIn);
+});
+
+
+
 // register special animation functions for common effects
 function registerAnimationEffect (name, fn) {
   exports[name] = bind(exports, function (target, opts) {

@@ -1,6 +1,7 @@
 
+var soundManager = backend.getAudioManager();
+
 exports.playMusic = function (resource, opts) {
-  var soundManager = backend.getAudioManager();
   var opts = opts || {};
 
   if (resource.getType() !== 'music') {
@@ -28,8 +29,6 @@ exports.playMusic = function (resource, opts) {
 };
 
 exports.playSound = function (resource, opts) {
-  var soundManager = backend.getAudioManager();
-
   var opts = opts || {};
 
   if (resource.getType() !== 'sound') {
