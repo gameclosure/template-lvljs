@@ -1,5 +1,6 @@
-
 var soundManager = backend.getAudioManager();
+
+var soundsCache = {};
 
 exports.playMusic = function (resource, opts) {
   var opts = opts || {};
@@ -8,14 +9,13 @@ exports.playMusic = function (resource, opts) {
     throw new Error("playMusic requires resource of type music");
   }
 
-  // TODO: soundManager.getSound throws a warning the first time through...
   var path = resource.getFullPath();
-  var music = soundManager.getSound(path);
+  var music = soundsCache[path];
   if (!music) {
       soundManager.addSound(path, merge({
         background: true
       }), resource.getOpts());
-      music = soundManager.getSound(path);
+      music = soundsCache[path] = soundManager.getSound(path);
   } else if (!music.isBackgroundMusic) {
     throw new Error("Audio file already loaded as sound; Audio files can only" +
                     "be played as either sound or music, but not both");
@@ -35,12 +35,11 @@ exports.playSound = function (resource, opts) {
     throw new Error("playSound requires resource of type sound");
   }
 
-  // TODO: soundManager.getSound throws a warning the first time through...
   var path = resource.getFullPath();
-  var sound = soundManager.getSound(path);
+  var sound = soundsCache[path];
   if (!sound) {
       soundManager.addSound(path, resource.getOpts());
-      sound = soundManager.getSound(path);
+      sound = soundsCache[path] = soundManager.getSound(path);
   } else if (sound.isBackgroundMusic) {
     throw new Error("Audio file already loaded as music; Audio files can only" +
                     "be played as either sound or music, but not both");

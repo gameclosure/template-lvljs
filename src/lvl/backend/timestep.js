@@ -33,6 +33,9 @@ var viewScale;
 
 // reset the backend state, recycle views etc
 exports.reset = function (lvl) {
+  rootView.style.layout = "";
+  rootView.style.inLayout = false;
+
   viewX = 0;
   viewY = 0;
   viewWidth = isLandscape ? DEFAULT_HEIGHT : DEFAULT_WIDTH;
