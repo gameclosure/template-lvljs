@@ -1,0 +1,14 @@
+{
+  "shape": {
+    "radius": 32
+  },
+  "view": {
+    "offsetX": -64,
+    "offsetY": -64,
+    "width": 128,
+    "height": 128,
+    "opacity": 0.9,
+    "image": "resources/images/pong/ball.png",
+    "compositeOperation": "lighter"
+  }
+}

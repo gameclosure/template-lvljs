@@ -8,14 +8,8 @@ exports = Class(GC.Application, function () {
     // TODO: move to lvl
     import .lvl;
 
-    // Sound API Tests
-    // var sfx = lvl.resource.loadSound('resources/sounds/v_fever_a.mp3');
-    // var music = lvl.resource.loadMusic('resources/sounds/game.mp3');
-    // lvl.sound.playSound(sfx, { volume: 0.5 + 0.5 * Math.random() });
-    // lvl.sound.playMusic(music);
-
     // Parallax API Tests
-    var parallax = lvl.resource.loadParallaxFromJSON('resources/config/spaceParallax.json');
+    var parallax = lvl.resource.loadParallaxFromJSON('resources/config/camera/parallax.json');
     lvl.bg.add(parallax);
 
     // Input API Tests
