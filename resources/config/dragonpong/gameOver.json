@@ -4,6 +4,6 @@
     "anchorY": 29,
     "width": 326,
     "height": 58,
-    "image": "resources/images/dragonpong/text_gameover.png"
+    "url": "resources/images/dragonpong/text_gameover.png"
   }
 }

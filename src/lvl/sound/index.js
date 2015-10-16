@@ -3,18 +3,21 @@ var soundManager = backend.getAudioManager();
 var soundsCache = {};
 
 exports.playMusic = function (resource, opts) {
-  var opts = opts || {};
   if (resource.getType() !== 'music') {
     throw new Error("playMusic requires resource of type music");
   }
 
+  opts = merge(opts, resource.getOpts());
   var path = resource.getFullPath();
+  if (!path) {
+    throw new Error("Music must have a valid url.");
+  }
+
   var sound = soundsCache[path];
   if (!sound) {
-      soundManager.addSound(path, merge({
-        background: true
-      }), resource.getOpts());
-      sound = soundsCache[path] = soundManager.getSound(path);
+    opts.background = true;
+    soundManager.addSound(path, opts);
+    sound = soundsCache[path] = soundManager.getSound(path);
   } else if (!sound.isBackgroundMusic) {
     throw new Error("Audio file already loaded as sound; Audio files can only" +
                     "be played as either sound or music, but not both");
@@ -28,16 +31,26 @@ exports.playMusic = function (resource, opts) {
 };
 
 exports.playSound = function (resource, opts) {
-  var opts = opts || {};
   if (resource.getType() !== 'sound') {
     throw new Error("playSound requires resource of type sound");
   }
 
+  opts = merge(opts, resource.getOpts());
   var path = resource.getFullPath();
+  if (!path) {
+    // sounds can have multiple sources (full paths)
+    var sources = opts.sources;
+    if (sources && sources.length) {
+      path = sources[0];
+    } else {
+      throw new Error("Sounds must have a valid url or sources list.");
+    }
+  }
+
   var sound = soundsCache[path];
   if (!sound) {
-      soundManager.addSound(path, resource.getOpts());
-      sound = soundsCache[path] = soundManager.getSound(path);
+    soundManager.addSound(path, opts);
+    sound = soundsCache[path] = soundManager.getSound(path);
   } else if (sound.isBackgroundMusic) {
     throw new Error("Audio file already loaded as music; Audio files can only" +
                     "be played as either sound or music, but not both");

@@ -10,10 +10,6 @@ exports.loadSound = function (fullPath, opts) {
   return new Resource(fullPath, 'sound', opts);
 };
 
-exports.loadAudioSetFromJSON = function (fullPath) {
-  throw new Error("TODO");
-};
-
 exports.loadImage = function (fullPath, opts) {
   throw new Error("TODO");
 };
@@ -46,6 +42,19 @@ exports.loadImageTextFromJSON = function (fullPath) {
   return resource;
 };
 
+// empty resources can be used for invisible Actors
 exports.loadEmptyResource = function () {
   return new Resource();
+};
+
+// bundles load multiple resources into an object map of resource keys
+exports.loadResourceBundleFromJSON = function (fullPath) {
+  var bundle = {};
+  var list = backend.readJSON(fullPath);
+  for (var key in list) {
+    var resource = list[key];
+    bundle[key] = new Resource(resource.url, resource.type, resource);
+    // TODO: if path ends with '.json', call loadOptsFromJSONFullPath ?
+  }
+  return bundle;
 };

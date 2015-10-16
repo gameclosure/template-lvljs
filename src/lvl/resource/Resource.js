@@ -1,10 +1,15 @@
 
 var Resource = exports = Class("Resource", function () {
   this.init = function (fullPath, type, opts) {
+    // _fullPath can be a string or an array of strings
     this._fullPath = fullPath || '';
     this._type = type || '';
     this._opts = opts || {};
     applyBackendDefaults.call(this);
+
+    if (!VALID_TYPES[this._type]) {
+      throw new Error("Invalid Resource Type:", this._type, this._fullPath);
+    }
   };
 
   this.getOpts = function () {
@@ -43,3 +48,14 @@ var Resource = exports = Class("Resource", function () {
     }
   };
 });
+
+
+
+var VALID_TYPES = exports.VALID_TYPES = {};
+VALID_TYPES[''] = true; // empty resource is valid
+VALID_TYPES['image'] = true;
+VALID_TYPES['imageText'] = true;
+VALID_TYPES['sprite'] = true;
+VALID_TYPES['parallax'] = true;
+VALID_TYPES['sound'] = true;
+VALID_TYPES['music'] = true;
