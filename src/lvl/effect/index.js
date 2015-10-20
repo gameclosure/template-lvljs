@@ -17,6 +17,58 @@ exports.reset = function () {
 
 
 
+// lvl.effect.emit
+exports.emit = function (resource, x, y, opts) {
+  var lvl = window.getLvlAPI();
+  opts = merge(opts, resource.getOpts());
+
+  if (resource.getType() !== 'particleEffect') {
+    throw new Error("lvl.effect.emit requires resource of type particleEffect");
+  }
+
+  if (typeof x !== 'number' || typeof y !== 'number') {
+    throw new Error("lvl.effect.emit requires valid x and y coordinates");
+  }
+
+  var layer = opts.layer;
+  if (layer) {
+    if (typeof layer === 'string') {
+      // if layer is a string, match it to a View layer
+      switch (layer) {
+        case 'bg':
+        case 'background':
+          opts.layer = lvl.bg;
+          break;
+        case 'lvl':
+        case 'level':
+          opts.layer = lvl.view;
+          break;
+        case 'fg':
+        case 'foreground':
+          opts.layer = lvl.fg;
+          break;
+        case 'ui':
+          opts.layer = lvl.ui;
+          break;
+        default:
+          throw new Error("lvl.effect.emit layer can be bg, lvl, fg, or ui");
+      }
+    } else if (layer === lvl) {
+      // if lvl itself was passed in, use its View
+      opts.layer = lvl.view;
+    } else if (layer.__class__ !== "View") {
+      throw new Error("lvl.effect.emit layer can be lvl, lvl.bg, lvl.fg, or lvl.ui");
+    }
+  } else {
+    // default to the primary layer
+    opts.layer = lvl.view;
+  }
+
+  backend.emitParticleEffect(resource, x, y, opts);
+};
+
+
+
 // lvl.animate
 exports.animate = function (subject, groupID) {
   // TODO: should refs to timestep animate exist only in the backend?

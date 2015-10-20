@@ -42,6 +42,12 @@ exports.loadImageTextFromJSON = function (fullPath) {
   return resource;
 };
 
+exports.loadParticleEffectFromJSON = function (fullPath) {
+  var resource = new Resource(fullPath, 'particleEffect');
+  resource.loadOptsFromJSONFullPath();
+  return resource;
+};
+
 // empty resources can be used for invisible Actors
 exports.loadEmptyResource = function () {
   return new Resource();

@@ -4,7 +4,7 @@ var soundsCache = {};
 
 exports.playMusic = function (resource, opts) {
   if (resource.getType() !== 'music') {
-    throw new Error("playMusic requires resource of type music");
+    throw new Error("lvl.sound.playMusic requires resource of type music");
   }
 
   opts = merge(opts, resource.getOpts());
@@ -32,7 +32,7 @@ exports.playMusic = function (resource, opts) {
 
 exports.playSound = function (resource, opts) {
   if (resource.getType() !== 'sound') {
-    throw new Error("playSound requires resource of type sound");
+    throw new Error("lvl.sound.playSound requires resource of type sound");
   }
 
   opts = merge(opts, resource.getOpts());

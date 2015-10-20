@@ -1,0 +1,38 @@
+{
+  "layer": "background",
+  "zIndex": 100,
+  "particles": [
+    {
+      "count": 1,
+      "x": {
+        "value": [0, 1],
+        "speed": [0, 1],
+        "accel": [0, 1]
+      },
+      "y": 0,
+      "r": 0,
+      "anchorX": 0,
+      "anchorY": 0,
+      "width": 1,
+      "height": 1,
+      "scale": 1,
+      "scaleX": 1,
+      "scaleY": 1,
+      "opacity": 1,
+
+      "ttl": [0, 1000],
+      "delay": [0, 1000],
+
+      "polar": false,
+      "originX": 0,
+      "originY": 0,
+      "theta": 0,
+      "radius": 0,
+
+      "flipX": false,
+      "flipY": false,
+      "image": ["", "", ""],
+      "compositeOperation": ""
+    }
+  ]
+}

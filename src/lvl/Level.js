@@ -30,10 +30,9 @@ jsio('import .Physics');
 
 
 var Level = Class("Level", function () {
-  var lvl;
-
   this.init = function () {
-    lvl = this;
+    // global API access
+    window.getLvlAPI = bind(this, function () { return this; });
 
     // attach library modules
     this.animate = effect.animate;
@@ -52,7 +51,6 @@ var Level = Class("Level", function () {
     this.camera = Camera;
     this.input = Input;
     this.physics = Physics;
-    Actor.setPhysics(this.physics);
 
     // reset lvl state
     this.reset();
@@ -63,7 +61,7 @@ var Level = Class("Level", function () {
 
   this.reset = function () {
     // always reset backend first
-    backend.reset(this);
+    backend.reset();
 
     // reset all stateful classes
     this.bg.reset();
@@ -147,6 +145,7 @@ var Level = Class("Level", function () {
   };
 
   function updateScreenBounds () {
+    var lvl = window.getLvlAPI();
     var x = lvl.camera.getViewportX();
     var y = lvl.camera.getViewportY();
     var w = lvl.camera.getViewportWidth();
@@ -259,10 +258,12 @@ var Group = Class("Group", function () {
   };
 
   this.collidesWith = function (target, handler) {
+    var lvl = window.getLvlAPI();
     lvl.physics.addCollisionHandler(this, target, handler);
   };
 
   this.cancelCollidesWith = function (target) {
+    var lvl = window.getLvlAPI();
     lvl.physics.removeCollisionHandler(this, target);
   };
 

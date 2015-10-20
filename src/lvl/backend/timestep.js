@@ -32,7 +32,8 @@ var viewScale;
  */
 
 // reset the backend state, recycle views etc
-exports.reset = function (lvl) {
+exports.reset = function () {
+  var lvl = window.getLvlAPI();
   rootView.style.layout = "";
   rootView.style.inLayout = false;
 
@@ -217,6 +218,33 @@ exports.stopSpriteAnimation = function (actor) {
   var id = actor.view.__uid;
   var view = getViewByID(id);
   view.pause();
+};
+
+exports.emitParticleEffect = function (resource, x, y, opts) {
+  var view = null;
+  var proxy = opts.layer;
+  switch (proxy.__uid) {
+    case backgroundView.uid:
+      view = backgroundView;
+      break;
+
+    case levelView.uid:
+      view = levelView;
+      break;
+
+    case foregroundView.uid:
+      view = foregroundView;
+      break;
+
+    case uiView.uid:
+      view = uiView;
+      break;
+
+    default:
+      throw new Error("TODO: attach effects to arbitrary actors via view proxy");
+  }
+
+  // TODO: ParticleEngine pool to run effects on different layers
 };
 
 exports.createViewFromResource = function (resource, parent, opts) {

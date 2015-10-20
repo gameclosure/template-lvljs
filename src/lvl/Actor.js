@@ -6,7 +6,6 @@ import entities.EntityPool as EntityPool;
 
 var uid = 0;
 var readOnlyProp = utils.addReadOnlyProperty;
-var physics;
 
 // Entity patches
 Entity.prototype.viewClass = null;
@@ -37,7 +36,8 @@ var Actor = exports = Class("Actor", function () {
     this.group && this.group.remove(this);
     backend.removeViewsFromActor(this);
     entityPool.release(this.entity);
-    physics.removeAllEventHandlersFromSubject(this);
+    var lvl = window.getLvlAPI();
+    lvl.physics.removeAllEventHandlersFromSubject(this);
   };
 
   // have this actor follow a target actor through the world
@@ -68,12 +68,14 @@ var Actor = exports = Class("Actor", function () {
 
   // this actor checks each tick to see if it collides with target
   this.collidesWith = function (target, handler) {
-    physics.addCollisionHandler(this, target, handler);
+    var lvl = window.getLvlAPI();
+    lvl.physics.addCollisionHandler(this, target, handler);
   };
 
   // a function to cancel collision handlers between actors
   this.cancelCollidesWith = function (target) {
-    physics.removeCollisionHandler(this, target);
+    var lvl = window.getLvlAPI();
+    lvl.physics.removeCollisionHandler(this, target);
   };
 
   // XXX: These are all just literally pasted from Entity for now.
@@ -194,8 +196,3 @@ var ActorView = Class("ActorView", View, function () {
     // TODO: extend View specifically for Actors if needed
   };
 });
-
-
-
-// TODO: global lvl API? other solution?
-exports.setPhysics = function (p) { physics = p; };

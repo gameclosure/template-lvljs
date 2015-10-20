@@ -57,5 +57,6 @@ VALID_TYPES['image'] = true;
 VALID_TYPES['imageText'] = true;
 VALID_TYPES['sprite'] = true;
 VALID_TYPES['parallax'] = true;
+VALID_TYPES['particleEffect'] = true;
 VALID_TYPES['sound'] = true;
 VALID_TYPES['music'] = true;
