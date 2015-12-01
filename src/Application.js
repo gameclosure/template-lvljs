@@ -30,6 +30,7 @@ var SPEAR_URL = 'resources/config/dragonpong/spear.json';
 var SCORE_URL = 'resources/config/dragonpong/score.json';
 var GAME_OVER_URL = 'resources/config/dragonpong/gameOver.json';
 var AUDIO_URL = 'resources/config/dragonpong/audio.json';
+var EXPLOSION_URL = 'resources/config/dragonpong/explosion.json';
 
 function startGame () {
   // set letter-boxed viewport; TODO: get 3:4 aspect ratio art
@@ -51,6 +52,7 @@ function startGame () {
 
   // load game over art for later
   var gameOverResource = lvl.resource.loadImageFromJSON(GAME_OVER_URL);
+  var explosionResource = lvl.resource.loadParticleEffectFromJSON(EXPLOSION_URL);
 
   // subscribe to player touch events
   lvl.input.on('touchstart', onTouchStart);
@@ -142,10 +144,12 @@ function startGame () {
 
   function onGameOver () {
     if (gameOver) { return; }
-    // TODO: death particle effect explosion
     gameOver = true;
-    player.destroy();
+
+    // player death explosion and screen shake
+    lvl.effect.emit(explosionResource, player.x, player.y);
     lvl.effect.shake(lvl.root);
+    player.destroy();
 
     // show spears on all sides
     hideSpears();

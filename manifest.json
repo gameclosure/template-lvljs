@@ -2,7 +2,7 @@
   "android": {},
   "appID": "79267d0b17a847058633316731992255",
   "dependencies": {
-    "devkit-core": "https://github.com/gameclosure/devkit-core#v4.0.1",
+    "devkit-core": "https://github.com/gameclosure/devkit-core#v4.1.0",
     "devkit-entities": "https://github.com/gameclosure/devkit-entities#v0.5.3",
     "devkit-parallax": "https://github.com/gameclosure/devkit-parallax#v0.3.5"
   },

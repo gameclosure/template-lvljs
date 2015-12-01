@@ -28,7 +28,11 @@ var Resource = exports = Class("Resource", function () {
 
   this.loadOptsFromJSONFullPath = function () {
     var newOpts = backend.readJSON(this._fullPath);
-    merge(this._opts, newOpts);
+    if (isArray(newOpts)) {
+      this._opts = newOpts;
+    } else {
+      merge(this._opts, newOpts);
+    }
     applyBackendDefaults.call(this);
   };
 

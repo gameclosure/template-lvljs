@@ -5,8 +5,9 @@ import ui.ImageView as ImageView;
 import ui.SpriteView as SpriteView;
 import ui.ScoreView as ScoreView;
 import ui.ViewPool as ViewPool;
-import parallax.Parallax as Parallax;
 import ui.resource.loader as loader;
+import ui.effectsEngine as effectsEngine;
+import parallax.Parallax as Parallax;
 var imageMap = loader.getMap();
 
 var imageViewPool = new ViewPool({ ctor: ImageView });
@@ -244,7 +245,11 @@ exports.emitParticleEffect = function (resource, x, y, opts) {
       throw new Error("TODO: attach effects to arbitrary actors via view proxy");
   }
 
-  // TODO: ParticleEngine pool to run effects on different layers
+  effectsEngine.emitEffectsFromData(resource.getOpts(), merge({
+    superview: view,
+    x: x,
+    y: y
+  }, opts));
 };
 
 exports.createViewFromResource = function (resource, parent, opts) {

@@ -1,0 +1,296 @@
+[
+  {
+    "continuous": false,
+    "count": 10,
+    "compositeOperation": "",
+    "flipX": false,
+    "flipY": false,
+    "filterType": "",
+    "theta": {
+      "range": [
+        0,
+        6.28
+      ]
+    },
+    "radius": {
+      "value": 0,
+      "delta": {
+        "range": [
+          0,
+          300
+        ],
+        "targets": [
+          {
+            "value": 0,
+            "delay": 0,
+            "duration": 1,
+            "easing": "linear"
+          }
+        ]
+      }
+    },
+    "x": {
+      "value": -50
+    },
+    "y": {
+      "value": -50
+    },
+    "r": {
+      "range": [
+        0,
+        6.28
+      ],
+      "delta": {
+        "range": [
+          -6,
+          6
+        ],
+        "targets": [
+          {
+            "value": 0,
+            "delay": 0,
+            "duration": 1,
+            "easing": "linear"
+          }
+        ]
+      }
+    },
+    "scale": {
+      "range": [
+        0.25,
+        2.5
+      ],
+      "targets": [
+        {
+          "value": 0,
+          "delay": 0,
+          "duration": 1,
+          "easing": "linear"
+        }
+      ]
+    },
+    "scaleX": {
+      "value": 1
+    },
+    "scaleY": {
+      "value": 1
+    },
+    "opacity": {
+      "range": [
+        0.25,
+        1
+      ],
+      "targets": [
+        {
+          "value": 0,
+          "delay": 0,
+          "duration": 1,
+          "easing": "linear"
+        }
+      ]
+    },
+    "height": {
+      "value": 100
+    },
+    "width": {
+      "value": 100
+    },
+    "anchorX": {
+      "value": 50
+    },
+    "anchorY": {
+      "value": 50
+    },
+    "ttl": {
+      "value": 750
+    },
+    "delay": {
+      "value": 0
+    },
+    "parameters": [],
+    "image": [
+      "resources/images/dragonpong/deathcloud1.png",
+      "resources/images/dragonpong/deathcloud2.png"
+    ]
+  },
+  {
+    "continuous": false,
+    "count": 10,
+    "compositeOperation": "",
+    "flipX": false,
+    "flipY": false,
+    "filterType": "",
+    "theta": {
+      "range": [
+        0,
+        6.28,
+        "count"
+      ]
+    },
+    "radius": {
+      "value": 0,
+      "delta": {
+        "range": [
+          0,
+          400
+        ],
+        "targets": [
+          {
+            "value": 0,
+            "delay": 0,
+            "duration": 1,
+            "easing": "linear"
+          }
+        ]
+      }
+    },
+    "x": {
+      "value": -18
+    },
+    "y": {
+      "value": -18,
+      "delta": {
+        "value": -350,
+        "delta": {
+          "value": 1600
+        }
+      }
+    },
+    "r": {
+      "value": 0
+    },
+    "scale": {
+      "range": [
+        0.25,
+        2.5
+      ],
+      "targets": [
+        {
+          "value": 0,
+          "delay": 0,
+          "duration": 1,
+          "easing": "linear"
+        }
+      ]
+    },
+    "scaleX": {
+      "value": 1
+    },
+    "scaleY": {
+      "value": 1
+    },
+    "opacity": {
+      "range": [
+        0.25,
+        1
+      ]
+    },
+    "height": {
+      "value": 36
+    },
+    "width": {
+      "value": 36
+    },
+    "anchorX": {
+      "value": 18
+    },
+    "anchorY": {
+      "value": 18
+    },
+    "ttl": {
+      "value": 600
+    },
+    "delay": {
+      "range": [
+        100,
+        200,
+        "count"
+      ]
+    },
+    "parameters": [
+      {
+        "id": "count",
+        "distributionFunction": "linear",
+        "distributionType": "index",
+        "resetInterval": 16,
+        "reverseReset": false
+      }
+    ],
+    "image": [
+      "resources/images/dragonpong/sparkle.png"
+    ]
+  },
+  {
+    "continuous": false,
+    "count": 1,
+    "compositeOperation": "lighter",
+    "flipX": false,
+    "flipY": false,
+    "filterType": "",
+    "x": {
+      "value": -203
+    },
+    "y": {
+      "value": -194.5
+    },
+    "r": {
+      "value": 0
+    },
+    "scale": {
+      "value": 0,
+      "targets": [
+        {
+          "value": 1,
+          "delay": 0.1,
+          "duration": 0.2,
+          "easing": "easeOut"
+        },
+        {
+          "value": 0,
+          "delay": 0,
+          "duration": 0.3,
+          "easing": "easeIn"
+        }
+      ]
+    },
+    "scaleX": {
+      "value": 1
+    },
+    "scaleY": {
+      "value": 1
+    },
+    "opacity": {
+      "value": 0.8,
+      "targets": [
+        {
+          "value": 0,
+          "delay": 0.3,
+          "duration": 0.3,
+          "easing": "easeOut"
+        }
+      ]
+    },
+    "height": {
+      "value": 389
+    },
+    "width": {
+      "value": 406
+    },
+    "anchorX": {
+      "value": 203
+    },
+    "anchorY": {
+      "value": 194.5
+    },
+    "ttl": {
+      "value": 750
+    },
+    "delay": {
+      "value": 0
+    },
+    "parameters": [],
+    "image": [
+      "resources/images/dragonpong/deathradial.png"
+    ]
+  }
+]
