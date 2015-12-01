@@ -29,6 +29,8 @@ var PLAYER_URL = 'resources/config/dragonpong/player.json';
 var SPEAR_URL = 'resources/config/dragonpong/spear.json';
 var SCORE_URL = 'resources/config/dragonpong/score.json';
 var GAME_OVER_URL = 'resources/config/dragonpong/gameOver.json';
+var AUDIO_URL = 'resources/config/dragonpong/audio.json';
+var EXPLOSION_URL = 'resources/config/dragonpong/explosion.json';
 
 function startGame () {
   // set letter-boxed viewport; TODO: get 3:4 aspect ratio art
@@ -45,20 +47,12 @@ function startGame () {
   scoreText.setText(score);
 
   // load sounds and music
-  var music = lvl.resource.loadMusic('resources/sounds/bgm_fever.mp3');
-  lvl.sound.playMusic(music, { volume: 0.5 });
-  // TODO: support multi-source sfx (sound manifest JSON)
-  var flapSFX1 = lvl.resource.loadSound('resources/sounds/flap_a.mp3');
-  var flapSFX2 = lvl.resource.loadSound('resources/sounds/flap_b.mp3');
-  var flapSFX3 = lvl.resource.loadSound('resources/sounds/flap_c.mp3');
-  var flapSFX = [flapSFX1, flapSFX2, flapSFX3];
-  var spearSFX1 = lvl.resource.loadSound('resources/sounds/hit_a.mp3');
-  var spearSFX2 = lvl.resource.loadSound('resources/sounds/hit_b.mp3');
-  var spearSFX3 = lvl.resource.loadSound('resources/sounds/hit_c.mp3');
-  var spearSFX = [spearSFX1, spearSFX2, spearSFX3];
+  var audio = lvl.resource.loadResourceBundleFromJSON(AUDIO_URL);
+  lvl.sound.playMusic(audio.music);
 
   // load game over art for later
   var gameOverResource = lvl.resource.loadImageFromJSON(GAME_OVER_URL);
+  var explosionResource = lvl.resource.loadParticleEffectFromJSON(EXPLOSION_URL);
 
   // subscribe to player touch events
   lvl.input.on('touchstart', onTouchStart);
@@ -88,7 +82,7 @@ function startGame () {
     }
     player.vy = PLAYER_JUMP_VY;
     player.startSprite("fly");
-    lvl.sound.playSound(flapSFX[~~(random() * flapSFX.length)], { volume: 0.3 });
+    lvl.sound.playSound(audio.wingFlap);
   };
 
   function onPlayerHitWall (player, wall) {
@@ -136,7 +130,7 @@ function startGame () {
     var length = gameOver ? spear.view.width : SPEAR_LENGTH;
     // shake the spear as if it's embedding into a wall
     if (!destroy) {
-      lvl.sound.playSound(spearSFX[~~(random() * spearSFX.length)]);
+      lvl.sound.playSound(audio.spearHit);
       lvl.effect.quiver(spear, {
         magnitude: (0.175 + 0.075 * random()) * (random() < 0.5 ? 1 : -1),
         duration: 500 + 250 * random()
@@ -150,10 +144,12 @@ function startGame () {
 
   function onGameOver () {
     if (gameOver) { return; }
-    // TODO: death particle effect explosion
     gameOver = true;
-    player.destroy();
+
+    // player death explosion and screen shake
+    lvl.effect.emit(explosionResource, player.x, player.y);
     lvl.effect.shake(lvl.root);
+    player.destroy();
 
     // show spears on all sides
     hideSpears();
