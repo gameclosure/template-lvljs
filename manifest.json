@@ -2,7 +2,7 @@
   "android": {},
   "appID": "79267d0b17a847058633316731992255",
   "dependencies": {
-    "devkit-core": "https://github.com/gameclosure/devkit-core#v4.1.0",
+    "devkit-core": "https://github.com/gameclosure/devkit-core#master",
     "devkit-entities": "https://github.com/gameclosure/devkit-entities#v0.5.3",
     "devkit-parallax": "https://github.com/gameclosure/devkit-parallax#v0.3.5"
   },
@@ -19,5 +19,5 @@
     "portrait",
     "landscape"
   ],
-  "title": "lvl.js Test"
+  "title": "lvl.js Template"
 }

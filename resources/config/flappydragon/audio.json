@@ -1,0 +1,25 @@
+{
+  "music": {
+    "type": "music",
+    "volume": 0.5,
+    "url": "resources/sounds/bgm_fever.mp3"
+  },
+  "wingFlap": {
+    "type": "sound",
+    "volume": 0.3,
+    "sources": [
+      "resources/sounds/flap_a.mp3",
+      "resources/sounds/flap_b.mp3",
+      "resources/sounds/flap_c.mp3"
+    ]
+  },
+  "spearHit": {
+    "type": "sound",
+    "volume": 1,
+    "sources": [
+      "resources/sounds/hit_a.mp3",
+      "resources/sounds/hit_b.mp3",
+      "resources/sounds/hit_c.mp3"
+    ]
+  }
+}

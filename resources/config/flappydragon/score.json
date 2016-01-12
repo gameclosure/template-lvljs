@@ -1,0 +1,21 @@
+{
+  "view": {
+    "width": 500,
+    "height": 120,
+    "anchorX": 250,
+    "anchorY": 60,
+    "spacing": -11,
+    "characters": {
+      "0": "resources/images/dragonpong/0.png",
+      "1": "resources/images/dragonpong/1.png",
+      "2": "resources/images/dragonpong/2.png",
+      "3": "resources/images/dragonpong/3.png",
+      "4": "resources/images/dragonpong/4.png",
+      "5": "resources/images/dragonpong/5.png",
+      "6": "resources/images/dragonpong/6.png",
+      "7": "resources/images/dragonpong/7.png",
+      "8": "resources/images/dragonpong/8.png",
+      "9": "resources/images/dragonpong/9.png"
+    }
+  }
+}

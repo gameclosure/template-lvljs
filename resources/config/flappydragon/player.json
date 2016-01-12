@@ -1,0 +1,15 @@
+{
+  "shape": {
+    "radius": 36
+  },
+  "view": {
+    "flipX": true,
+    "offsetX": -82,
+    "offsetY": -104,
+    "width": 163,
+    "height": 208,
+    "url": "resources/images/dragonpong/character",
+    "defaultAnimation": "idle",
+    "frameRate": 30
+  }
+}
