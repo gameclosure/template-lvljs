@@ -1,13 +1,11 @@
 {
   "android": {},
+  "ios": {},
   "appID": "79267d0b17a847058633316731992255",
   "dependencies": {
     "devkit-core": "git@github.com:gameclosure/devkit-core.git#master",
     "devkit-entities": "git@github.com:gameclosure/devkit-entities.git#v0.5.3",
     "devkit-parallax": "git@github.com:gameclosure/devkit-parallax.git#v0.3.5"
-  },
-  "ios": {
-    "bundleID": "co.weeby.lvljs"
   },
   "shortName": "lvljs",
   "studio": {
