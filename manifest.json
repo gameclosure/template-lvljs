@@ -2,9 +2,9 @@
   "android": {},
   "appID": "79267d0b17a847058633316731992255",
   "dependencies": {
-    "devkit-core": "https://github.com/gameclosure/devkit-core#master",
-    "devkit-entities": "https://github.com/gameclosure/devkit-entities#v0.5.3",
-    "devkit-parallax": "https://github.com/gameclosure/devkit-parallax#v0.3.5"
+    "devkit-core": "git@github.com:gameclosure/devkit-core.git#master",
+    "devkit-entities": "git@github.com:gameclosure/devkit-entities.git#v0.5.3",
+    "devkit-parallax": "git@github.com:gameclosure/devkit-parallax.git#v0.3.5"
   },
   "ios": {
     "bundleID": "co.weeby.lvljs"
